@@ -1,0 +1,147 @@
+Create a fullstack MVP web app called "Arsi – My Wedding".
+
+This is a DEMO project (no real AI APIs, no real PayPal).
+
+Tech Stack:
+Frontend:
+- React
+- Vite
+- Tailwind CSS
+
+Backend:
+- Node.js
+- Express
+
+Database:
+- SQLite or JSON files (simple local storage)
+
+Auth:
+- Simple email/password (local)
+
+Languages:
+Arabic + French labels.
+
+Project goal:
+Wedding planning platform for Morocco.
+
+--------------------------------------------------
+
+FEATURES:
+
+1. Landing Page
+- Moroccan wedding style UI
+- Buttons:
+  - Continue as Visitor
+  - Login / Register
+
+2. Categories Page
+Show cards with image sliders:
+
+- Traiteur
+- Wedding Halls
+- DJs
+- Cameraman
+
+Each card:
+- Multiple images
+- Name
+- Description
+- City
+- Price range
+- View details button
+
+3. Provider Details Page
+- Gallery
+- Description
+- Packages
+- Contact button
+
+4. Authentication
+Local auth stored in SQLite/JSON.
+
+After login redirect to Wedding Planner.
+
+5. AI Wedding Planner (Mock AI)
+
+Form:
+- Number of guests
+- Total budget (MAD)
+- City
+- Wedding style
+
+Logic:
+budgetPerGuest = totalBudget / guests
+
+Select providers from mock data based on price.
+
+Display:
+- Suggested Traiteur
+- Hall
+- DJ
+- Cameraman
+- Cost breakdown
+- Total price
+- Save plan
+
+NO OpenAI API.
+
+6. Guest Management System
+
+Allow groom to add guests:
+
+Fields:
+- Guest name
+- Type: Local / Foreign
+- Price per guest (set by groom)
+
+Show:
+- Guest list
+- Total guest income
+- Remaining wedding budget
+
+7. Payment System (Mock)
+
+Checkout page:
+
+Options:
+- Local payment (cash)
+- Fake PayPal button (just simulation)
+
+On payment:
+- Save transaction locally
+- Show confirmation
+
+NO real PayPal API.
+
+8. Admin Mock Data
+
+Create dummy providers for each category.
+
+9. UX
+
+- Mobile friendly
+- Arabic RTL support
+- French labels
+- Clean cards
+- Soft animations
+
+--------------------------------------------------
+
+IMPORTANT:
+
+- Use mock data only
+- No external API keys
+- Project must run with:
+
+npm install
+npm run dev
+
+Provide:
+- Full folder structure
+- Backend routes
+- Frontend pages
+- Dummy data
+- Instructions to run
+
+Project name:
+arsi-wedding-app
