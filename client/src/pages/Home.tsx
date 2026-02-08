@@ -12,9 +12,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative h-[80vh] flex items-center overflow-hidden">
         {/* Moroccan Pattern Overlay */}
-        <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-multiply pointer-events-none" />
+        <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-multiply pointer-events-none" />
         
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/20 z-10" />
+        {/* Dark wash gradient for readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-2xl">
@@ -23,10 +24,10 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl md:text-7xl font-display font-bold text-secondary mb-6 leading-tight">
+              <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 leading-tight">
                 Your Dream <span className="text-primary">Moroccan Wedding</span> Awaits
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 font-light">
+              <p className="text-xl text-gray-200 mb-8 font-light">
                 Plan your perfect "Arsi" with our AI-powered planner. From Neggafas to Traiteurs, discover the best providers in Morocco.
               </p>
               
@@ -37,7 +38,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/providers">
-                  <Button size="lg" variant="outline" className="border-secondary text-secondary hover:bg-secondary/5 font-semibold">
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-semibold backdrop-blur-sm">
                     Browse Providers
                   </Button>
                 </Link>
@@ -52,9 +53,8 @@ export default function Home() {
           <img 
             src="https://pixabay.com/get/gebcac335e42574a15f30055926cd3ae82ddb12a74962a67605350ae79336b8f9b5613bbbc0fca64fbdca4db85fa12fdc0f47b81ca5ed668b24ed7984111c67ba_1280.jpg" 
             alt="Moroccan Wedding Decor" 
-            className="w-full h-full object-cover mask-image-gradient"
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background" />
         </div>
       </section>
 

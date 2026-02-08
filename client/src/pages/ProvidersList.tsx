@@ -39,11 +39,11 @@ export default function ProvidersList() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Traiteur">Traiteur</SelectItem>
-                <SelectItem value="Hall">Hall</SelectItem>
-                <SelectItem value="DJ">DJ / Music</SelectItem>
-                <SelectItem value="Cameraman">Photography</SelectItem>
-                <SelectItem value="Neggafa">Neggafa</SelectItem>
+                <SelectItem value="traiteur">Traiteur</SelectItem>
+                <SelectItem value="hall">Hall</SelectItem>
+                <SelectItem value="dj">DJ / Music</SelectItem>
+                <SelectItem value="cameraman">Photography</SelectItem>
+                <SelectItem value="neggafa">Neggafa</SelectItem>
               </SelectContent>
             </Select>
           </div>
