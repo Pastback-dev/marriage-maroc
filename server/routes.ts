@@ -91,7 +91,7 @@ export async function registerRoutes(
     };
 
     const planData = {
-      userId: req.user!.id,
+      userId: (req.user as any).id,
       guestCount: input.guestCount,
       totalBudget: input.totalBudget,
       city: input.city,
@@ -107,27 +107,27 @@ export async function registerRoutes(
 
   app.get(api.plans.list.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send();
-    const plans = await storage.getPlans(req.user!.id);
+    const plans = await storage.getPlans((req.user as any).id);
     res.json(plans);
   });
 
   // Guests
   app.get(api.guests.list.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send();
-    const guests = await storage.getGuests(req.user!.id);
+    const guests = await storage.getGuests((req.user as any).id);
     res.json(guests);
   });
 
   app.post(api.guests.create.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send();
     const input = api.guests.create.input.parse(req.body);
-    const guest = await storage.createGuest({ ...input, userId: req.user!.id });
+    const guest = await storage.createGuest({ ...input, userId: (req.user as any).id });
     res.status(201).json(guest);
   });
 
   app.delete(api.guests.delete.path, async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send();
-    await storage.deleteGuest(Number(req.params.id), req.user!.id);
+    await storage.deleteGuest(Number(req.params.id), (req.user as any).id);
     res.status(200).send();
   });
 

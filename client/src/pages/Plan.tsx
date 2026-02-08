@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2, Sparkles, Receipt, Calendar, Users as UsersIcon } from "lucide-react";
 import { ProviderCard } from "@/components/ProviderCard";
+import { type PlanResponse } from "@shared/routes";
 
 const planSchema = z.object({
   guestCount: z.coerce.number().min(1, "At least 1 guest required"),
@@ -49,7 +50,7 @@ export default function Plan() {
   }
 
   // If user has a plan, show it. Otherwise show create form.
-  const currentPlan = plans?.[0];
+  const currentPlan = plans?.[0] as PlanResponse | undefined;
 
   return (
     <div className="min-h-screen bg-background pb-20">
