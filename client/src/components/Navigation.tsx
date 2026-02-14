@@ -7,23 +7,43 @@ import {
   Users, 
   LogOut, 
   Menu,
-  X 
+  X,
+  Languages
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useTranslation } from "react-i18next";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Navigation() {
   const { data: user } = useUser();
   const { mutate: logout } = useLogout();
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   const isActive = (path: string) => location === path;
   
   const navItems = [
-    { label: "My Plan", path: "/plan", icon: MapIcon },
-    { label: "Guests", path: "/guests", icon: Users },
-    { label: "Providers", path: "/providers", icon: Heart },
+    { label: t("nav_plan"), path: "/plan", icon: MapIcon },
+    { label: t("nav_guests"), path: "/guests", icon: Users },
+    { label: t("nav_providers"), path: "/providers", icon: Heart },
+  ];
+
+  const languages = [
+    { code: 'en', label: 'EN' },
+    { code: 'fr', label: 'FR' },
+    { code: 'ar', label: 'AR' },
   ];
 
   return (
@@ -38,6 +58,25 @@ export function Navigation() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Languages className="w-4 h-4" />
+                  {i18n.language.toUpperCase()}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {languages.map((lang) => (
+                  <DropdownMenuItem 
+                    key={lang.code}
+                    onClick={() => i18n.changeLanguage(lang.code)}
+                  >
+                    {lang.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {user ? (
               <>
                 {navItems.map((item) => (
@@ -71,11 +110,11 @@ export function Navigation() {
             ) : (
               <div className="flex items-center gap-4">
                 <Link href="/login">
-                  <Button variant="ghost" className="font-semibold text-secondary">Sign In</Button>
+                  <Button variant="ghost" className="font-semibold text-secondary">{t("sign_in")}</Button>
                 </Link>
                 <Link href="/register">
                   <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20">
-                    Get Started
+                    {t("get_started")}
                   </Button>
                 </Link>
               </div>

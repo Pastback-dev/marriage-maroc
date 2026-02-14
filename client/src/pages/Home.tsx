@@ -1,60 +1,114 @@
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { ArrowRight, Star, Sparkles, HeartHandshake } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { ArrowRight, Star, Sparkles, HeartHandshake, Users as UsersIcon, Receipt } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProviders } from "@/hooks/use-providers";
 
 export default function Home() {
+  const { t } = useTranslation();
+  const [, setLocation] = useLocation();
+  const [budget, setBudget] = useState<string>("");
+  const [guests, setGuests] = useState<string>("");
+  
+  const { data: providers } = useProviders();
+
+  const handleAiRecommendation = () => {
+    // In a real app, this would store the intent and redirect to plan page with prefilled data
+    setLocation("/plan");
+  };
+
   return (
     <div className="min-h-screen bg-background font-body">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative h-[80vh] flex items-center overflow-hidden">
-        {/* Moroccan Pattern Overlay */}
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden py-12">
         <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-multiply pointer-events-none" />
-        
-        {/* Dark wash gradient for readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="max-w-2xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
               <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 leading-tight">
-                Your Dream <span className="text-primary">Moroccan Wedding</span> Awaits
+                {t("hero_title").split(t("hero_span"))[0]}
+                <span className="text-primary">{t("hero_span")}</span>
+                {t("hero_title").split(t("hero_span"))[1]}
               </h1>
-              <p className="text-xl text-gray-200 mb-8 font-light">
-                Plan your perfect "Arsi" with our AI-powered planner. From Neggafas to Traiteurs, discover the best providers in Morocco.
+              <p className="text-xl text-gray-200 mb-8 font-light max-w-xl">
+                {t("hero_subtitle")}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/register">
                   <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all">
-                    Start Planning Free <ArrowRight className="ml-2 w-5 h-5" />
+                    {t("start_planning")} <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
                 <Link href="/providers">
                   <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-semibold backdrop-blur-sm">
-                    Browse Providers
+                    {t("browse_providers")}
                   </Button>
                 </Link>
               </div>
             </motion.div>
-          </div>
-        </div>
 
-        {/* Hero Image - Right Side */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 z-0 hidden lg:block">
-          {/* Traditional Moroccan Wedding Details */}
-          <img 
-            src="https://pixabay.com/get/gebcac335e42574a15f30055926cd3ae82ddb12a74962a67605350ae79336b8f9b5613bbbc0fca64fbdca4db85fa12fdc0f47b81ca5ed668b24ed7984111c67ba_1280.jpg" 
-            alt="Moroccan Wedding Decor" 
-            className="w-full h-full object-cover"
-          />
+            {/* AI Recommendation Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-primary/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-2xl font-display text-secondary">
+                    <Sparkles className="w-6 h-6 text-primary" />
+                    {t("ai_box_title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                      <UsersIcon className="w-4 h-4" /> {t("guest_count")}
+                    </label>
+                    <Input 
+                      type="number" 
+                      placeholder="e.g. 200"
+                      value={guests}
+                      onChange={(e) => setGuests(e.target.value)}
+                      className="bg-muted/50 border-none h-12 text-lg"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                      <Receipt className="w-4 h-4" /> {t("budget")}
+                    </label>
+                    <Input 
+                      type="number" 
+                      placeholder="e.g. 80000"
+                      value={budget}
+                      onChange={(e) => setBudget(e.target.value)}
+                      className="bg-muted/50 border-none h-12 text-lg"
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleAiRecommendation}
+                    className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary/90 text-white shadow-lg"
+                  >
+                    {t("get_recommendation")}
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -62,7 +116,7 @@ export default function Home() {
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary mb-4">Why Choose Arsi?</h2>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary mb-4">{t("why_choose")}</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">We combine traditional Moroccan elegance with modern planning tools to make your special day effortless.</p>
           </div>
 
@@ -70,18 +124,18 @@ export default function Home() {
             {[
               {
                 icon: Sparkles,
-                title: "AI-Powered Planning",
-                desc: "Tell us your budget and style, and we'll generate the perfect vendor package instantly."
+                title: t("ai_powered"),
+                desc: t("ai_desc")
               },
               {
                 icon: Star,
-                title: "Curated Providers",
-                desc: "Every Neggafa, Traiteur, and Hall is vetted for quality and authenticity."
+                title: t("curated"),
+                desc: t("curated_desc")
               },
               {
                 icon: HeartHandshake,
-                title: "Budget Management",
-                desc: "Track every Dirham. Manage guest lists and payments in one dashboard."
+                title: t("budget_mgmt"),
+                desc: t("budget_desc")
               }
             ].map((feature, idx) => (
               <motion.div 
