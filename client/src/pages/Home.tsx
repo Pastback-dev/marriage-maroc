@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProviders } from "@/hooks/use-providers";
 
-import heroWedding from "@/assets/hero-wedding.jpg";
+import heroWedding from "@/assets/hero-wedding.png";
 
 export default function Home() {
   const { t } = useTranslation();
