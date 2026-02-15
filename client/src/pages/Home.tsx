@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProviders } from "@/hooks/use-providers";
 
+import heroWedding from "@/assets/hero-wedding.jpg";
+
 export default function Home() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
@@ -28,7 +30,10 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden py-12">
-        <div className="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-multiply pointer-events-none" />
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-40 mix-blend-multiply pointer-events-none" 
+          style={{ backgroundImage: `url(${heroWedding})` }}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
