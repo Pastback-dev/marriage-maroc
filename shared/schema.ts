@@ -55,11 +55,30 @@ export const guests = pgTable("guests", {
   pricePerGuest: integer("price_per_guest").default(0),
 });
 
+// Mood Boards
+export const moodBoards = pgTable("mood_boards", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  title: text("title").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Mood Board Items (Inspiration Images)
+export const moodBoardItems = pgTable("mood_board_items", {
+  id: serial("id").primaryKey(),
+  boardId: integer("board_id").notNull(),
+  imageUrl: text("image_url").notNull(),
+  note: text("note"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertProviderSchema = createInsertSchema(providers).omit({ id: true });
 export const insertPlanSchema = createInsertSchema(plans).omit({ id: true, createdAt: true, selectedProviders: true, totalCost: true });
 export const insertGuestSchema = createInsertSchema(guests).omit({ id: true });
+export const insertMoodBoardSchema = createInsertSchema(moodBoards).omit({ id: true, createdAt: true });
+export const insertMoodBoardItemSchema = createInsertSchema(moodBoardItems).omit({ id: true, createdAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -68,6 +87,10 @@ export type Provider = typeof providers.$inferSelect;
 export type Plan = typeof plans.$inferSelect;
 export type Guest = typeof guests.$inferSelect;
 export type InsertGuest = z.infer<typeof insertGuestSchema>;
+export type MoodBoard = typeof moodBoards.$inferSelect;
+export type MoodBoardItem = typeof moodBoardItems.$inferSelect;
+export type InsertMoodBoard = z.infer<typeof insertMoodBoardSchema>;
+export type InsertMoodBoardItem = z.infer<typeof insertMoodBoardItemSchema>;
 
 // API Request/Response Types
 export type LoginRequest = Pick<InsertUser, "username" | "password">;
