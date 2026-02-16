@@ -3,7 +3,9 @@ import {
   users, providers, plans, guests,
   type User, type InsertUser,
   type Provider, type InsertUser as InsertProvider, // Alias for consistency if needed, but schema uses createInsertSchema(providers)
-  type Plan, type Guest, type InsertGuest
+  type Plan, type Guest, type InsertGuest,
+  moodBoards, moodBoardItems,
+  type MoodBoard, type MoodBoardItem, type InsertMoodBoard, type InsertMoodBoardItem
 } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -32,6 +34,14 @@ export interface IStorage {
   getGuests(userId: number): Promise<Guest[]>;
   createGuest(guest: InsertGuest & { userId: number }): Promise<Guest>;
   deleteGuest(id: number, userId: number): Promise<void>;
+
+  // Mood Boards
+  getMoodBoards(userId: number): Promise<MoodBoard[]>;
+  getMoodBoard(id: number): Promise<MoodBoard | undefined>;
+  createMoodBoard(board: InsertMoodBoard & { userId: number }): Promise<MoodBoard>;
+  getMoodBoardItems(boardId: number): Promise<MoodBoardItem[]>;
+  addMoodBoardItem(item: InsertMoodBoardItem): Promise<MoodBoardItem>;
+  deleteMoodBoardItem(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -165,6 +175,34 @@ export class DatabaseStorage implements IStorage {
 
   async deleteGuest(id: number, userId: number): Promise<void> {
     await db.delete(guests).where(and(eq(guests.id, id), eq(guests.userId, userId)));
+  }
+
+  // Mood Boards
+  async getMoodBoards(userId: number): Promise<MoodBoard[]> {
+    return await db.select().from(moodBoards).where(eq(moodBoards.userId, userId));
+  }
+
+  async getMoodBoard(id: number): Promise<MoodBoard | undefined> {
+    const [board] = await db.select().from(moodBoards).where(eq(moodBoards.id, id));
+    return board;
+  }
+
+  async createMoodBoard(board: InsertMoodBoard & { userId: number }): Promise<MoodBoard> {
+    const [newBoard] = await db.insert(moodBoards).values(board).returning();
+    return newBoard;
+  }
+
+  async getMoodBoardItems(boardId: number): Promise<MoodBoardItem[]> {
+    return await db.select().from(moodBoardItems).where(eq(moodBoardItems.boardId, boardId));
+  }
+
+  async addMoodBoardItem(item: InsertMoodBoardItem): Promise<MoodBoardItem> {
+    const [newItem] = await db.insert(moodBoardItems).values(item).returning();
+    return newItem;
+  }
+
+  async deleteMoodBoardItem(id: number): Promise<void> {
+    await db.delete(moodBoardItems).where(eq(moodBoardItems.id, id));
   }
 }
 

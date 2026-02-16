@@ -9,6 +9,7 @@ import AuthPage from "@/pages/Auth";
 import Plan from "@/pages/Plan";
 import Guests from "@/pages/Guests";
 import ProvidersList from "@/pages/ProvidersList";
+import MoodBoard from "@/pages/MoodBoard";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/plan" component={Plan} />
       <Route path="/guests" component={Guests} />
       <Route path="/providers" component={ProvidersList} />
+      <Route path="/moodboard" component={MoodBoard} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

@@ -138,5 +138,36 @@ export async function registerRoutes(
     res.json({ success: true, message: "Transaction saved successfully (Mock)" });
   });
 
+  // Mood Boards
+  app.get("/api/moodboards", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const boards = await storage.getMoodBoards((req.user as any).id);
+    res.json(boards);
+  });
+
+  app.post("/api/moodboards", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const board = await storage.createMoodBoard({ ...req.body, userId: (req.user as any).id });
+    res.status(201).json(board);
+  });
+
+  app.get("/api/moodboards/:id/items", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const items = await storage.getMoodBoardItems(Number(req.params.id));
+    res.json(items);
+  });
+
+  app.post("/api/moodboards/:id/items", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const item = await storage.addMoodBoardItem({ ...req.body, boardId: Number(req.params.id) });
+    res.status(201).json(item);
+  });
+
+  app.delete("/api/moodboard-items/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    await storage.deleteMoodBoardItem(Number(req.params.id));
+    res.status(200).send();
+  });
+
   return httpServer;
 }

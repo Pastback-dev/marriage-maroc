@@ -6,9 +6,10 @@ import {
   Map as MapIcon, 
   Users, 
   LogOut, 
-  Menu,
+  Menu, 
   X,
-  Languages
+  Languages,
+  Layout
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -38,6 +39,7 @@ export function Navigation() {
     { label: t("nav_plan"), path: "/plan", icon: MapIcon },
     { label: t("nav_guests"), path: "/guests", icon: Users },
     { label: t("nav_providers"), path: "/providers", icon: Heart },
+    { label: "Mood Board", path: "/moodboard", icon: Layout },
   ];
 
   const languages = [
