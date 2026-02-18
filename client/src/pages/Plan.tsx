@@ -30,9 +30,9 @@ export default function Plan() {
   const form = useForm<PlanFormValues>({
     resolver: zodResolver(planSchema),
     defaultValues: {
-      guestCount: 100,
-      totalBudget: 50000,
-      city: "Casablanca",
+      guestCount: parseInt(new URLSearchParams(window.location.search).get("guests") || "100"),
+      totalBudget: parseInt(new URLSearchParams(window.location.search).get("budget") || "50000"),
+      city: new URLSearchParams(window.location.search).get("city") || "Casablanca",
       weddingStyle: "Traditional",
     },
   });

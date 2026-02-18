@@ -2,11 +2,15 @@ import { ArrowRight, Star, Sparkles, HeartHandshake, Users as UsersIcon, Receipt
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { Link, useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProviders } from "@/hooks/use-providers";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { Navigation } from "@/components/Navigation";
+import heroWedding from "@/assets/hero-wedding.jpg";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -18,6 +22,15 @@ export default function Home() {
   
   const { data: providers } = useProviders();
 
+  const cities = [
+    { id: "Casablanca", name: t("city_casablanca") },
+    { id: "Rabat", name: t("city_rabat") },
+    { id: "Marrakech", name: t("city_marrakech") },
+    { id: "Fes", name: t("city_fes") },
+    { id: "Tangier", name: t("city_tangier") },
+    { id: "Agadir", name: t("city_agadir") },
+  ];
+
   const handleAiRecommendation = () => {
     if (!city) {
       toast({
@@ -27,7 +40,6 @@ export default function Home() {
       });
       return;
     }
-    // In a real app, we would pass city, budget, guests to the planning engine
     setLocation(`/plan?city=${city}&budget=${budget}&guests=${guests}`);
   };
 
@@ -120,8 +132,8 @@ export default function Home() {
                           <SelectValue placeholder={t("select_city")} />
                         </SelectTrigger>
                         <SelectContent className="rounded-2xl border-none shadow-2xl p-2">
-                          {["Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir"].map(c => (
-                            <SelectItem key={c} value={c} className="rounded-xl py-3 focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">{c}</SelectItem>
+                          {cities.map(c => (
+                            <SelectItem key={c.id} value={c.id} className="rounded-xl py-3 focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
