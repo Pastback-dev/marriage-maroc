@@ -1,0 +1,108 @@
+You are working on an existing project called:
+
+ARSI – My Wedding
+Tech stack:
+Frontend: React + Vite + Tailwind CSS
+Backend: Node.js + Express
+Database: SQLite (local)
+Languages: Arabic + French
+
+I want to upgrade the platform with the following features:
+
+--------------------------------------------------
+1) ADD NEW CATEGORY
+--------------------------------------------------
+
+Add a new vendor category:
+
+Name: Clothing Rental
+Description: Wedding dresses, Caftans, Traditional Moroccan outfits, Groom suits
+
+Requirements:
+- Update database to support categories table if not dynamic
+- Admin can add/edit/delete categories from dashboard
+- Category fields:
+   - name
+   - icon
+   - description
+   - coverImage
+- Update vendor registration form to include category selection
+- Update homepage to display new category
+- Update filtering system
+
+--------------------------------------------------
+2) MULTIPLE PACKS PER VENDOR
+--------------------------------------------------
+
+Currently vendor can create only 1 pack.
+Change system so that:
+
+- Each vendor can create MIN 1 pack
+- MAXIMUM 3 packs per vendor account
+- Prevent creation if more than 3 packs
+
+Each pack must contain:
+- packName
+- price
+- description
+- includedServices (array of strings)
+- images (multiple)
+- availabilityStatus (available / unavailable)
+
+--------------------------------------------------
+3) DATABASE RELATIONS
+--------------------------------------------------
+
+Update database schema:
+
+- One Vendor has many Packs (max 3)
+- One Pack belongs to one Vendor
+- One Pack belongs to one Category
+
+--------------------------------------------------
+4) VENDOR PROFILE PAGE UPDATE
+--------------------------------------------------
+
+When user opens a vendor profile page:
+
+Display:
+- Vendor banner
+- Vendor name
+- Rating
+- Contact button
+- WhatsApp button
+- All Packs created by vendor (1–3)
+
+Each pack should be displayed as a card with:
+- Pack name
+- Price
+- Short description
+- View Details button
+- Book Now button
+
+Make UI modern and elegant.
+Use soft gold wedding style.
+Mobile responsive.
+
+--------------------------------------------------
+5) VALIDATION RULES
+--------------------------------------------------
+
+- Prevent vendor from creating more than 3 packs
+- Show error message if limit exceeded
+- Prevent pack creation without price or description
+
+--------------------------------------------------
+
+Important:
+- Do NOT break existing authentication
+- Keep Arabic + French labels
+- Keep project structure clean
+- Update backend routes and frontend components properly
+- Use clean code
+
+Start by updating database schema first.
+Then backend routes.
+Then frontend components.
+
+Generate full working code.
