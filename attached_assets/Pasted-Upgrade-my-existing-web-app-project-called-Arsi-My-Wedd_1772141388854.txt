@@ -1,0 +1,199 @@
+Upgrade my existing web app project called:
+
+"Arsi – My Wedding"
+
+Tech Stack:
+Frontend:
+- React
+- Vite
+- Tailwind CSS
+
+Backend:
+- Node.js
+- Express
+
+Database:
+- SQLite (preferred) or JSON storage
+
+Authentication:
+- Simple Email / Password (local auth with JWT or session)
+
+Languages:
+- Arabic + French labels
+
+--------------------------------------------------
+
+🎯 MAIN GOAL:
+Create an AI-based recommendation system that suggests providers
+based on:
+- User city
+- Budget (price range)
+- Category
+- Existing providers data stored in database
+
+⚠️ No real AI API.
+Simulate AI logic using scoring algorithm.
+
+--------------------------------------------------
+
+📌 NAVIGATION MENU (Each must have a separate page)
+
+1. Login
+2. Providers
+3. AI Recommendation
+4. Categories
+5. About Us
+6. Rules
+
+Each must have its own route and clean UI page.
+
+--------------------------------------------------
+
+📌 PROVIDERS SYSTEM
+
+Each provider must have:
+
+- Name
+- Category
+- City (SELECT from cities list)
+- Price (numeric)
+- Description
+- Images (multiple allowed)
+- Packs (up to 3 packs per provider)
+
+Each provider:
+- Can create up to 3 packs
+- Each pack contains:
+    - Pack Name
+    - Description
+    - Price
+    - Images
+
+--------------------------------------------------
+
+📌 CITY SYSTEM
+
+- Create predefined Moroccan cities list
+- When a provider registers:
+    - Must select a city from dropdown
+- Store city in database
+
+When user searches:
+- If no results in selected city
+- Suggest nearest cities (static mapping example)
+
+Example:
+If user selects "Safi"
+Suggest:
+- Marrakech
+- El Jadida
+- Casablanca
+
+Create a simple nearbyCities object for that.
+
+--------------------------------------------------
+
+📌 CATEGORIES
+
+Default categories:
+- Wedding Hall
+- Catering
+- Negafa
+- Photography
+- Decoration
+- Music & DJ
+
+Add new category:
+- Other (for special services)
+
+Categories page:
+- Show all categories
+- Allow filter providers by category
+
+--------------------------------------------------
+
+📌 AI RECOMMENDATION PAGE
+
+Create page:
+"AI Recommendation"
+
+User selects:
+- City
+- Budget
+- Category
+
+Logic:
+- Filter providers by category
+- Filter by city (or nearby cities if empty)
+- Score providers:
+    score = 
+        +2 if same city
+        +1 if nearby city
+        +2 if price within budget
+        +1 if price slightly above
+
+Sort by score DESC
+
+Display:
+- Top 3 recommendations
+- Label: "AI Suggested"
+
+--------------------------------------------------
+
+📌 SEARCH IMPROVEMENT
+
+In Providers page:
+- Add search bar
+- Add city filter dropdown
+- Add category filter
+- Add price range filter
+
+--------------------------------------------------
+
+📌 UI REQUIREMENTS
+
+- Modern clean design
+- Wedding theme colors (soft rose, beige, gold)
+- Responsive (mobile friendly)
+- Cards layout for providers
+- Nice badges for:
+    - City
+    - Category
+    - Price
+
+--------------------------------------------------
+
+📌 ABOUT US PAGE
+
+Simple page explaining:
+"Arsi is a Moroccan wedding planning platform 
+that connects couples with trusted providers."
+
+--------------------------------------------------
+
+📌 RULES PAGE
+
+Include:
+- Providers must upload real photos
+- Max 3 packs per provider
+- Respect pricing transparency
+- No fake reviews
+
+--------------------------------------------------
+
+📌 BONUS
+
+- Add "All Categories" section more visible and less aggressive design
+- Make categories cards softer UI
+- Improve filtering UX
+
+--------------------------------------------------
+
+Project must be clean structured:
+- frontend/
+- backend/
+- routes/
+- models/
+- controllers/
+
+Add comments in code explaining AI scoring logic.
