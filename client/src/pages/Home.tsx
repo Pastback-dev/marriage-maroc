@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import heroWedding from "@/assets/hero-wedding-new.png";
+import traditionalHall from "@/assets/moroccan-traditional-hall.png";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -165,8 +166,12 @@ export default function Home() {
       </section>
 
       {/* Categories Section - Redesigned UI */}
-      <section className="py-24 bg-slate-50/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-slate-50/40 relative overflow-hidden">
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-5 pointer-events-none" 
+          style={{ backgroundImage: `url(${traditionalHall})` }}
+        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-secondary mb-4">{t("all_categories")}</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">{t("categories_subtitle")}</p>
