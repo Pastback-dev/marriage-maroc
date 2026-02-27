@@ -10,7 +10,7 @@ import { useProviders } from "@/hooks/use-providers";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
-import heroWedding from "@/assets/hero-wedding.jpg";
+import heroWedding from "@/assets/hero-wedding-new.png";
 
 export default function Home() {
   const { t } = useTranslation();
