@@ -60,10 +60,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden py-12">
         <div 
-          className="absolute inset-0 z-0 bg-cover bg-center opacity-40 mix-blend-multiply pointer-events-none" 
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-30 pointer-events-none" 
           style={{ backgroundImage: `url(${heroWedding})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0a2e]/95 via-[#1a0a2e]/80 to-[#1a0a2e]/70 z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -72,12 +72,12 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4 leading-tight" data-testid="text-hero-title">
+              <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-5 leading-tight drop-shadow-lg" data-testid="text-hero-title">
                 {t("hero_title").split(t("hero_span"))[0]}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-amber-300 to-primary">{t("hero_span")}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-primary to-amber-300 drop-shadow-none">{t("hero_span")}</span>
                 {t("hero_title").split(t("hero_span"))[1]}
               </h1>
-              <p className="text-lg md:text-xl text-white/70 mb-8 font-light max-w-xl leading-relaxed">
+              <p className="text-base md:text-lg text-white/90 mb-8 max-w-xl leading-relaxed drop-shadow-sm">
                 {t("hero_subtitle")}
               </p>
               
