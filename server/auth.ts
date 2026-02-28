@@ -23,14 +23,19 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export async function seedAdmin() {
-  const adminEmail = "zakariaelrhanmi@gmail.com";
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminEmail || !adminPassword) {
+    console.log("ADMIN_EMAIL or ADMIN_PASSWORD not set, skipping admin seed");
+    return;
+  }
   const existing = await storage.getUserByUsername(adminEmail);
   if (!existing) {
-    const hashedPassword = await hashPassword("Zakizaki7@");
+    const hashedPassword = await hashPassword(adminPassword);
     await storage.createUser({
       username: adminEmail,
       password: hashedPassword,
-      displayName: "Zakaria Elrhanmi",
+      displayName: "Administrator",
       isAdmin: true,
     });
     console.log("Admin account created");
@@ -38,7 +43,7 @@ export async function seedAdmin() {
     if (!existing.isAdmin) {
       await storage.updateUserAdmin(existing.id, true);
     }
-    const hashedPassword = await hashPassword("Zakizaki7@");
+    const hashedPassword = await hashPassword(adminPassword);
     await storage.updateUserPassword(existing.id, hashedPassword);
     console.log("Admin account updated");
   }
