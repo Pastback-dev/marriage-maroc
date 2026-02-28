@@ -9,7 +9,12 @@ import {
   Menu, 
   X,
   Languages,
-  Layout
+  Layout,
+  Sparkles,
+  Grid3X3,
+  Info,
+  ShieldCheck,
+  LogIn
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -35,10 +40,17 @@ export function Navigation() {
 
   const isActive = (path: string) => location === path;
   
-  const navItems = [
-    { label: t("nav_plan"), path: "/plan", icon: MapIcon },
-    { label: t("nav_guests"), path: "/guests", icon: Users },
+  const publicNavItems = [
+    { label: t("sign_in"), path: "/login", icon: LogIn },
     { label: t("nav_providers"), path: "/providers", icon: Heart },
+    { label: t("nav_ai_recommendation"), path: "/plan", icon: Sparkles },
+    { label: t("nav_categories"), path: "/categories", icon: Grid3X3 },
+    { label: t("nav_about"), path: "/about", icon: Info },
+    { label: t("nav_rules"), path: "/rules", icon: ShieldCheck },
+  ];
+
+  const userNavItems = [
+    { label: t("nav_guests"), path: "/guests", icon: Users },
     { label: "Mood Board", path: "/moodboard", icon: Layout },
   ];
 
@@ -79,23 +91,41 @@ export function Navigation() {
               </DropdownMenuContent>
             </DropdownMenu>
 
+            {publicNavItems
+              .filter(item => !(user && item.path === "/login"))
+              .map((item) => (
+              <Link 
+                key={item.path} 
+                href={item.path}
+                className={`
+                  flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
+                  ${isActive(item.path) ? "text-primary font-bold" : "text-muted-foreground"}
+                `}
+                data-testid={`link-nav-${item.path.slice(1)}`}
+              >
+                <item.icon className="w-4 h-4" />
+                {item.label}
+              </Link>
+            ))}
+
             {user ? (
               <>
-                {navItems.map((item) => (
+                {userNavItems.map((item) => (
                   <Link 
                     key={item.path} 
                     href={item.path}
                     className={`
-                      flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary
+                      flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
                       ${isActive(item.path) ? "text-primary font-bold" : "text-muted-foreground"}
                     `}
+                    data-testid={`link-nav-${item.path.slice(1)}`}
                   >
                     <item.icon className="w-4 h-4" />
                     {item.label}
                   </Link>
                 ))}
-                <div className="h-6 w-px bg-border mx-2" />
-                <div className="flex items-center gap-4">
+                <div className="h-6 w-px bg-border mx-1" />
+                <div className="flex items-center gap-3">
                   <span className="text-sm font-medium text-foreground">
                     {user.displayName || user.username}
                   </span>
@@ -104,22 +134,18 @@ export function Navigation() {
                     size="icon"
                     onClick={() => logout()}
                     className="text-muted-foreground hover:text-destructive"
+                    data-testid="button-logout"
                   >
                     <LogOut className="w-4 h-4" />
                   </Button>
                 </div>
               </>
             ) : (
-              <div className="flex items-center gap-4">
-                <Link href="/login">
-                  <Button variant="ghost" className="font-semibold text-secondary">{t("sign_in")}</Button>
-                </Link>
-                <Link href="/register">
-                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20">
-                    {t("get_started")}
-                  </Button>
-                </Link>
-              </div>
+              <Link href="/register">
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20" data-testid="link-register">
+                  {t("get_started")}
+                </Button>
+              </Link>
             )}
           </div>
 
@@ -137,13 +163,38 @@ export function Navigation() {
                     ARSI
                   </Link>
                   
+                  <div className="flex flex-col gap-2">
+                    {publicNavItems
+                      .filter(item => !(user && item.path === "/login"))
+                      .map((item) => (
+                      <Link 
+                        key={item.path} 
+                        href={item.path}
+                        onClick={() => setIsOpen(false)}
+                        data-testid={`link-mobile-nav-${item.path.slice(1)}`}
+                        className={`
+                          flex items-center gap-4 p-3 rounded-lg transition-colors
+                          ${isActive(item.path) 
+                            ? "bg-primary/10 text-primary font-bold" 
+                            : "text-muted-foreground hover:bg-muted"}
+                        `}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+
+                  <div className="h-px bg-border my-2" />
+
                   {user ? (
-                    <div className="flex flex-col gap-4">
-                      {navItems.map((item) => (
+                    <div className="flex flex-col gap-2">
+                      {userNavItems.map((item) => (
                         <Link 
                           key={item.path} 
                           href={item.path}
                           onClick={() => setIsOpen(false)}
+                          data-testid={`link-mobile-nav-${item.path.slice(1)}`}
                           className={`
                             flex items-center gap-4 p-3 rounded-lg transition-colors
                             ${isActive(item.path) 
@@ -163,16 +214,13 @@ export function Navigation() {
                           setIsOpen(false);
                         }}
                       >
-                        Sign Out
+                        {t("sign_out")}
                       </Button>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-4">
-                      <Link href="/login" onClick={() => setIsOpen(false)}>
-                        <Button variant="outline" className="w-full">Sign In</Button>
-                      </Link>
                       <Link href="/register" onClick={() => setIsOpen(false)}>
-                        <Button className="w-full bg-primary hover:bg-primary/90">Get Started</Button>
+                        <Button className="w-full bg-primary hover:bg-primary/90" data-testid="link-mobile-register">{t("get_started")}</Button>
                       </Link>
                     </div>
                   )}

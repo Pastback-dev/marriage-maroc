@@ -10,6 +10,9 @@ import Plan from "@/pages/Plan";
 import Guests from "@/pages/Guests";
 import ProvidersList from "@/pages/ProvidersList";
 import MoodBoard from "@/pages/MoodBoard";
+import Categories from "@/pages/Categories";
+import AboutUs from "@/pages/AboutUs";
+import Rules from "@/pages/Rules";
 
 function Router() {
   return (
@@ -25,7 +28,9 @@ function Router() {
       <Route path="/guests" component={Guests} />
       <Route path="/providers" component={ProvidersList} />
       <Route path="/moodboard" component={MoodBoard} />
-      {/* Fallback to 404 */}
+      <Route path="/categories" component={Categories} />
+      <Route path="/about" component={AboutUs} />
+      <Route path="/rules" component={Rules} />
       <Route component={NotFound} />
     </Switch>
   );
