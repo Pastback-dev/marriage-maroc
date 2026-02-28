@@ -68,7 +68,7 @@ Preferred communication style: Simple, everyday language.
 - `/admin` — Admin dashboard (admin-only, shows stats, manage users/providers)
 
 ### Admin System
-- Default admin account seeded on startup: username `admin`, password `admin123`
+- Default admin account seeded on startup: username `zakariaelrhanmi@gmail.com`
 - Admin role stored in `isAdmin` boolean column on users table
 - Admin API routes under `/api/admin/*` protected by `requireAdmin` middleware
 - Admin dashboard at `/admin` shows user/provider management with stats
