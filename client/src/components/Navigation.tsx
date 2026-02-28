@@ -53,9 +53,9 @@ export function Navigation() {
   ];
 
   const languages = [
-    { code: 'en', label: 'EN' },
-    { code: 'fr', label: 'FR' },
-    { code: 'ar', label: 'AR' },
+    { code: 'en', label: 'English', short: 'EN' },
+    { code: 'fr', label: 'Français', short: 'FR' },
+    { code: 'ar', label: 'العربية', short: 'AR' },
   ];
 
   return (
@@ -72,18 +72,27 @@ export function Navigation() {
           <div className="hidden md:flex items-center gap-6">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Languages className="w-4 h-4" />
-                  {i18n.language.toUpperCase()}
+                <Button variant="outline" size="sm" className="gap-2 border-primary/20 hover:border-primary/40 hover:bg-primary/5 text-secondary font-semibold rounded-full px-4 transition-all" data-testid="button-language">
+                  <Languages className="w-4 h-4 text-primary" />
+                  {languages.find(l => l.code === i18n.language)?.short || 'EN'}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="min-w-[160px] rounded-xl border-border/40 shadow-xl p-1.5 bg-white">
                 {languages.map((lang) => (
                   <DropdownMenuItem 
                     key={lang.code}
                     onClick={() => i18n.changeLanguage(lang.code)}
+                    className={`rounded-lg px-4 py-2.5 cursor-pointer transition-all font-medium ${
+                      i18n.language === lang.code 
+                        ? 'bg-primary/10 text-primary' 
+                        : 'text-secondary hover:bg-muted'
+                    }`}
+                    data-testid={`button-lang-${lang.code}`}
                   >
-                    {lang.label}
+                    <span className="flex items-center justify-between w-full">
+                      <span>{lang.label}</span>
+                      <span className={`text-xs font-bold ${i18n.language === lang.code ? 'text-primary' : 'text-muted-foreground/50'}`}>{lang.short}</span>
+                    </span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -160,6 +169,23 @@ export function Navigation() {
                   <Link href="/" onClick={() => setIsOpen(false)} className="text-2xl font-display font-bold text-center text-gradient-gold">
                     ARSI
                   </Link>
+
+                  <div className="flex items-center justify-center gap-1 p-1 bg-muted/50 rounded-full">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => i18n.changeLanguage(lang.code)}
+                        className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
+                          i18n.language === lang.code
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'text-muted-foreground hover:text-secondary'
+                        }`}
+                        data-testid={`button-mobile-lang-${lang.code}`}
+                      >
+                        {lang.short}
+                      </button>
+                    ))}
+                  </div>
                   
                   <div className="flex flex-col gap-2">
                     {publicNavItems
