@@ -22,6 +22,23 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
+export async function seedAdmin() {
+  const existing = await storage.getUserByUsername("admin");
+  if (!existing) {
+    const hashedPassword = await hashPassword("admin123");
+    await storage.createUser({
+      username: "admin",
+      password: hashedPassword,
+      displayName: "Administrator",
+      isAdmin: true,
+    });
+    console.log("Admin account created (admin / admin123)");
+  } else if (!existing.isAdmin) {
+    await storage.updateUserAdmin(existing.id, true);
+    console.log("Existing admin account updated with admin role");
+  }
+}
+
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "r3pl1t_s3cr3t",

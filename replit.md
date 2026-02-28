@@ -44,7 +44,7 @@ Preferred communication style: Simple, everyday language.
 - **Migration output**: `./migrations/`
 
 ### Key Database Tables
-- **users**: id, username (email), password (hashed), displayName, createdAt
+- **users**: id, username (email), password (hashed), displayName, isAdmin (boolean, default false), createdAt
 - **providers**: id, category, name, description, city, priceMin, priceMax, images (text array), packages (JSONB), rating, contactInfo
 - **plans**: id, userId, guestCount, totalBudget, city, weddingStyle, selectedProviders (JSONB), totalCost, createdAt
 - **guests**: id, userId, name, type (local/foreign), pricePerGuest
@@ -65,6 +65,13 @@ Preferred communication style: Simple, everyday language.
 - `/categories` — Services page with descriptions and provider counts
 - `/rules` — Platform quality standards and guidelines for providers and users
 - `/moodboard` — Mood board for wedding inspiration (image collection)
+- `/admin` — Admin dashboard (admin-only, shows stats, manage users/providers)
+
+### Admin System
+- Default admin account seeded on startup: username `admin`, password `admin123`
+- Admin role stored in `isAdmin` boolean column on users table
+- Admin API routes under `/api/admin/*` protected by `requireAdmin` middleware
+- Admin dashboard at `/admin` shows user/provider management with stats
 
 ### Mock/Demo Features
 - AI Planner: Simple percentage-based budget allocation (40% traiteur, 30% hall, 10% DJ, 10% cameraman)

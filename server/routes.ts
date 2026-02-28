@@ -1,9 +1,10 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth } from "./auth";
+import { setupAuth, seedAdmin } from "./auth";
 import { api } from "@shared/routes";
 import { z } from "zod";
+import { User } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -14,6 +15,55 @@ export async function registerRoutes(
 
   // Seed data on startup
   await storage.seedProviders();
+  await seedAdmin();
+
+  // Admin middleware
+  function requireAdmin(req: Request, res: Response, next: NextFunction) {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (!user.isAdmin) return res.status(403).json({ message: "Admin access required" });
+    next();
+  }
+
+  // Admin API Routes
+  app.get("/api/admin/stats", requireAdmin, async (req, res) => {
+    const allUsers = await storage.getAllUsers();
+    const allProviders = await storage.getProviders();
+    const userCount = allUsers.length;
+    const providerCount = allProviders.length;
+    const categoryCounts: Record<string, number> = {};
+    for (const p of allProviders) {
+      categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1;
+    }
+    res.json({ userCount, providerCount, categoryCounts });
+  });
+
+  app.get("/api/admin/users", requireAdmin, async (req, res) => {
+    const allUsers = await storage.getAllUsers();
+    const safeUsers = allUsers.map(({ password, ...u }) => u);
+    res.json(safeUsers);
+  });
+
+  app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    const targetId = Number(req.params.id);
+    const currentUser = req.user as User;
+    if (targetId === currentUser.id) {
+      return res.status(400).json({ message: "Cannot delete your own account" });
+    }
+    await storage.deleteUser(targetId);
+    res.status(200).json({ message: "User deleted" });
+  });
+
+  app.get("/api/admin/providers", requireAdmin, async (req, res) => {
+    const allProviders = await storage.getProviders();
+    res.json(allProviders);
+  });
+
+  app.delete("/api/admin/providers/:id", requireAdmin, async (req, res) => {
+    const id = Number(req.params.id);
+    await storage.deleteProvider(id);
+    res.status(200).json({ message: "Provider deleted" });
+  });
 
   // API Routes
 

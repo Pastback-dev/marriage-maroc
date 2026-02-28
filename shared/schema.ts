@@ -5,9 +5,10 @@ import { z } from "zod";
 // Users for local auth
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(), // using as email
+  username: text("username").notNull().unique(),
   password: text("password").notNull(),
   displayName: text("display_name"),
+  isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -73,7 +74,8 @@ export const moodBoardItems = pgTable("mood_board_items", {
 });
 
 // Schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
+export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, isAdmin: true });
+export const insertUserSchemaAdmin = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertProviderSchema = createInsertSchema(providers).omit({ id: true });
 export const insertPlanSchema = createInsertSchema(plans).omit({ id: true, createdAt: true, selectedProviders: true, totalCost: true });
 export const insertGuestSchema = createInsertSchema(guests).omit({ id: true });

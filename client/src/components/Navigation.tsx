@@ -13,7 +13,8 @@ import {
   Sparkles,
   Grid3X3,
   ShieldCheck,
-  LogIn
+  LogIn,
+  LayoutDashboard
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -131,6 +132,19 @@ export function Navigation() {
                     {item.label}
                   </Link>
                 ))}
+                {user.isAdmin && (
+                  <Link 
+                    href="/admin"
+                    className={`
+                      flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
+                      ${isActive("/admin") ? "text-primary font-bold" : "text-muted-foreground"}
+                    `}
+                    data-testid="link-nav-admin"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Link>
+                )}
                 <div className="h-6 w-px bg-border mx-1" />
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-medium text-foreground">
@@ -230,6 +244,22 @@ export function Navigation() {
                           {item.label}
                         </Link>
                       ))}
+                      {user.isAdmin && (
+                        <Link 
+                          href="/admin"
+                          onClick={() => setIsOpen(false)}
+                          data-testid="link-mobile-nav-admin"
+                          className={`
+                            flex items-center gap-4 p-3 rounded-lg transition-colors
+                            ${isActive("/admin") 
+                              ? "bg-primary/10 text-primary font-bold" 
+                              : "text-muted-foreground hover:bg-muted"}
+                          `}
+                        >
+                          <LayoutDashboard className="w-5 h-5" />
+                          Dashboard
+                        </Link>
+                      )}
                       <Button 
                         variant="destructive" 
                         className="mt-4 w-full"

@@ -21,10 +21,15 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   sessionStore: session.Store;
 
+  updateUserAdmin(id: number, isAdmin: boolean): Promise<void>;
+  getAllUsers(): Promise<User[]>;
+  deleteUser(id: number): Promise<void>;
+
   // Providers
   getProviders(category?: string, city?: string): Promise<Provider[]>;
   getProvider(id: number): Promise<Provider | undefined>;
-  seedProviders(): Promise<void>; // Helper to seed mock data
+  seedProviders(): Promise<void>;
+  deleteProvider(id: number): Promise<void>;
 
   // Plans
   createPlan(plan: any): Promise<Plan>; // simplified type for storage
@@ -70,6 +75,20 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async updateUserAdmin(id: number, isAdmin: boolean): Promise<void> {
+    await db.update(users).set({ isAdmin }).where(eq(users.id, id));
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(guests).where(eq(guests.userId, id));
+    await db.delete(plans).where(eq(plans.userId, id));
+    await db.delete(users).where(eq(users.id, id));
+  }
+
   // Providers
   async getProviders(category?: string, city?: string): Promise<Provider[]> {
     let query = db.select().from(providers);
@@ -87,6 +106,10 @@ export class DatabaseStorage implements IStorage {
   async getProvider(id: number): Promise<Provider | undefined> {
     const [provider] = await db.select().from(providers).where(eq(providers.id, id));
     return provider;
+  }
+
+  async deleteProvider(id: number): Promise<void> {
+    await db.delete(providers).where(eq(providers.id, id));
   }
 
   async seedProviders(): Promise<void> {
