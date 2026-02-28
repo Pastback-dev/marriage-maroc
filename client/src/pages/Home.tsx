@@ -72,12 +72,12 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl md:text-7xl font-display font-bold text-white mb-6 leading-tight">
+              <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-4 leading-tight" data-testid="text-hero-title">
                 {t("hero_title").split(t("hero_span"))[0]}
-                <span className="text-primary">{t("hero_span")}</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-amber-300 to-primary">{t("hero_span")}</span>
                 {t("hero_title").split(t("hero_span"))[1]}
               </h1>
-              <p className="text-xl text-gray-200 mb-8 font-light max-w-xl leading-relaxed">
+              <p className="text-lg md:text-xl text-white/70 mb-8 font-light max-w-xl leading-relaxed">
                 {t("hero_subtitle")}
               </p>
               
@@ -102,59 +102,62 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-none rounded-[2.5rem] overflow-hidden">
-                <CardHeader className="bg-primary/5 pb-6 pt-10 px-10">
-                  <CardTitle className="flex items-center gap-3 text-2xl font-display text-secondary">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <Sparkles className="w-6 h-6 text-primary" />
+                <CardHeader className="bg-gradient-to-r from-primary/5 to-amber-50/50 pb-5 pt-8 px-8">
+                  <CardTitle className="flex items-center gap-3 text-xl font-display text-secondary" data-testid="text-ai-title">
+                    <div className="p-2 bg-gradient-to-br from-primary/20 to-amber-200/30 rounded-xl">
+                      <Sparkles className="w-5 h-5 text-primary" />
                     </div>
                     {t("ai_box_title")}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6 p-10">
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2 mb-1">
-                        <UsersIcon className="w-3 h-3 text-primary" /> {t("guest_count")}
+                <CardContent className="space-y-5 p-8 pt-6">
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                        <UsersIcon className="w-3 h-3 text-primary/70" /> {t("guest_count")}
                       </label>
                       <Input 
                         type="number" 
-                        placeholder="e.g. 200"
+                        placeholder="200"
                         value={guests}
                         onChange={(e) => setGuests(e.target.value)}
-                        className="bg-muted/40 border-none h-12 text-lg rounded-2xl focus-visible:ring-primary/20 transition-all"
+                        className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all"
+                        data-testid="input-guests"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2 mb-1">
-                        <MapPin className="w-3 h-3 text-primary" /> {t("city")}
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                        <MapPin className="w-3 h-3 text-primary/70" /> {t("city")}
                       </label>
                       <Select value={city} onValueChange={setCity}>
-                        <SelectTrigger className="bg-muted/40 border-none h-12 text-lg rounded-2xl focus:ring-primary/20 transition-all">
+                        <SelectTrigger className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-city">
                           <SelectValue placeholder={t("select_city")} />
                         </SelectTrigger>
-                        <SelectContent className="rounded-2xl border-none shadow-2xl p-2">
+                        <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5">
                           {cities.map(c => (
-                            <SelectItem key={c.id} value={c.id} className="rounded-xl py-3 focus:bg-primary/10 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
+                            <SelectItem key={c.id} value={c.id} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2 mb-1">
-                      <Receipt className="w-3 h-3 text-primary" /> {t("budget")}
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                      <Receipt className="w-3 h-3 text-primary/70" /> {t("budget")}
                     </label>
                     <Input 
                       type="number" 
-                      placeholder="e.g. 80000"
+                      placeholder="80,000"
                       value={budget}
                       onChange={(e) => setBudget(e.target.value)}
-                      className="bg-muted/40 border-none h-12 text-lg rounded-2xl focus-visible:ring-primary/20 transition-all"
+                      className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all"
+                      data-testid="input-budget"
                     />
                   </div>
                   <Button 
                     onClick={handleAiRecommendation}
-                    className="w-full h-14 text-lg font-bold bg-secondary hover:bg-secondary/90 text-white shadow-xl shadow-secondary/20 rounded-2xl transition-all active:scale-[0.98] hover-elevate"
+                    className="w-full h-12 text-base font-bold bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg shadow-secondary/15 rounded-xl transition-all active:scale-[0.98]"
+                    data-testid="button-generate"
                   >
                     {t("get_recommendation")}
                   </Button>

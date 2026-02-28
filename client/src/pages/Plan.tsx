@@ -4,12 +4,13 @@ import { useUser } from "@/hooks/use-auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Sparkles, Receipt, Calendar, Users as UsersIcon } from "lucide-react";
+import { Loader2, Sparkles, Receipt, Calendar, Users as UsersIcon, MapPin } from "lucide-react";
 import { ProviderCard } from "@/components/ProviderCard";
 import { type PlanResponse } from "@shared/routes";
 
@@ -23,9 +24,19 @@ const planSchema = z.object({
 type PlanFormValues = z.infer<typeof planSchema>;
 
 export default function Plan() {
+  const { t } = useTranslation();
   const { data: user, isLoading: userLoading } = useUser();
   const { data: plans, isLoading: plansLoading } = usePlans();
   const createPlan = useCreatePlan();
+
+  const cities = [
+    { id: "Casablanca", name: t("city_casablanca") },
+    { id: "Rabat", name: t("city_rabat") },
+    { id: "Marrakech", name: t("city_marrakech") },
+    { id: "Fes", name: t("city_fes") },
+    { id: "Tangier", name: t("city_tangier") },
+    { id: "Agadir", name: t("city_agadir") },
+  ];
   
   const form = useForm<PlanFormValues>({
     resolver: zodResolver(planSchema),
@@ -49,7 +60,6 @@ export default function Plan() {
     );
   }
 
-  // If user has a plan, show it. Otherwise show create form.
   const currentPlan = plans?.[0] as PlanResponse | undefined;
 
   return (
@@ -60,29 +70,33 @@ export default function Plan() {
         {!currentPlan ? (
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-display font-bold text-secondary mb-4">Plan Your Wedding</h1>
-              <p className="text-muted-foreground">Let our AI curate the perfect package for your budget.</p>
+              <h1 className="text-4xl font-display font-bold text-secondary mb-3" data-testid="text-plan-title">{t("ai_box_title")}</h1>
+              <p className="text-muted-foreground/80 text-sm">{t("hero_subtitle")}</p>
             </div>
 
-            <Card className="border-t-4 border-t-primary shadow-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" /> AI Wedding Generator
+            <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-amber-50/50 pb-4 pt-7 px-8">
+                <CardTitle className="flex items-center gap-3 text-lg font-display text-secondary" data-testid="text-generator-title">
+                  <div className="p-2 bg-gradient-to-br from-primary/20 to-amber-200/30 rounded-xl">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  {t("ai_box_title")}
                 </CardTitle>
-                <CardDescription>Enter your details below to get started.</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-8 pt-6">
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid md:grid-cols-2 gap-6">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                    <div className="grid md:grid-cols-2 gap-5">
                       <FormField
                         control={form.control}
                         name="guestCount"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Number of Guests</FormLabel>
+                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                              <UsersIcon className="w-3 h-3 text-primary/70" /> {t("guest_count")}
+                            </FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} />
+                              <Input type="number" {...field} className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-guests" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -93,9 +107,11 @@ export default function Plan() {
                         name="totalBudget"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Total Budget (MAD)</FormLabel>
+                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                              <Receipt className="w-3 h-3 text-primary/70" /> {t("budget")}
+                            </FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} />
+                              <Input type="number" {...field} className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-budget" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -103,25 +119,25 @@ export default function Plan() {
                       />
                     </div>
                     
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid md:grid-cols-2 gap-5">
                       <FormField
                         control={form.control}
                         name="city"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>City</FormLabel>
+                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                              <MapPin className="w-3 h-3 text-primary/70" /> {t("city")}
+                            </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select City" />
+                                <SelectTrigger className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-city">
+                                  <SelectValue placeholder={t("select_city")} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
-                                <SelectItem value="Casablanca">Casablanca</SelectItem>
-                                <SelectItem value="Rabat">Rabat</SelectItem>
-                                <SelectItem value="Marrakech">Marrakech</SelectItem>
-                                <SelectItem value="Fes">Fes</SelectItem>
-                                <SelectItem value="Tangier">Tangier</SelectItem>
+                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5">
+                                {cities.map(c => (
+                                  <SelectItem key={c.id} value={c.id} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -133,18 +149,20 @@ export default function Plan() {
                         name="weddingStyle"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Wedding Style</FormLabel>
+                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
+                              <Calendar className="w-3 h-3 text-primary/70" /> {t("style_label")}
+                            </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select Style" />
+                                <SelectTrigger className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-style">
+                                  <SelectValue placeholder={t("select_style")} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
-                                <SelectItem value="Traditional">Traditional Moroccan</SelectItem>
-                                <SelectItem value="Modern">Modern / Western</SelectItem>
-                                <SelectItem value="Royal">Royal / Luxury</SelectItem>
-                                <SelectItem value="Intimate">Intimate</SelectItem>
+                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5">
+                                <SelectItem value="Traditional" className="rounded-lg py-2.5">{t("style_traditional")}</SelectItem>
+                                <SelectItem value="Modern" className="rounded-lg py-2.5">{t("style_modern")}</SelectItem>
+                                <SelectItem value="Royal" className="rounded-lg py-2.5">{t("style_royal")}</SelectItem>
+                                <SelectItem value="Intimate" className="rounded-lg py-2.5">{t("style_intimate")}</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -153,13 +171,13 @@ export default function Plan() {
                       />
                     </div>
 
-                    <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold" disabled={createPlan.isPending}>
+                    <Button type="submit" size="lg" className="w-full h-12 text-base font-bold bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg shadow-secondary/15 rounded-xl transition-all active:scale-[0.98]" disabled={createPlan.isPending} data-testid="button-generate-plan">
                       {createPlan.isPending ? (
                         <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" /> Generating Plan...
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("generating")}
                         </>
                       ) : (
-                        "Generate My Plan"
+                        t("get_recommendation")
                       )}
                     </Button>
                   </form>
@@ -169,62 +187,60 @@ export default function Plan() {
           </div>
         ) : (
           <div className="space-y-12 animate-in fade-in duration-700">
-            {/* Plan Summary Dashboard */}
             <div className="grid md:grid-cols-4 gap-6">
-              <Card className="bg-secondary text-secondary-foreground border-none">
+              <Card className="bg-secondary text-secondary-foreground border-none rounded-2xl">
                 <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 bg-white/10 rounded-lg">
-                    <Receipt className="w-6 h-6" />
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <Receipt className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm opacity-70">Total Estimated Cost</p>
-                    <p className="text-2xl font-bold font-display">{currentPlan.totalCost.toLocaleString()} MAD</p>
+                    <p className="text-[11px] uppercase tracking-wider opacity-60 font-semibold">{t("total_estimated")}</p>
+                    <p className="text-xl font-bold font-display" data-testid="text-total-cost">{currentPlan.totalCost.toLocaleString()} MAD</p>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card>
+              <Card className="rounded-2xl">
                 <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 text-primary rounded-lg">
-                    <UsersIcon className="w-6 h-6" />
+                  <div className="p-3 bg-primary/10 text-primary rounded-xl">
+                    <UsersIcon className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Guest Count</p>
-                    <p className="text-2xl font-bold font-display">{currentPlan.guestCount}</p>
+                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-semibold">{t("guest_count")}</p>
+                    <p className="text-xl font-bold font-display" data-testid="text-guest-count">{currentPlan.guestCount}</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="rounded-2xl">
                 <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 bg-accent/10 text-accent rounded-lg">
-                    <Calendar className="w-6 h-6" />
+                  <div className="p-3 bg-accent/10 text-accent rounded-xl">
+                    <Calendar className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Wedding Style</p>
-                    <p className="text-2xl font-bold font-display">{currentPlan.weddingStyle}</p>
+                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-semibold">{t("style_label")}</p>
+                    <p className="text-xl font-bold font-display" data-testid="text-style">{currentPlan.weddingStyle}</p>
                   </div>
                 </CardContent>
               </Card>
               
-               <Card>
+              <Card className="rounded-2xl">
                 <CardContent className="p-6 flex items-center gap-4">
-                   <div className="p-3 bg-primary/10 text-primary rounded-lg">
-                    <Sparkles className="w-6 h-6" />
+                  <div className="p-3 bg-primary/10 text-primary rounded-xl">
+                    <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Remaining Budget</p>
-                    <p className="text-2xl font-bold font-display text-emerald-600">{(currentPlan.totalBudget - currentPlan.totalCost).toLocaleString()} MAD</p>
+                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-semibold">{t("remaining_budget")}</p>
+                    <p className="text-xl font-bold font-display text-emerald-600" data-testid="text-remaining">{(currentPlan.totalBudget - currentPlan.totalCost).toLocaleString()} MAD</p>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Selected Providers Grid */}
             <div>
               <h2 className="text-3xl font-display font-bold text-secondary mb-6 flex items-center gap-3">
                 <span className="bg-primary/20 p-2 rounded-lg"><Sparkles className="w-6 h-6 text-primary" /></span>
-                Your Curated Team
+                {t("curated_team")}
               </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {currentPlan.breakdown.traiteur && <ProviderCard provider={currentPlan.breakdown.traiteur} />}
@@ -235,19 +251,19 @@ export default function Plan() {
             </div>
             
             <div className="flex justify-center mt-12">
-               <Button 
+              <Button 
                 variant="outline" 
                 size="lg"
-                className="text-muted-foreground hover:text-destructive hover:border-destructive"
+                className="text-muted-foreground hover:text-destructive hover:border-destructive rounded-xl"
                 onClick={() => {
-                  if(confirm("Are you sure? This will delete your current plan.")) {
-                    // Logic to delete plan would go here if implemented in backend
+                  if(confirm(t("reset_confirm"))) {
                     window.location.reload(); 
                   }
                 }}
-               >
-                 Reset Plan & Start Over
-               </Button>
+                data-testid="button-reset-plan"
+              >
+                {t("reset_plan")}
+              </Button>
             </div>
           </div>
         )}
