@@ -60,10 +60,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden py-12">
         <div 
-          className="absolute inset-0 z-0 bg-cover bg-center opacity-30 pointer-events-none" 
+          className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none" 
           style={{ backgroundImage: `url(${heroWedding})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1a0a2e]/95 via-[#1a0a2e]/80 to-[#1a0a2e]/70 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30 z-10" />
         
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
