@@ -12,7 +12,6 @@ import {
   Layout,
   Sparkles,
   Grid3X3,
-  Info,
   ShieldCheck,
   LogIn
 } from "lucide-react";
@@ -45,7 +44,6 @@ export function Navigation() {
     { label: t("nav_providers"), path: "/providers", icon: Heart },
     { label: t("nav_ai_recommendation"), path: "/plan", icon: Sparkles },
     { label: t("nav_categories"), path: "/categories", icon: Grid3X3 },
-    { label: t("nav_about"), path: "/about", icon: Info },
     { label: t("nav_rules"), path: "/rules", icon: ShieldCheck },
   ];
 

@@ -212,7 +212,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-secondary mb-6">{t("why_choose")}</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">Every detail of your wedding deserves perfection. Our platform brings you the best of Morocco with ease.</p>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">{t("features_intro")}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-12 lg:gap-16">
@@ -260,14 +260,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <span className="text-2xl font-display font-bold">ARSI</span>
-            <p className="text-white/60 text-sm mt-2">Making Moroccan weddings unforgettable.</p>
+            <p className="text-white/60 text-sm mt-2">{t("footer_tagline")}</p>
           </div>
           <div className="flex gap-8 text-sm text-white/80">
-            <Link href="/providers" className="hover:text-primary transition-colors">Providers</Link>
-            <Link href="/login" className="hover:text-primary transition-colors">Login</Link>
-            <Link href="/register" className="hover:text-primary transition-colors">Register</Link>
+            <Link href="/providers" className="hover:text-primary transition-colors">{t("nav_providers")}</Link>
+            <Link href="/categories" className="hover:text-primary transition-colors">{t("nav_categories")}</Link>
+            <Link href="/rules" className="hover:text-primary transition-colors">{t("nav_rules")}</Link>
           </div>
-          <p className="text-white/40 text-xs">© 2024 Arsi Wedding Planner</p>
+          <p className="text-white/40 text-xs">&copy; 2025 Arsi</p>
         </div>
       </footer>
     </div>

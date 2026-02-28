@@ -62,9 +62,8 @@ Preferred communication style: Simple, everyday language.
 - `/plan` — AI Recommendation (mock logic: budget allocation by percentage)
 - `/guests` — Guest list management (add/remove, local/foreign classification)
 - `/providers` — Browse/filter service providers by category and city
-- `/categories` — All categories page with descriptions and provider counts
-- `/about` — About Us page with platform info, values, stats, and city coverage
-- `/rules` — Platform rules and guidelines for providers and users
+- `/categories` — Services page with descriptions and provider counts
+- `/rules` — Platform quality standards and guidelines for providers and users
 - `/moodboard` — Mood board for wedding inspiration (image collection)
 
 ### Mock/Demo Features
