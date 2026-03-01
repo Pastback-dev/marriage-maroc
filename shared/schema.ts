@@ -75,6 +75,15 @@ export const moodBoardItems = pgTable("mood_board_items", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Provider Photos
+export const providerPhotos = pgTable("provider_photos", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  imageUrl: text("image_url").notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, isAdmin: true }).extend({
   role: z.enum(["client", "provider"]).default("client"),
@@ -85,6 +94,7 @@ export const insertPlanSchema = createInsertSchema(plans).omit({ id: true, creat
 export const insertGuestSchema = createInsertSchema(guests).omit({ id: true });
 export const insertMoodBoardSchema = createInsertSchema(moodBoards).omit({ id: true, createdAt: true });
 export const insertMoodBoardItemSchema = createInsertSchema(moodBoardItems).omit({ id: true, createdAt: true });
+export const insertProviderPhotoSchema = createInsertSchema(providerPhotos).omit({ id: true, createdAt: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -97,6 +107,8 @@ export type MoodBoard = typeof moodBoards.$inferSelect;
 export type MoodBoardItem = typeof moodBoardItems.$inferSelect;
 export type InsertMoodBoard = z.infer<typeof insertMoodBoardSchema>;
 export type InsertMoodBoardItem = z.infer<typeof insertMoodBoardItemSchema>;
+export type ProviderPhoto = typeof providerPhotos.$inferSelect;
+export type InsertProviderPhoto = z.infer<typeof insertProviderPhotoSchema>;
 
 // API Request/Response Types
 export type LoginRequest = Pick<InsertUser, "username" | "password"> & { role?: "client" | "provider" };

@@ -5,6 +5,30 @@ import { setupAuth, seedAdmin } from "./auth";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { User } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import express from "express";
+
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: uploadDir,
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+    },
+  }),
+  fileFilter: (_req, file, cb) => {
+    const allowed = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowed.includes(ext)) cb(null, true);
+    else cb(new Error("Only image files are allowed (jpg, jpeg, png, gif, webp)"));
+  },
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 export async function registerRoutes(
   httpServer: Server,
@@ -65,6 +89,9 @@ export async function registerRoutes(
     res.status(200).json({ message: "Provider deleted" });
   });
 
+  // Serve uploaded files
+  app.use("/uploads", express.static(uploadDir));
+
   // Provider Profile Routes
   app.patch("/api/provider/service-category", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send();
@@ -80,6 +107,54 @@ export async function registerRoutes(
     const updatedUser = await storage.updateUserServiceCategory(user.id, serviceCategory);
     const { password: _, ...safeUser } = updatedUser;
     res.json(safeUser);
+  });
+
+  // Provider Photos
+  app.get("/api/provider/photos", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+    const photos = await storage.getProviderPhotos(user.id);
+    res.json(photos);
+  });
+
+  app.post("/api/provider/photos", upload.single("photo"), async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+    if (!req.file) return res.status(400).json({ message: "No image file uploaded" });
+
+    const imageUrl = `/uploads/${req.file.filename}`;
+    const description = req.body.description || null;
+
+    const photo = await storage.addProviderPhoto({
+      userId: user.id,
+      imageUrl,
+      description,
+    });
+    res.status(201).json(photo);
+  });
+
+  app.patch("/api/provider/photos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
+    const { description } = req.body;
+    if (typeof description !== "string") return res.status(400).json({ message: "Description is required" });
+
+    const updated = await storage.updateProviderPhotoDescription(Number(req.params.id), user.id, description);
+    if (!updated) return res.status(404).json({ message: "Photo not found" });
+    res.json(updated);
+  });
+
+  app.delete("/api/provider/photos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
+    await storage.deleteProviderPhoto(Number(req.params.id), user.id);
+    res.status(200).json({ message: "Photo deleted" });
   });
 
   // API Routes

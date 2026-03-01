@@ -2,10 +2,11 @@ import { db } from "./db";
 import {
   users, providers, plans, guests,
   type User, type InsertUser,
-  type Provider, type InsertUser as InsertProvider, // Alias for consistency if needed, but schema uses createInsertSchema(providers)
+  type Provider, type InsertUser as InsertProvider,
   type Plan, type Guest, type InsertGuest,
   moodBoards, moodBoardItems,
-  type MoodBoard, type MoodBoardItem, type InsertMoodBoard, type InsertMoodBoardItem
+  type MoodBoard, type MoodBoardItem, type InsertMoodBoard, type InsertMoodBoardItem,
+  providerPhotos, type ProviderPhoto, type InsertProviderPhoto
 } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -49,6 +50,12 @@ export interface IStorage {
   getMoodBoardItems(boardId: number): Promise<MoodBoardItem[]>;
   addMoodBoardItem(item: InsertMoodBoardItem): Promise<MoodBoardItem>;
   deleteMoodBoardItem(id: number): Promise<void>;
+
+  // Provider Photos
+  getProviderPhotos(userId: number): Promise<ProviderPhoto[]>;
+  addProviderPhoto(photo: InsertProviderPhoto): Promise<ProviderPhoto>;
+  updateProviderPhotoDescription(id: number, userId: number, description: string): Promise<ProviderPhoto>;
+  deleteProviderPhoto(id: number, userId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -237,6 +244,28 @@ export class DatabaseStorage implements IStorage {
 
   async deleteMoodBoardItem(id: number): Promise<void> {
     await db.delete(moodBoardItems).where(eq(moodBoardItems.id, id));
+  }
+
+  // Provider Photos
+  async getProviderPhotos(userId: number): Promise<ProviderPhoto[]> {
+    return await db.select().from(providerPhotos).where(eq(providerPhotos.userId, userId));
+  }
+
+  async addProviderPhoto(photo: InsertProviderPhoto): Promise<ProviderPhoto> {
+    const [newPhoto] = await db.insert(providerPhotos).values(photo).returning();
+    return newPhoto;
+  }
+
+  async updateProviderPhotoDescription(id: number, userId: number, description: string): Promise<ProviderPhoto> {
+    const [updated] = await db.update(providerPhotos)
+      .set({ description })
+      .where(and(eq(providerPhotos.id, id), eq(providerPhotos.userId, userId)))
+      .returning();
+    return updated;
+  }
+
+  async deleteProviderPhoto(id: number, userId: number): Promise<void> {
+    await db.delete(providerPhotos).where(and(eq(providerPhotos.id, id), eq(providerPhotos.userId, userId)));
   }
 }
 
