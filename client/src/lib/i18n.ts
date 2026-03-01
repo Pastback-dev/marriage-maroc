@@ -81,7 +81,24 @@ const resources = {
       "reset_plan": "Reset Plan & Start Over",
       "reset_confirm": "Are you sure? This will delete your current plan.",
       "generating": "Generating...",
-      "footer_tagline": "Where Moroccan wedding dreams come true."
+      "footer_tagline": "Where Moroccan wedding dreams come true.",
+      "about_badge": "Morocco's #1 Wedding Platform",
+      "about_title": "We Make Your Dream Wedding a Reality",
+      "about_subtitle": "Arsi connects you with the finest wedding professionals across Morocco. From Casablanca to Marrakech, we handpick every vendor so you can focus on what matters most — celebrating your love.",
+      "about_stat_providers": "Verified Providers",
+      "about_stat_cities": "Cities Covered",
+      "about_stat_categories": "Service Categories",
+      "about_stat_support": "Dedicated Support",
+      "about_mission_title": "Why Couples Choose Arsi",
+      "about_mission_desc": "Planning a Moroccan wedding can be overwhelming — juggling caterers, venues, photographers, and budgets across multiple cities. Arsi was built to simplify that process. We combine technology with deep local expertise to deliver a seamless, stress-free planning experience that honors your traditions while embracing modern convenience.",
+      "about_value_passion": "Passion for Weddings",
+      "about_value_passion_desc": "We live and breathe Moroccan weddings. Our team understands the traditions, the details, and the emotions that make every celebration unique. From the Amariya to the final dance, we ensure every moment is extraordinary.",
+      "about_value_trust": "Trusted & Transparent",
+      "about_value_trust_desc": "Every vendor on our platform is personally vetted for quality, reliability, and fair pricing. No hidden fees, no surprises — just honest service you can count on. Your trust is our most valued asset.",
+      "about_value_community": "Built for Moroccan Families",
+      "about_value_community_desc": "We understand that a Moroccan wedding is a family affair. Our platform is designed to bring everyone together — from managing guest lists to coordinating with vendors across cities, we make collaboration effortless.",
+      "about_coverage_title": "Covering All of Morocco",
+      "about_coverage_desc": "Whether you're planning an intimate celebration in Rabat or a grand royal affair in Marrakech, our network of premium vendors spans the country's most beloved cities. Wherever your dream takes you, Arsi is there."
     }
   },
   fr: {
@@ -162,7 +179,24 @@ const resources = {
       "reset_plan": "Réinitialiser & Recommencer",
       "reset_confirm": "Êtes-vous sûr ? Cela supprimera votre plan actuel.",
       "generating": "Génération...",
-      "footer_tagline": "Où les rêves de mariage marocain deviennent réalité."
+      "footer_tagline": "Où les rêves de mariage marocain deviennent réalité.",
+      "about_badge": "Plateforme N°1 du Mariage au Maroc",
+      "about_title": "Nous Réalisons le Mariage de Vos Rêves",
+      "about_subtitle": "Arsi vous connecte avec les meilleurs professionnels du mariage à travers le Maroc. De Casablanca à Marrakech, nous sélectionnons chaque prestataire pour que vous puissiez vous concentrer sur l'essentiel — célébrer votre amour.",
+      "about_stat_providers": "Prestataires Vérifiés",
+      "about_stat_cities": "Villes Couvertes",
+      "about_stat_categories": "Catégories de Services",
+      "about_stat_support": "Support Dédié",
+      "about_mission_title": "Pourquoi les Couples Choisissent Arsi",
+      "about_mission_desc": "Organiser un mariage marocain peut être stressant — jongler entre traiteurs, salles, photographes et budgets dans plusieurs villes. Arsi a été conçu pour simplifier ce processus. Nous combinons technologie et expertise locale pour offrir une expérience de planification fluide et sans stress, qui honore vos traditions tout en embrassant la modernité.",
+      "about_value_passion": "La Passion du Mariage",
+      "about_value_passion_desc": "Nous vivons et respirons le mariage marocain. Notre équipe comprend les traditions, les détails et les émotions qui rendent chaque célébration unique. De l'Amariya à la dernière danse, nous veillons à ce que chaque instant soit extraordinaire.",
+      "about_value_trust": "Confiance & Transparence",
+      "about_value_trust_desc": "Chaque prestataire sur notre plateforme est personnellement vérifié pour la qualité, la fiabilité et des tarifs justes. Pas de frais cachés, pas de surprises — un service honnête sur lequel vous pouvez compter. Votre confiance est notre bien le plus précieux.",
+      "about_value_community": "Conçu pour les Familles Marocaines",
+      "about_value_community_desc": "Nous savons qu'un mariage marocain est une affaire de famille. Notre plateforme est conçue pour rassembler tout le monde — de la gestion des listes d'invités à la coordination avec les prestataires, nous rendons la collaboration simple et naturelle.",
+      "about_coverage_title": "Partout au Maroc",
+      "about_coverage_desc": "Que vous planifiez une célébration intime à Rabat ou une grande fête royale à Marrakech, notre réseau de prestataires premium couvre les plus belles villes du pays. Où que votre rêve vous mène, Arsi est là."
     }
   },
   ar: {
@@ -243,7 +277,24 @@ const resources = {
       "reset_plan": "إعادة البدء",
       "reset_confirm": "هل أنت متأكد؟ سيتم حذف خطتك الحالية.",
       "generating": "جاري الإنشاء...",
-      "footer_tagline": "حيث تتحقق أحلام الزفاف المغربي."
+      "footer_tagline": "حيث تتحقق أحلام الزفاف المغربي.",
+      "about_badge": "المنصة رقم 1 للأعراس في المغرب",
+      "about_title": "نحقق لك عرس أحلامك",
+      "about_subtitle": "عرسي يربطك بأفضل محترفي الأعراس في جميع أنحاء المغرب. من الدار البيضاء إلى مراكش، نختار كل مزود بعناية حتى تتفرّغ للأهم — الاحتفال بحبكم.",
+      "about_stat_providers": "مزودون معتمدون",
+      "about_stat_cities": "مدن مغطاة",
+      "about_stat_categories": "فئات خدمات",
+      "about_stat_support": "دعم متواصل",
+      "about_mission_title": "لماذا يختار الأزواج عرسي",
+      "about_mission_desc": "تنظيم عرس مغربي قد يكون مرهقاً — التنسيق بين الممون والقاعة والمصور والميزانية عبر عدة مدن. عرسي صُمم لتبسيط هذه العملية. نجمع بين التكنولوجيا والخبرة المحلية العميقة لنقدم تجربة تخطيط سلسة وخالية من التوتر، تحترم تقاليدك وتعانق الحداثة.",
+      "about_value_passion": "شغف بالأعراس",
+      "about_value_passion_desc": "نعيش ونتنفس الأعراس المغربية. فريقنا يفهم التقاليد والتفاصيل والمشاعر التي تجعل كل حفل فريداً. من العمارية إلى آخر رقصة، نضمن أن تكون كل لحظة استثنائية.",
+      "about_value_trust": "ثقة وشفافية",
+      "about_value_trust_desc": "كل مزود في منصتنا تم التحقق منه شخصياً من حيث الجودة والموثوقية والأسعار العادلة. لا رسوم خفية، لا مفاجآت — خدمة صادقة يمكنك الاعتماد عليها. ثقتك هي أثمن ما لدينا.",
+      "about_value_community": "مصمم للعائلات المغربية",
+      "about_value_community_desc": "نعلم أن العرس المغربي شأن عائلي. منصتنا مصممة لجمع الجميع معاً — من إدارة قوائم الضيوف إلى التنسيق مع المزودين عبر المدن، نجعل التعاون سهلاً وطبيعياً.",
+      "about_coverage_title": "في كل أنحاء المغرب",
+      "about_coverage_desc": "سواء كنت تخطط لحفل حميمي في الرباط أو عرس ملكي كبير في مراكش، شبكتنا من المزودين المتميزين تغطي أجمل مدن البلاد. أينما يأخذك حلمك، عرسي هنا."
     }
   }
 };
