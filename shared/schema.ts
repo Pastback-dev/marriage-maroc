@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   displayName: text("display_name"),
   role: text("role").notNull().default("client"),
   serviceCategory: text("service_category"),
+  city: text("city"),
   isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });

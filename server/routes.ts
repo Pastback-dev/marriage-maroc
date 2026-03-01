@@ -109,6 +109,21 @@ export async function registerRoutes(
     res.json(safeUser);
   });
 
+  app.patch("/api/provider/city", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
+    const { city } = req.body;
+    if (!city || typeof city !== "string") {
+      return res.status(400).json({ message: "Invalid city" });
+    }
+
+    const updatedUser = await storage.updateUserCity(user.id, city);
+    const { password: _, ...safeUser } = updatedUser;
+    res.json(safeUser);
+  });
+
   // Provider Photos
   app.get("/api/provider/photos", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send();

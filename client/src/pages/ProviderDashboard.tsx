@@ -11,9 +11,49 @@ import { apiRequest } from "@/lib/queryClient";
 import {
   Store, Star, Eye, MessageSquare, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Check, Loader2,
-  Upload, ImagePlus, Trash2, Pencil, X, Image as ImageIcon
+  Upload, ImagePlus, Trash2, Pencil, X, Image as ImageIcon, MapPin
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState, useRef } from "react";
+
+const MOROCCO_CITIES = [
+  "Casablanca",
+  "Rabat",
+  "Marrakech",
+  "Fes",
+  "Tangier",
+  "Agadir",
+  "Meknes",
+  "Oujda",
+  "Kenitra",
+  "Tetouan",
+  "El Jadida",
+  "Safi",
+  "Mohammedia",
+  "Khouribga",
+  "Beni Mellal",
+  "Nador",
+  "Taza",
+  "Settat",
+  "Berrechid",
+  "Khémisset",
+  "Errachidia",
+  "Ouarzazate",
+  "Guelmim",
+  "Dakhla",
+  "Laayoune",
+  "Tiznit",
+  "Ifrane",
+  "Chefchaouen",
+  "Essaouira",
+  "Taroudant",
+];
 
 const SERVICE_CATEGORIES = [
   {
@@ -84,6 +124,22 @@ export default function ProviderDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [changingCity, setChangingCity] = useState(false);
+
+  const cityMutation = useMutation({
+    mutationFn: async (city: string) => {
+      const res = await apiRequest("PATCH", "/api/provider/city", { city });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/user"], data);
+      toast({ title: "City saved", description: "Your city has been updated." });
+      setChangingCity(false);
+    },
+    onError: () => {
+      toast({ variant: "destructive", title: "Error", description: "Failed to update city." });
+    },
+  });
 
   const categoryMutation = useMutation({
     mutationFn: async (serviceCategory: string) => {
@@ -94,6 +150,9 @@ export default function ProviderDashboard() {
       queryClient.setQueryData(["/api/user"], data);
       toast({ title: "Service selected", description: "Your service category has been saved." });
       setSelectedCategory(null);
+      if (!data.city) {
+        setChangingCity(true);
+      }
     },
     onError: () => {
       toast({ variant: "destructive", title: "Error", description: "Failed to update service category." });
@@ -139,28 +198,56 @@ export default function ProviderDashboard() {
 
         {currentCategory && currentCatInfo ? (
           <>
-            <Card className="mb-8 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-2xl ${currentCatInfo.bg} flex items-center justify-center`}>
-                    <currentCatInfo.icon className="w-7 h-7 opacity-80" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <Card className="border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 rounded-2xl ${currentCatInfo.bg} flex items-center justify-center`}>
+                      <currentCatInfo.icon className="w-7 h-7 opacity-80" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-muted-foreground">Your Service</p>
+                      <p className="text-xl font-bold text-secondary" data-testid="text-current-service">{currentCatInfo.name}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5 truncate">{currentCatInfo.desc}</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedCategory(currentCategory)}
+                      data-testid="button-change-service"
+                    >
+                      Change
+                    </Button>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Your Service</p>
-                    <p className="text-xl font-bold text-secondary" data-testid="text-current-service">{currentCatInfo.name}</p>
-                    <p className="text-sm text-muted-foreground mt-0.5">{currentCatInfo.desc}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center">
+                      <MapPin className="w-7 h-7 text-emerald-600 opacity-80" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-muted-foreground">Your City</p>
+                      {user.city ? (
+                        <p className="text-xl font-bold text-secondary" data-testid="text-current-city">{user.city}</p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">No city selected</p>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setChangingCity(true)}
+                      data-testid="button-change-city"
+                    >
+                      {user.city ? "Change" : "Set City"}
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedCategory(currentCategory)}
-                    data-testid="button-change-service"
-                  >
-                    Change Service
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
 
             {selectedCategory && (
               <ServiceCategoryPicker
@@ -169,6 +256,15 @@ export default function ProviderDashboard() {
                 onConfirm={() => categoryMutation.mutate(selectedCategory)}
                 onCancel={() => setSelectedCategory(null)}
                 isPending={categoryMutation.isPending}
+              />
+            )}
+
+            {changingCity && (
+              <CityPicker
+                currentCity={user.city ?? null}
+                onConfirm={(city) => cityMutation.mutate(city)}
+                onCancel={() => setChangingCity(false)}
+                isPending={cityMutation.isPending}
               />
             )}
 
@@ -577,6 +673,67 @@ function ServiceCategoryPicker({
           </Button>
           {onCancel && (
             <Button variant="outline" onClick={onCancel} data-testid="button-cancel-service">
+              Cancel
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CityPicker({
+  currentCity,
+  onConfirm,
+  onCancel,
+  isPending,
+}: {
+  currentCity: string | null;
+  onConfirm: (city: string) => void;
+  onCancel?: () => void;
+  isPending: boolean;
+}) {
+  const [selectedCity, setSelectedCity] = useState<string>(currentCity ?? "");
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle className="text-xl font-display flex items-center gap-2" data-testid="text-select-city-title">
+          <MapPin className="w-5 h-5 text-emerald-600" />
+          Select Your City
+        </CardTitle>
+        <CardDescription>
+          Choose the Moroccan city where you primarily offer your services.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="max-w-xs mb-6">
+          <Select value={selectedCity} onValueChange={setSelectedCity}>
+            <SelectTrigger data-testid="select-city-trigger">
+              <SelectValue placeholder="Choose a city..." />
+            </SelectTrigger>
+            <SelectContent>
+              {MOROCCO_CITIES.map((city) => (
+                <SelectItem key={city} value={city} data-testid={`option-city-${city.toLowerCase().replace(/\s/g, '-')}`}>
+                  {city}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => selectedCity && onConfirm(selectedCity)}
+            disabled={!selectedCity || isPending}
+            className="bg-secondary hover:bg-secondary/90"
+            data-testid="button-confirm-city"
+          >
+            {isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+            Confirm City
+          </Button>
+          {onCancel && (
+            <Button variant="outline" onClick={onCancel} data-testid="button-cancel-city">
               Cancel
             </Button>
           )}

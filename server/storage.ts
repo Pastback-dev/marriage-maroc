@@ -25,6 +25,7 @@ export interface IStorage {
   updateUserAdmin(id: number, isAdmin: boolean): Promise<void>;
   updateUserPassword(id: number, hashedPassword: string): Promise<void>;
   updateUserServiceCategory(id: number, serviceCategory: string): Promise<User>;
+  updateUserCity(id: number, city: string): Promise<User>;
   getAllUsers(): Promise<User[]>;
   deleteUser(id: number): Promise<void>;
 
@@ -94,6 +95,11 @@ export class DatabaseStorage implements IStorage {
 
   async updateUserServiceCategory(id: number, serviceCategory: string): Promise<User> {
     const [user] = await db.update(users).set({ serviceCategory }).where(eq(users.id, id)).returning();
+    return user;
+  }
+
+  async updateUserCity(id: number, city: string): Promise<User> {
+    const [user] = await db.update(users).set({ city }).where(eq(users.id, id)).returning();
     return user;
   }
 
