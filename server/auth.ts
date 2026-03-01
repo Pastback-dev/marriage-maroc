@@ -115,10 +115,8 @@ export function setupAuth(app: Express) {
         password: hashedPassword,
       });
 
-      req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(201).json(user);
-      });
+      const { password: _, ...safeUser } = user;
+      res.status(201).json(safeUser);
     } catch (err) {
       next(err);
     }
