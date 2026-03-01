@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, Link } from "wouter";
 import { z } from "zod";
-import { Loader2, Mail, Lock, User } from "lucide-react";
+import { useState } from "react";
+import { Loader2, Mail, Lock, User, Store } from "lucide-react";
 
 const loginSchema = z.object({
   username: z.string().email("Please enter a valid email address"),
@@ -31,9 +33,10 @@ function LoginPage() {
   const [, setLocation] = useLocation();
   const { data: user } = useUser();
   const loginMutation = useLogin();
+  const [loginRole, setLoginRole] = useState<"client" | "provider">("client");
 
   if (user) {
-    setLocation("/plan");
+    setLocation(user.role === "provider" ? "/provider-dashboard" : "/plan");
     return null;
   }
 
@@ -46,16 +49,36 @@ function LoginPage() {
   });
 
   const onSubmit = async (data: LoginForm) => {
-    loginMutation.mutate(data, {
-      onSuccess: () => setLocation("/plan"),
+    loginMutation.mutate({ ...data, role: loginRole }, {
+      onSuccess: (user: any) => {
+        setLocation(user.role === "provider" ? "/provider-dashboard" : "/plan");
+      },
     });
+  };
+
+  const descriptions: Record<string, string> = {
+    client: "Sign in to access your wedding plan",
+    provider: "Sign in to manage your services and bookings",
   };
 
   return (
     <AuthLayout
       title="Welcome Back"
-      description="Sign in with your email to access your wedding plan"
+      description={descriptions[loginRole]}
     >
+      <Tabs value={loginRole} onValueChange={(v) => setLoginRole(v as "client" | "provider")} className="mb-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="client" className="flex items-center gap-2" data-testid="tab-client-login">
+            <User className="w-4 h-4" />
+            Client
+          </TabsTrigger>
+          <TabsTrigger value="provider" className="flex items-center gap-2" data-testid="tab-provider-login">
+            <Store className="w-4 h-4" />
+            Provider
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -69,7 +92,7 @@ function LoginPage() {
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder={loginRole === "provider" ? "provider@business.com" : "your@email.com"}
                       className="pl-10"
                       autoComplete="email"
                       data-testid="input-email"
@@ -115,16 +138,20 @@ function LoginPage() {
             {loginMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
             ) : null}
-            Sign In
+            {loginRole === "provider" ? "Sign In as Provider" : "Sign In"}
           </Button>
         </form>
       </Form>
 
-      <div className="mt-6 text-center text-sm">
+      <div className="mt-6 text-center text-sm space-y-2">
         <p className="text-muted-foreground">
           Don't have an account?{" "}
-          <Link href="/register" className="text-primary hover:underline font-semibold" data-testid="link-register">
-            Sign up
+          <Link
+            href={loginRole === "provider" ? "/register?role=provider" : "/register"}
+            className="text-primary hover:underline font-semibold"
+            data-testid="link-register"
+          >
+            {loginRole === "provider" ? "Register as Provider" : "Sign up"}
           </Link>
         </p>
       </div>
@@ -137,8 +164,12 @@ function RegisterPage() {
   const { data: user } = useUser();
   const registerMutation = useRegister();
 
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialRole = searchParams.get("role") === "provider" ? "provider" : "client";
+  const [registerRole, setRegisterRole] = useState<"client" | "provider">(initialRole);
+
   if (user) {
-    setLocation("/plan");
+    setLocation(user.role === "provider" ? "/provider-dashboard" : "/plan");
     return null;
   }
 
@@ -154,16 +185,34 @@ function RegisterPage() {
 
   const onSubmit = async (data: RegisterForm) => {
     const { confirmPassword, ...registerData } = data;
-    registerMutation.mutate(registerData, {
+    registerMutation.mutate({ ...registerData, role: registerRole }, {
       onSuccess: () => setLocation("/login"),
     });
   };
 
+  const descriptions: Record<string, string> = {
+    client: "Start planning your dream Moroccan wedding today",
+    provider: "Join our platform and reach more clients",
+  };
+
   return (
     <AuthLayout
-      title="Create Account"
-      description="Start planning your dream Moroccan wedding today"
+      title={registerRole === "provider" ? "Provider Registration" : "Create Account"}
+      description={descriptions[registerRole]}
     >
+      <Tabs value={registerRole} onValueChange={(v) => setRegisterRole(v as "client" | "provider")} className="mb-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="client" className="flex items-center gap-2" data-testid="tab-client-register">
+            <User className="w-4 h-4" />
+            Client
+          </TabsTrigger>
+          <TabsTrigger value="provider" className="flex items-center gap-2" data-testid="tab-provider-register">
+            <Store className="w-4 h-4" />
+            Provider
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -171,12 +220,16 @@ function RegisterPage() {
             name="displayName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>{registerRole === "provider" ? "Business Name" : "Full Name"}</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    {registerRole === "provider" ? (
+                      <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    )}
                     <Input
-                      placeholder="Your full name"
+                      placeholder={registerRole === "provider" ? "Your business name" : "Your full name"}
                       className="pl-10"
                       autoComplete="name"
                       data-testid="input-displayname"
@@ -200,7 +253,7 @@ function RegisterPage() {
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       type="email"
-                      placeholder="your@email.com"
+                      placeholder={registerRole === "provider" ? "provider@business.com" : "your@email.com"}
                       className="pl-10"
                       autoComplete="email"
                       data-testid="input-email"
@@ -270,7 +323,7 @@ function RegisterPage() {
             {registerMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
             ) : null}
-            Create Account
+            {registerRole === "provider" ? "Register as Provider" : "Create Account"}
           </Button>
         </form>
       </Form>

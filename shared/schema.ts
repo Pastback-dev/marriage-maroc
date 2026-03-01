@@ -8,6 +8,7 @@ export const users = pgTable("users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   displayName: text("display_name"),
+  role: text("role").notNull().default("client"),
   isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -74,7 +75,9 @@ export const moodBoardItems = pgTable("mood_board_items", {
 });
 
 // Schemas
-export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, isAdmin: true });
+export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true, isAdmin: true }).extend({
+  role: z.enum(["client", "provider"]).default("client"),
+});
 export const insertUserSchemaAdmin = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertProviderSchema = createInsertSchema(providers).omit({ id: true });
 export const insertPlanSchema = createInsertSchema(plans).omit({ id: true, createdAt: true, selectedProviders: true, totalCost: true });
@@ -95,7 +98,7 @@ export type InsertMoodBoard = z.infer<typeof insertMoodBoardSchema>;
 export type InsertMoodBoardItem = z.infer<typeof insertMoodBoardItemSchema>;
 
 // API Request/Response Types
-export type LoginRequest = Pick<InsertUser, "username" | "password">;
+export type LoginRequest = Pick<InsertUser, "username" | "password"> & { role?: "client" | "provider" };
 export type RegisterRequest = InsertUser;
 
 export type CreatePlanRequest = {

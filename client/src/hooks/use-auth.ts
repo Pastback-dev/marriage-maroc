@@ -27,7 +27,16 @@ export function useLogin() {
       });
 
       if (!res.ok) {
-        if (res.status === 401) throw new Error("Invalid email or password");
+        if (res.status === 401) {
+          const text = await res.text();
+          try {
+            const error = JSON.parse(text);
+            throw new Error(error.message || "Invalid email or password");
+          } catch (e) {
+            if (e instanceof Error && e.message !== "Invalid email or password" && e.message !== "Unexpected token") throw e;
+          }
+          throw new Error("Invalid email or password");
+        }
         throw new Error("Login failed");
       }
       return api.auth.login.responses[200].parse(await res.json());

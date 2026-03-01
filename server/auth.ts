@@ -88,7 +88,7 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, password, displayName } = req.body;
+      const { username, password, displayName, role } = req.body;
 
       if (!username || !password) {
         return res.status(400).json({ message: "Email and password are required" });
@@ -103,6 +103,8 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Password must be at least 6 characters" });
       }
 
+      const validRole = role === "provider" ? "provider" : "client";
+
       const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
         return res.status(400).json({ message: "An account with this email already exists" });
@@ -113,6 +115,7 @@ export function setupAuth(app: Express) {
         username,
         displayName: displayName || null,
         password: hashedPassword,
+        role: validRole,
       });
 
       const { password: _, ...safeUser } = user;
@@ -123,6 +126,13 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", passport.authenticate("local"), (req, res) => {
+    const user = req.user as any;
+    const expectedRole = req.body.role;
+    if (expectedRole && user.role !== expectedRole) {
+      req.logout(() => {});
+      const label = expectedRole === "provider" ? "provider" : "client";
+      return res.status(401).json({ message: `This account is not registered as a ${label}` });
+    }
     res.status(200).json(req.user);
   });
 

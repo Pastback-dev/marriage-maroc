@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   LogIn,
   LayoutDashboard,
-  Info
+  Info,
+  Store
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -134,6 +135,19 @@ export function Navigation() {
                     {item.label}
                   </Link>
                 ))}
+                {user.role === "provider" && (
+                  <Link 
+                    href="/provider-dashboard"
+                    className={`
+                      flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
+                      ${isActive("/provider-dashboard") ? "text-primary font-bold" : "text-muted-foreground"}
+                    `}
+                    data-testid="link-nav-provider-dashboard"
+                  >
+                    <Store className="w-4 h-4" />
+                    My Dashboard
+                  </Link>
+                )}
                 {user.isAdmin && (
                   <Link 
                     href="/admin"
@@ -246,6 +260,22 @@ export function Navigation() {
                           {item.label}
                         </Link>
                       ))}
+                      {user.role === "provider" && (
+                        <Link 
+                          href="/provider-dashboard"
+                          onClick={() => setIsOpen(false)}
+                          data-testid="link-mobile-nav-provider-dashboard"
+                          className={`
+                            flex items-center gap-4 p-3 rounded-lg transition-colors
+                            ${isActive("/provider-dashboard") 
+                              ? "bg-primary/10 text-primary font-bold" 
+                              : "text-muted-foreground hover:bg-muted"}
+                          `}
+                        >
+                          <Store className="w-5 h-5" />
+                          My Dashboard
+                        </Link>
+                      )}
                       {user.isAdmin && (
                         <Link 
                           href="/admin"

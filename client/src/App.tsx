@@ -14,6 +14,7 @@ import Categories from "@/pages/Categories";
 import Rules from "@/pages/Rules";
 import AboutUs from "@/pages/AboutUs";
 import AdminDashboard from "@/pages/AdminDashboard";
+import ProviderDashboard from "@/pages/ProviderDashboard";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/rules" component={Rules} />
       <Route path="/about" component={AboutUs} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/provider-dashboard" component={ProviderDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

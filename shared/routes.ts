@@ -33,7 +33,7 @@ export const api = {
     login: {
       method: 'POST' as const,
       path: '/api/login' as const,
-      input: insertUserSchema.pick({ username: true, password: true }),
+      input: insertUserSchema.pick({ username: true, password: true }).extend({ role: z.string().optional() }),
       responses: {
         200: z.custom<typeof users.$inferSelect>(),
         401: errorSchemas.unauthorized,
