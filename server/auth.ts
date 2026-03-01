@@ -1,22 +1,25 @@
-import { Express, Request, Response, NextFunction } from "express";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import { Express } from "express";
 import session from "express-session";
-import connectPg from "connect-pg-simple";
-import { pool } from "./db";
+import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { promisify } from "util";
 import { storage } from "./storage";
-import { supabaseAdmin } from "./supabase";
 import { User } from "@shared/schema";
 
-const PostgresSessionStore = connectPg(session);
+const scryptAsync = promisify(scrypt);
 
-declare module "express-session" {
-  interface SessionData {
-    userId?: number;
-  }
+async function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${buf.toString("hex")}.${salt}`;
 }
 
-export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!req.session.userId) return res.status(401).send();
-  next();
+async function comparePasswords(supplied: string, stored: string) {
+  const [hashed, salt] = stored.split(".");
+  const hashedBuf = Buffer.from(hashed, "hex");
+  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+  return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
 export async function seedAdmin() {
@@ -26,21 +29,12 @@ export async function seedAdmin() {
     console.log("ADMIN_EMAIL or ADMIN_PASSWORD not set, skipping admin seed");
     return;
   }
-
   const existing = await storage.getUserByUsername(adminEmail);
   if (!existing) {
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      email: adminEmail,
-      password: adminPassword,
-      email_confirm: true,
-    });
-    if (error && !error.message.includes("already registered")) {
-      console.error("Failed to create admin in Supabase Auth:", error.message);
-      return;
-    }
+    const hashedPassword = await hashPassword(adminPassword);
     await storage.createUser({
       username: adminEmail,
-      password: "",
+      password: hashedPassword,
       displayName: "Administrator",
       isAdmin: true,
     });
@@ -49,7 +43,9 @@ export async function seedAdmin() {
     if (!existing.isAdmin) {
       await storage.updateUserAdmin(existing.id, true);
     }
-    console.log("Admin account already exists");
+    const hashedPassword = await hashPassword(adminPassword);
+    await storage.updateUserPassword(existing.id, hashedPassword);
+    console.log("Admin account updated");
   }
 }
 
@@ -58,15 +54,7 @@ export function setupAuth(app: Express) {
     secret: process.env.SESSION_SECRET || "r3pl1t_s3cr3t",
     resave: false,
     saveUninitialized: false,
-    store: new PostgresSessionStore({
-      pool,
-      createTableIfMissing: true,
-    }),
-    cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-    },
+    store: storage.sessionStore,
   };
 
   if (app.get("env") === "production") {
@@ -74,8 +62,31 @@ export function setupAuth(app: Express) {
   }
 
   app.use(session(sessionSettings));
+  app.use(passport.initialize());
+  app.use(passport.session());
 
-  app.post("/api/register", async (req, res) => {
+  passport.use(
+    new LocalStrategy(async (username, password, done) => {
+      try {
+        const user = await storage.getUserByUsername(username);
+        if (!user || !(await comparePasswords(password, user.password))) {
+          return done(null, false);
+        } else {
+          return done(null, user);
+        }
+      } catch (err) {
+        return done(err);
+      }
+    }),
+  );
+
+  passport.serializeUser((user, done) => done(null, (user as User).id));
+  passport.deserializeUser(async (id, done) => {
+    const user = await storage.getUser(id as number);
+    done(null, user);
+  });
+
+  app.post("/api/register", async (req, res, next) => {
     try {
       const { username, password, displayName, role } = req.body;
 
@@ -99,86 +110,41 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "An account with this email already exists" });
       }
 
-      const { data, error } = await supabaseAdmin.auth.admin.createUser({
-        email: username,
-        password,
-        email_confirm: true,
-      });
-
-      if (error) {
-        if (error.message.includes("already registered")) {
-          return res.status(400).json({ message: "An account with this email already exists" });
-        }
-        return res.status(400).json({ message: error.message });
-      }
-
+      const hashedPassword = await hashPassword(password);
       const user = await storage.createUser({
         username,
         displayName: displayName || null,
-        password: "",
+        password: hashedPassword,
         role: validRole,
       });
 
       const { password: _, ...safeUser } = user;
       res.status(201).json(safeUser);
-    } catch (err: any) {
-      console.error("Register error:", err);
-      res.status(500).json({ message: "Registration failed" });
+    } catch (err) {
+      next(err);
     }
   });
 
-  app.post("/api/login", async (req, res) => {
-    try {
-      const { username, password, role } = req.body;
-
-      if (!username || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
-      }
-
-      const { data, error } = await supabaseAdmin.auth.signInWithPassword({
-        email: username,
-        password,
-      });
-
-      if (error || !data.user) {
-        return res.status(401).json({ message: "Invalid email or password" });
-      }
-
-      const user = await storage.getUserByUsername(username);
-      if (!user) {
-        return res.status(401).json({ message: "User not found in database" });
-      }
-
-      if (role && user.role !== role) {
-        const label = role === "provider" ? "provider" : "client";
-        return res.status(401).json({ message: `This account is not registered as a ${label}` });
-      }
-
-      req.session.userId = user.id;
-      const { password: _, ...safeUser } = user;
-      res.status(200).json(safeUser);
-    } catch (err: any) {
-      console.error("Login error:", err);
-      res.status(500).json({ message: "Login failed" });
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+    const user = req.user as any;
+    const expectedRole = req.body.role;
+    if (expectedRole && user.role !== expectedRole) {
+      req.logout(() => {});
+      const label = expectedRole === "provider" ? "provider" : "client";
+      return res.status(401).json({ message: `This account is not registered as a ${label}` });
     }
+    res.status(200).json(req.user);
   });
 
-  app.post("/api/logout", (req, res) => {
-    req.session.destroy((err) => {
-      if (err) return res.status(500).json({ message: "Logout failed" });
-      res.clearCookie("connect.sid");
+  app.post("/api/logout", (req, res, next) => {
+    req.logout((err) => {
+      if (err) return next(err);
       res.sendStatus(200);
     });
   });
 
-  app.get("/api/user", async (req, res) => {
-    if (!req.session.userId) return res.sendStatus(401);
-    const user = await storage.getUser(req.session.userId);
-    if (!user) {
-      req.session.destroy(() => {});
-      return res.sendStatus(401);
-    }
-    const { password: _, ...safeUser } = user;
-    res.json(safeUser);
+  app.get("/api/user", (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    res.json(req.user);
   });
 }

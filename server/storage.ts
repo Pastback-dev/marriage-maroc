@@ -2,20 +2,25 @@ import { db } from "./db";
 import {
   users, providers, plans, guests,
   type User, type InsertUser,
-  type Provider,
+  type Provider, type InsertUser as InsertProvider,
   type Plan, type Guest, type InsertGuest,
   moodBoards, moodBoardItems,
   type MoodBoard, type MoodBoardItem, type InsertMoodBoard, type InsertMoodBoardItem,
   providerPhotos, type ProviderPhoto, type InsertProviderPhoto
 } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
-import { supabaseAdmin, STORAGE_BUCKET } from "./supabase";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
+import { pool } from "./db";
+
+const PostgresSessionStore = connectPg(session);
 
 export interface IStorage {
   // Auth & Users
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser & { password?: string; isAdmin?: boolean }): Promise<User>;
+  createUser(user: InsertUser): Promise<User>;
+  sessionStore: session.Store;
 
   updateUserAdmin(id: number, isAdmin: boolean): Promise<void>;
   updateUserPassword(id: number, hashedPassword: string): Promise<void>;
@@ -50,13 +55,20 @@ export interface IStorage {
   // Provider Photos
   getProviderPhotos(userId: number): Promise<ProviderPhoto[]>;
   addProviderPhoto(photo: InsertProviderPhoto): Promise<ProviderPhoto>;
-  uploadProviderPhotoToStorage(fileBuffer: Buffer, fileName: string, mimeType: string): Promise<string>;
-  deleteProviderPhotoFromStorage(imageUrl: string): Promise<void>;
   updateProviderPhotoDescription(id: number, userId: number, description: string): Promise<ProviderPhoto>;
   deleteProviderPhoto(id: number, userId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
+  sessionStore: session.Store;
+
+  constructor() {
+    this.sessionStore = new PostgresSessionStore({
+      pool,
+      createTableIfMissing: true,
+    });
+  }
+
   // User
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
@@ -68,8 +80,8 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async createUser(insertUser: InsertUser & { password?: string; isAdmin?: boolean }): Promise<User> {
-    const [user] = await db.insert(users).values({ ...insertUser, password: insertUser.password ?? "" }).returning();
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
@@ -109,7 +121,7 @@ export class DatabaseStorage implements IStorage {
     if (city) conditions.push(eq(providers.city, city));
 
     if (conditions.length > 0) {
-      // @ts-ignore
+      // @ts-ignore - spread arguments issue with and()
       return await query.where(and(...conditions));
     }
     return await query;
@@ -243,31 +255,6 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(providerPhotos).where(eq(providerPhotos.userId, userId));
   }
 
-  async uploadProviderPhotoToStorage(fileBuffer: Buffer, fileName: string, mimeType: string): Promise<string> {
-    const { data, error } = await supabaseAdmin.storage
-      .from(STORAGE_BUCKET)
-      .upload(fileName, fileBuffer, {
-        contentType: mimeType,
-        upsert: false,
-      });
-
-    if (error) throw new Error(`Storage upload failed: ${error.message}`);
-
-    const { data: urlData } = supabaseAdmin.storage
-      .from(STORAGE_BUCKET)
-      .getPublicUrl(data.path);
-
-    return urlData.publicUrl;
-  }
-
-  async deleteProviderPhotoFromStorage(imageUrl: string): Promise<void> {
-    const url = new URL(imageUrl);
-    const pathParts = url.pathname.split(`/${STORAGE_BUCKET}/`);
-    if (pathParts.length < 2) return;
-    const filePath = pathParts[1];
-    await supabaseAdmin.storage.from(STORAGE_BUCKET).remove([filePath]);
-  }
-
   async addProviderPhoto(photo: InsertProviderPhoto): Promise<ProviderPhoto> {
     const [newPhoto] = await db.insert(providerPhotos).values(photo).returning();
     return newPhoto;
@@ -282,13 +269,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProviderPhoto(id: number, userId: number): Promise<void> {
-    const [photo] = await db.select().from(providerPhotos)
-      .where(and(eq(providerPhotos.id, id), eq(providerPhotos.userId, userId)));
-
-    if (photo) {
-      await this.deleteProviderPhotoFromStorage(photo.imageUrl).catch(console.error);
-      await db.delete(providerPhotos).where(and(eq(providerPhotos.id, id), eq(providerPhotos.userId, userId)));
-    }
+    await db.delete(providerPhotos).where(and(eq(providerPhotos.id, id), eq(providerPhotos.userId, userId)));
   }
 }
 

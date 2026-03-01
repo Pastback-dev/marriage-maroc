@@ -1,14 +1,26 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, seedAdmin, requireAuth } from "./auth";
+import { setupAuth, seedAdmin } from "./auth";
 import { api } from "@shared/routes";
+import { z } from "zod";
 import { User } from "@shared/schema";
 import multer from "multer";
 import path from "path";
+import fs from "fs";
+import express from "express";
+
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage: multer.diskStorage({
+    destination: uploadDir,
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`);
+    },
+  }),
   fileFilter: (_req, file, cb) => {
     const allowed = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
     const ext = path.extname(file.originalname).toLowerCase();
@@ -18,40 +30,22 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-async function getSessionUser(req: Request): Promise<User | undefined> {
-  if (!req.session.userId) return undefined;
-  return await storage.getUser(req.session.userId);
-}
-
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Initialize Auth
   setupAuth(app);
 
+  // Seed data on startup
   await storage.seedProviders();
   await seedAdmin();
 
-  async function requireAdmin(req: Request, res: Response, next: NextFunction) {
-    const user = await getSessionUser(req);
-    if (!user) return res.status(401).send();
+  // Admin middleware
+  function requireAdmin(req: Request, res: Response, next: NextFunction) {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
     if (!user.isAdmin) return res.status(403).json({ message: "Admin access required" });
-    (req as any).currentUser = user;
-    next();
-  }
-
-  async function requireProvider(req: Request, res: Response, next: NextFunction) {
-    const user = await getSessionUser(req);
-    if (!user) return res.status(401).send();
-    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
-    (req as any).currentUser = user;
-    next();
-  }
-
-  async function requireAnyAuth(req: Request, res: Response, next: NextFunction) {
-    const user = await getSessionUser(req);
-    if (!user) return res.status(401).send();
-    (req as any).currentUser = user;
     next();
   }
 
@@ -59,11 +53,13 @@ export async function registerRoutes(
   app.get("/api/admin/stats", requireAdmin, async (req, res) => {
     const allUsers = await storage.getAllUsers();
     const allProviders = await storage.getProviders();
+    const userCount = allUsers.length;
+    const providerCount = allProviders.length;
     const categoryCounts: Record<string, number> = {};
     for (const p of allProviders) {
       categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1;
     }
-    res.json({ userCount: allUsers.length, providerCount: allProviders.length, categoryCounts });
+    res.json({ userCount, providerCount, categoryCounts });
   });
 
   app.get("/api/admin/users", requireAdmin, async (req, res) => {
@@ -74,7 +70,7 @@ export async function registerRoutes(
 
   app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
     const targetId = Number(req.params.id);
-    const currentUser = (req as any).currentUser as User;
+    const currentUser = req.user as User;
     if (targetId === currentUser.id) {
       return res.status(400).json({ message: "Cannot delete your own account" });
     }
@@ -88,84 +84,102 @@ export async function registerRoutes(
   });
 
   app.delete("/api/admin/providers/:id", requireAdmin, async (req, res) => {
-    await storage.deleteProvider(Number(req.params.id));
+    const id = Number(req.params.id);
+    await storage.deleteProvider(id);
     res.status(200).json({ message: "Provider deleted" });
   });
 
+  // Serve uploaded files
+  app.use("/uploads", express.static(uploadDir));
+
   // Provider Profile Routes
-  app.patch("/api/provider/service-category", requireProvider, async (req, res) => {
-    const user = (req as any).currentUser as User;
+  app.patch("/api/provider/service-category", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
     const validCategories = ["traiteur", "hall", "dj", "cameraman", "neggafa", "decoration"];
     const { serviceCategory } = req.body;
     if (!serviceCategory || !validCategories.includes(serviceCategory)) {
       return res.status(400).json({ message: "Invalid service category" });
     }
+
     const updatedUser = await storage.updateUserServiceCategory(user.id, serviceCategory);
     const { password: _, ...safeUser } = updatedUser;
     res.json(safeUser);
   });
 
-  app.patch("/api/provider/city", requireProvider, async (req, res) => {
-    const user = (req as any).currentUser as User;
+  app.patch("/api/provider/city", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
     const { city } = req.body;
     if (!city || typeof city !== "string") {
       return res.status(400).json({ message: "Invalid city" });
     }
+
     const updatedUser = await storage.updateUserCity(user.id, city);
     const { password: _, ...safeUser } = updatedUser;
     res.json(safeUser);
   });
 
   // Provider Photos
-  app.get("/api/provider/photos", requireProvider, async (req, res) => {
-    const user = (req as any).currentUser as User;
+  app.get("/api/provider/photos", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
     const photos = await storage.getProviderPhotos(user.id);
     res.json(photos);
   });
 
-  app.post("/api/provider/photos", requireProvider, upload.single("photo"), async (req, res) => {
-    const user = (req as any).currentUser as User;
+  app.post("/api/provider/photos", upload.single("photo"), async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
     if (!req.file) return res.status(400).json({ message: "No image file uploaded" });
 
-    try {
-      const ext = path.extname(req.file.originalname).toLowerCase();
-      const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
-      const imageUrl = await storage.uploadProviderPhotoToStorage(
-        req.file.buffer,
-        fileName,
-        req.file.mimetype,
-      );
+    const imageUrl = `/uploads/${req.file.filename}`;
+    const description = req.body.description || null;
 
-      const description = req.body.description || null;
-      const photo = await storage.addProviderPhoto({ userId: user.id, imageUrl, description });
-      res.status(201).json(photo);
-    } catch (err: any) {
-      console.error("Photo upload error:", err);
-      res.status(500).json({ message: err.message || "Upload failed" });
-    }
+    const photo = await storage.addProviderPhoto({
+      userId: user.id,
+      imageUrl,
+      description,
+    });
+    res.status(201).json(photo);
   });
 
-  app.patch("/api/provider/photos/:id", requireProvider, async (req, res) => {
-    const user = (req as any).currentUser as User;
+  app.patch("/api/provider/photos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
     const { description } = req.body;
     if (typeof description !== "string") return res.status(400).json({ message: "Description is required" });
+
     const updated = await storage.updateProviderPhotoDescription(Number(req.params.id), user.id, description);
     if (!updated) return res.status(404).json({ message: "Photo not found" });
     res.json(updated);
   });
 
-  app.delete("/api/provider/photos/:id", requireProvider, async (req, res) => {
-    const user = (req as any).currentUser as User;
+  app.delete("/api/provider/photos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
     await storage.deleteProviderPhoto(Number(req.params.id), user.id);
     res.status(200).json({ message: "Photo deleted" });
   });
+
+  // API Routes
 
   // Providers
   app.get(api.providers.list.path, async (req, res) => {
     const category = req.query.category as string | undefined;
     const city = req.query.city as string | undefined;
-    const providersList = await storage.getProviders(category, city);
-    res.json(providersList);
+    const providers = await storage.getProviders(category, city);
+    res.json(providers);
   });
 
   app.get(api.providers.get.path, async (req, res) => {
@@ -174,9 +188,10 @@ export async function registerRoutes(
     res.json(provider);
   });
 
-  // Plans
-  app.post(api.plans.create.path, requireAnyAuth, async (req, res) => {
-    const user = (req as any).currentUser as User;
+  // Plans (AI Planner Mock)
+  app.post(api.plans.create.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+
     const input = api.plans.create.input.parse(req.body);
 
     const budgetAlloc = {
@@ -186,26 +201,26 @@ export async function registerRoutes(
       cameraman: input.totalBudget * 0.1,
     };
 
-    const allTraiteurs = await storage.getProviders("traiteur");
-    const allHalls = await storage.getProviders("hall");
-    const allDjs = await storage.getProviders("dj");
-    const allCams = await storage.getProviders("cameraman");
+    const allTraiteurs = await storage.getProviders('traiteur');
+    const allHalls = await storage.getProviders('hall');
+    const allDjs = await storage.getProviders('dj');
+    const allCams = await storage.getProviders('cameraman');
 
-    const pickBest = (items: any[]) => {
+    const pickBest = (items: any[], targetBudget: number) => {
       if (!items.length) return null;
       return items[Math.floor(Math.random() * items.length)];
     };
 
-    const suggestedTraiteur = pickBest(allTraiteurs);
-    const suggestedHall = pickBest(allHalls);
-    const suggestedDj = pickBest(allDjs);
-    const suggestedCam = pickBest(allCams);
+    const suggestedTraiteur = pickBest(allTraiteurs, budgetAlloc.traiteur);
+    const suggestedHall = pickBest(allHalls, budgetAlloc.hall);
+    const suggestedDj = pickBest(allDjs, budgetAlloc.dj);
+    const suggestedCam = pickBest(allCams, budgetAlloc.cameraman);
 
     const breakdown = {
       traiteur: suggestedTraiteur,
       hall: suggestedHall,
       dj: suggestedDj,
-      cameraman: suggestedCam,
+      cameraman: suggestedCam
     };
 
     const cost =
@@ -218,45 +233,47 @@ export async function registerRoutes(
       traiteur: suggestedTraiteur?.id,
       hall: suggestedHall?.id,
       dj: suggestedDj?.id,
-      cameraman: suggestedCam?.id,
+      cameraman: suggestedCam?.id
     };
 
-    const newPlan = await storage.createPlan({
-      userId: user.id,
+    const planData = {
+      userId: (req.user as any).id,
       guestCount: input.guestCount,
       totalBudget: input.totalBudget,
       city: input.city,
       weddingStyle: input.weddingStyle,
       selectedProviders,
-      totalCost: cost,
-    });
+      totalCost: cost
+    };
+
+    const newPlan = await storage.createPlan(planData);
 
     res.status(201).json({ ...newPlan, breakdown });
   });
 
-  app.get(api.plans.list.path, requireAnyAuth, async (req, res) => {
-    const user = (req as any).currentUser as User;
-    const plansList = await storage.getPlans(user.id);
-    res.json(plansList);
+  app.get(api.plans.list.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const plans = await storage.getPlans((req.user as any).id);
+    res.json(plans);
   });
 
   // Guests
-  app.get(api.guests.list.path, requireAnyAuth, async (req, res) => {
-    const user = (req as any).currentUser as User;
-    const guestsList = await storage.getGuests(user.id);
-    res.json(guestsList);
+  app.get(api.guests.list.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const guests = await storage.getGuests((req.user as any).id);
+    res.json(guests);
   });
 
-  app.post(api.guests.create.path, requireAnyAuth, async (req, res) => {
-    const user = (req as any).currentUser as User;
+  app.post(api.guests.create.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
     const input = api.guests.create.input.parse(req.body);
-    const guest = await storage.createGuest({ ...input, userId: user.id });
+    const guest = await storage.createGuest({ ...input, userId: (req.user as any).id });
     res.status(201).json(guest);
   });
 
-  app.delete(api.guests.delete.path, requireAnyAuth, async (req, res) => {
-    const user = (req as any).currentUser as User;
-    await storage.deleteGuest(Number(req.params.id), user.id);
+  app.delete(api.guests.delete.path, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    await storage.deleteGuest(Number(req.params.id), (req.user as any).id);
     res.status(200).send();
   });
 
@@ -267,29 +284,32 @@ export async function registerRoutes(
   });
 
   // Mood Boards
-  app.get("/api/moodboards", requireAnyAuth, async (req, res) => {
-    const user = (req as any).currentUser as User;
-    const boards = await storage.getMoodBoards(user.id);
+  app.get("/api/moodboards", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const boards = await storage.getMoodBoards((req.user as any).id);
     res.json(boards);
   });
 
-  app.post("/api/moodboards", requireAnyAuth, async (req, res) => {
-    const user = (req as any).currentUser as User;
-    const board = await storage.createMoodBoard({ ...req.body, userId: user.id });
+  app.post("/api/moodboards", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const board = await storage.createMoodBoard({ ...req.body, userId: (req.user as any).id });
     res.status(201).json(board);
   });
 
-  app.get("/api/moodboards/:id/items", requireAnyAuth, async (req, res) => {
+  app.get("/api/moodboards/:id/items", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
     const items = await storage.getMoodBoardItems(Number(req.params.id));
     res.json(items);
   });
 
-  app.post("/api/moodboards/:id/items", requireAnyAuth, async (req, res) => {
+  app.post("/api/moodboards/:id/items", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
     const item = await storage.addMoodBoardItem({ ...req.body, boardId: Number(req.params.id) });
     res.status(201).json(item);
   });
 
-  app.delete("/api/moodboard-items/:id", requireAnyAuth, async (req, res) => {
+  app.delete("/api/moodboard-items/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
     await storage.deleteMoodBoardItem(Number(req.params.id));
     res.status(200).send();
   });
