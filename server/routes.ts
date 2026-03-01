@@ -65,6 +65,23 @@ export async function registerRoutes(
     res.status(200).json({ message: "Provider deleted" });
   });
 
+  // Provider Profile Routes
+  app.patch("/api/provider/service-category", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send();
+    const user = req.user as User;
+    if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
+
+    const validCategories = ["traiteur", "hall", "dj", "cameraman", "neggafa", "decoration"];
+    const { serviceCategory } = req.body;
+    if (!serviceCategory || !validCategories.includes(serviceCategory)) {
+      return res.status(400).json({ message: "Invalid service category" });
+    }
+
+    const updatedUser = await storage.updateUserServiceCategory(user.id, serviceCategory);
+    const { password: _, ...safeUser } = updatedUser;
+    res.json(safeUser);
+  });
+
   // API Routes
 
   // Providers
