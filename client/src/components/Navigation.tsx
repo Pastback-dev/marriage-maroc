@@ -14,7 +14,8 @@ import {
   Grid3X3,
   ShieldCheck,
   LogIn,
-  LayoutDashboard
+  LayoutDashboard,
+  Info
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -46,6 +47,7 @@ export function Navigation() {
     { label: t("nav_ai_recommendation"), path: "/plan", icon: Sparkles },
     { label: t("nav_categories"), path: "/categories", icon: Grid3X3 },
     { label: t("nav_rules"), path: "/rules", icon: ShieldCheck },
+    { label: t("nav_about"), path: "/about", icon: Info },
   ];
 
   const userNavItems = [

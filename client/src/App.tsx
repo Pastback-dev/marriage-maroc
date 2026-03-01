@@ -12,6 +12,7 @@ import ProvidersList from "@/pages/ProvidersList";
 import MoodBoard from "@/pages/MoodBoard";
 import Categories from "@/pages/Categories";
 import Rules from "@/pages/Rules";
+import AboutUs from "@/pages/AboutUs";
 import AdminDashboard from "@/pages/AdminDashboard";
 
 function Router() {
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/moodboard" component={MoodBoard} />
       <Route path="/categories" component={Categories} />
       <Route path="/rules" component={Rules} />
+      <Route path="/about" component={AboutUs} />
       <Route path="/admin" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
