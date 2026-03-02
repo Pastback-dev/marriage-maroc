@@ -12,7 +12,7 @@ import {
   Store, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Loader2,
   Upload, ImagePlus, Trash2, ImageIcon, MapPin, Sparkles,
-  FileText
+  FileText, Banknote
 } from "lucide-react";
 import {
   Select,
@@ -44,6 +44,7 @@ export default function ProviderDashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [changingCity, setChangingCity] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
+  const [editingPrice, setEditingPrice] = useState(false);
 
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
@@ -111,6 +112,29 @@ export default function ProviderDashboard() {
     }
   });
 
+  const priceMutation = useMutation({
+    mutationFn: async ({ min, max }: { min: number; max: number }) => {
+      if (!user?.id) throw new Error("User not found");
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          price_min: min,
+          price_max: max,
+          role: 'provider'
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({ title: "Pricing updated" });
+      setEditingPrice(false);
+    },
+    onError: (error: any) => {
+      toast({ variant: "destructive", title: "Error saving pricing", description: error.message });
+    }
+  });
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   
   if (!user || user.role !== "provider") { 
@@ -130,7 +154,7 @@ export default function ProviderDashboard() {
           <p className="text-muted-foreground mt-2">Welcome back, {user.displayName || user.username}!</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card className="border-primary/20 shadow-sm">
             <CardContent className="pt-6 flex items-center gap-4">
               <div className={`w-14 h-14 rounded-2xl ${currentCatInfo?.bg || 'bg-slate-100'} flex items-center justify-center`}>
@@ -160,6 +184,23 @@ export default function ProviderDashboard() {
               </Button>
             </CardContent>
           </Card>
+
+          <Card className="border-primary/20 shadow-sm">
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center">
+                <Banknote className="w-7 h-7 text-amber-600 opacity-80" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Pricing Range</p>
+                <p className="text-xl font-bold text-secondary">
+                  {user.priceMin !== null ? `${user.priceMin.toLocaleString()} - ${user.priceMax?.toLocaleString()} MAD` : "Not set"}
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setEditingPrice(true)}>
+                {user.priceMin !== null ? "Change" : "Set Price"}
+              </Button>
+            </CardContent>
+          </Card>
         </div>
 
         {selectedCategory !== null && (
@@ -181,6 +222,18 @@ export default function ProviderDashboard() {
               onConfirm={(city) => cityMutation.mutate(city)}
               onCancel={() => setChangingCity(false)}
               isPending={cityMutation.isPending}
+            />
+          </div>
+        )}
+
+        {editingPrice && (
+          <div className="mb-8">
+            <PricePicker
+              currentMin={user.priceMin}
+              currentMax={user.priceMax}
+              onConfirm={(min, max) => priceMutation.mutate({ min, max })}
+              onCancel={() => setEditingPrice(false)}
+              isPending={priceMutation.isPending}
             />
           </div>
         )}
@@ -277,7 +330,7 @@ function PhotoGallery({ userId }: { userId: string }) {
           .insert({
             user_id: userId,
             image_url: publicUrl,
-            description: null // Description is now separate
+            description: null
           });
 
         if (dbError) throw dbError;
@@ -461,6 +514,49 @@ function CityPicker({ currentCity, onConfirm, onCancel, isPending }: any) {
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(city)} disabled={!city || isPending} className="bg-secondary hover:bg-secondary/90">
               {isPending && <Loader2 className="animate-spin mr-2" />} Save City
+            </Button>
+            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PricePicker({ currentMin, currentMax, onConfirm, onCancel, isPending }: any) {
+  const [min, setMin] = useState(currentMin || 0);
+  const [max, setMax] = useState(currentMax || 0);
+  return (
+    <Card className="border-primary/10 shadow-sm">
+      <CardHeader>
+        <CardTitle>Set your pricing range</CardTitle>
+        <CardDescription>Provide an estimated price range for your services in MAD.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="max-w-md space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Minimum Price (MAD)</label>
+              <Input 
+                type="number" 
+                value={min} 
+                onChange={(e) => setMin(Number(e.target.value))} 
+                placeholder="e.g. 5000"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Maximum Price (MAD)</label>
+              <Input 
+                type="number" 
+                value={max} 
+                onChange={(e) => setMax(Number(e.target.value))} 
+                placeholder="e.g. 15000"
+              />
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button onClick={() => onConfirm(min, max)} disabled={isPending} className="bg-secondary hover:bg-secondary/90">
+              {isPending && <Loader2 className="animate-spin mr-2" />} Save Pricing
             </Button>
             <Button variant="outline" onClick={onCancel}>Cancel</Button>
           </div>

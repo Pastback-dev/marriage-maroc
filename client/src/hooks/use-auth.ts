@@ -29,6 +29,8 @@ export function useUser() {
           serviceCategory: null,
           city: null,
           description: null,
+          priceMin: null,
+          priceMax: null,
         };
       }
 
@@ -43,10 +45,11 @@ export function useUser() {
         serviceCategory: profile.service_category,
         city: profile.city,
         description: profile.description,
+        priceMin: profile.price_min ? Number(profile.price_min) : null,
+        priceMax: profile.price_max ? Number(profile.price_max) : null,
       };
     },
     refetchOnWindowFocus: true,
-    // Removed staleTime to ensure we always get the freshest auth state
   });
 }
 
@@ -126,7 +129,6 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
-      // Clear cache BEFORE sign out so the login page never sees stale user data
       queryClient.clear();
       queryClient.setQueryData(["/api/user"], null);
       await supabase.auth.signOut();
