@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const MOROCCO_CITIES = [
   "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda", "Kenitra", "Tetouan"
@@ -43,6 +43,17 @@ export default function ProviderDashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [changingCity, setChangingCity] = useState(false);
 
+  // Debugging log
+  useEffect(() => {
+    if (user) {
+      console.log("Current User Data:", {
+        role: user.role,
+        serviceCategory: user.serviceCategory,
+        city: user.city
+      });
+    }
+  }, [user]);
+
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
       const { error } = await supabase
@@ -56,6 +67,9 @@ export default function ProviderDashboard() {
       toast({ title: "City saved" });
       setChangingCity(false);
     },
+    onError: (error: any) => {
+      toast({ variant: "destructive", title: "Error saving city", description: error.message });
+    }
   });
 
   const categoryMutation = useMutation({
@@ -71,10 +85,19 @@ export default function ProviderDashboard() {
       toast({ title: "Service selected" });
       setSelectedCategory(null);
     },
+    onError: (error: any) => {
+      toast({ variant: "destructive", title: "Error saving service", description: error.message });
+    }
   });
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
-  if (!user || user.role !== "provider") { setLocation("/login"); return null; }
+  
+  // If user is not a provider, redirect
+  if (!user || user.role !== "provider") { 
+    console.log("User is not a provider, redirecting...", user?.role);
+    setLocation("/login"); 
+    return null; 
+  }
 
   const currentCategory = user.serviceCategory;
   const currentCatInfo = SERVICE_CATEGORIES.find(c => c.id === currentCategory);

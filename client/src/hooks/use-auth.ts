@@ -7,37 +7,45 @@ export function useUser() {
   return useQuery({
     queryKey: ["/api/user"],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return null;
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) return null;
 
       // Fetch profile data from public.profiles table
-      const { data: profile, error } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
         .single();
 
-      if (error) {
-        console.warn("Profile not found or error fetching, using session data:", error.message);
-        // Fallback to basic session data if profile isn't ready yet
+      if (profileError) {
+        console.warn("Profile fetch error:", profileError.message);
+        // Fallback to session metadata if profile table isn't fully set up yet
         return {
           id: session.user.id,
           username: session.user.email,
           role: session.user.user_metadata?.role || 'client',
           isAdmin: false,
           displayName: session.user.user_metadata?.display_name || null,
+          serviceCategory: null,
+          city: null,
         };
       }
 
       // Map snake_case from DB to camelCase for the frontend
       return {
         ...profile,
-        displayName: profile.display_name,
-        isAdmin: profile.is_admin,
+        id: profile.id,
+        username: session.user.email,
+        role: profile.role || session.user.user_metadata?.role || 'client',
+        displayName: profile.display_name || session.user.user_metadata?.display_name,
+        isAdmin: !!profile.is_admin,
         serviceCategory: profile.service_category,
+        city: profile.city,
       };
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    // Refetch more often during development to catch profile updates
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 5, // 5 seconds
   });
 }
 
