@@ -46,7 +46,7 @@ export function useUser() {
       };
     },
     refetchOnWindowFocus: true,
-    staleTime: 1000 * 5, // 5 seconds
+    // Removed staleTime to ensure we always get the freshest auth state
   });
 }
 
@@ -101,7 +101,6 @@ export function useRegister() {
     onSuccess: (user) => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       
-      // If email confirmation is off, they might be logged in immediately
       const message = user?.identities?.length === 0 
         ? "Account already exists or needs verification." 
         : "Account created! You can now log in.";
@@ -130,8 +129,9 @@ export function useLogout() {
       await supabase.auth.signOut();
     },
     onSuccess: () => {
-      // The AuthProvider handles the cache clearing via onAuthStateChange
-      toast({ title: "Logged out", description: "See you soon!" });
+      // Force a hard reload to the login page to clear all memory state
+      queryClient.clear();
+      window.location.href = "/login";
     },
   });
 }
