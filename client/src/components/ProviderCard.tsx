@@ -22,24 +22,37 @@ export function ProviderCard({ provider }: ProviderCardProps) {
       <CardHeader className="p-0">
         <Carousel className="w-full">
           <CarouselContent>
-            {provider.images.map((img, idx) => (
-              <CarouselItem key={idx}>
-                <div className="aspect-[4/3] w-full overflow-hidden relative">
-                  {/* Unsplash image with fallback */}
-                  <img 
-                    src={img} 
-                    alt={`${provider.name} - ${idx + 1}`} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {provider.images && provider.images.length > 0 ? (
+              provider.images.map((img, idx) => (
+                <CarouselItem key={idx}>
+                  <div className="aspect-[4/3] w-full overflow-hidden relative">
+                    <img 
+                      src={img} 
+                      alt={`${provider.name} - ${idx + 1}`} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                </CarouselItem>
+              ))
+            ) : (
+              <CarouselItem>
+                <div className="aspect-[4/3] w-full overflow-hidden relative bg-muted flex items-center justify-center">
+                  <div className="text-muted-foreground">No image available</div>
                 </div>
               </CarouselItem>
-            ))}
+            )}
           </CarouselContent>
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-            <CarouselPrevious className="left-2 bg-background/80 backdrop-blur-sm border-0" />
-            <CarouselNext className="right-2 bg-background/80 backdrop-blur-sm border-0" />
-          </div>
+          {provider.images && provider.images.length > 1 && (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <CarouselPrevious className="left-2 bg-background/80 backdrop-blur-sm border-0" />
+              <CarouselNext className="right-2 bg-background/80 backdrop-blur-sm border-0" />
+            </div>
+          )}
         </Carousel>
       </CardHeader>
       
@@ -48,10 +61,12 @@ export function ProviderCard({ provider }: ProviderCardProps) {
           <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 uppercase tracking-wide text-xs font-bold">
             {provider.category}
           </Badge>
-          <div className="flex items-center gap-1 text-amber-400">
-            <Star className="w-4 h-4 fill-current" />
-            <span className="text-sm font-semibold text-foreground">{provider.rating}</span>
-          </div>
+          {provider.rating && (
+            <div className="flex items-center gap-1 text-amber-400">
+              <Star className="w-4 h-4 fill-current" />
+              <span className="text-sm font-semibold text-foreground">{provider.rating}</span>
+            </div>
+          )}
         </div>
         
         <h3 className="text-xl font-display font-bold text-secondary mb-2 line-clamp-1">{provider.name}</h3>

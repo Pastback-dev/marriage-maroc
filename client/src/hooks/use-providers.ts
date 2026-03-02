@@ -32,7 +32,12 @@ export function useProvider(id: number) {
         .eq('id', id)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        if (error.code === 'PGRST116') { // Resource not found
+          return null;
+        }
+        throw error;
+      }
       return data as Provider;
     },
     enabled: !!id,

@@ -8,9 +8,12 @@ import { Loader2, Search } from "lucide-react";
 
 export default function ProvidersList() {
   const [city, setCity] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState<string>("all");
   
-  const { data: providers, isLoading } = useProviders({ city, category: category === "all" ? undefined : category });
+  const { data: providers, isLoading } = useProviders({ 
+    city: city || undefined, 
+    category: category === "all" ? undefined : category 
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -19,7 +22,7 @@ export default function ProvidersList() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
           <div>
-            <h1 className="text-4xl font-display font-bold text-secondary mb-2">Our Providers</h1>
+            <h1 className="text-4xl font-display font-bold text-secondary mb-2">Our Vendors</h1>
             <p className="text-muted-foreground">Discover the finest wedding services in Morocco</p>
           </div>
           
@@ -44,6 +47,7 @@ export default function ProvidersList() {
                 <SelectItem value="dj">DJ / Music</SelectItem>
                 <SelectItem value="cameraman">Photography</SelectItem>
                 <SelectItem value="neggafa">Neggafa</SelectItem>
+                <SelectItem value="decoration">Decoration</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -55,7 +59,7 @@ export default function ProvidersList() {
           </div>
         ) : providers?.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-border">
-            <p className="text-lg text-muted-foreground">No providers found matching your criteria.</p>
+            <p className="text-lg text-muted-foreground">No vendors found matching your criteria.</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
