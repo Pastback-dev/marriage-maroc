@@ -12,7 +12,7 @@ import {
   Store, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Loader2,
   Upload, ImagePlus, Trash2, ImageIcon, MapPin, Sparkles,
-  FileText
+  FileText, DollarSign
 } from "lucide-react";
 import {
   Select,
@@ -44,6 +44,23 @@ export default function ProviderDashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [changingCity, setChangingCity] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
+  const [editingPrice, setEditingPrice] = useState(false);
+
+  // Fetch provider details from providers table
+  const { data: providerDetails } = useQuery({
+    queryKey: ["provider-details", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data, error } = await supabase
+        .from('providers')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      if (error) return null;
+      return data;
+    },
+    enabled: !!user,
+  });
 
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
@@ -111,6 +128,54 @@ export default function ProviderDashboard() {
     }
   });
 
+  const priceMutation = useMutation({
+    mutationFn: async ({ priceMin, priceMax }: { priceMin: number; priceMax: number }) => {
+      if (!user?.id) throw new Error("User not found");
+      
+      // Check if provider record exists
+      const { data: existing } = await supabase
+        .from('providers')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+      
+      if (existing) {
+        // Update existing provider record
+        const { error } = await supabase
+          .from('providers')
+          .update({ price_min: priceMin, price_max: priceMax })
+          .eq('id', user.id);
+        if (error) throw error;
+      } else {
+        // Create new provider record
+        const { error } = await supabase
+          .from('providers')
+          .insert({
+            id: user.id,
+            category: user.serviceCategory || 'other',
+            name: user.displayName || user.username,
+            description: user.description || '',
+            city: user.city || '',
+            price_min: priceMin,
+            price_max: priceMax,
+            images: [],
+            packages: [],
+            rating: 5,
+            contact_info: null
+          });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["provider-details", user?.id] });
+      toast({ title: "Pricing saved" });
+      setEditingPrice(false);
+    },
+    onError: (error: any) => {
+      toast({ variant: "destructive", title: "Error saving pricing", description: error.message });
+    }
+  });
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   
   if (!user || user.role !== "provider") { 
@@ -120,6 +185,9 @@ export default function ProviderDashboard() {
 
   const currentCategory = user.serviceCategory;
   const currentCatInfo = SERVICE_CATEGORIES.find(c => c.id === currentCategory);
+  
+  const currentPriceMin = providerDetails?.price_min || 0;
+  const currentPriceMax = providerDetails?.price_max || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -161,6 +229,72 @@ export default function ProviderDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Pricing Card */}
+        <Card className="border-primary/20 shadow-sm mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-primary" /> Pricing
+            </CardTitle>
+            <CardDescription>Set your price range for services</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {editingPrice ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Minimum Price (MAD)</label>
+                  <Input 
+                    type="number" 
+                    defaultValue={currentPriceMin}
+                    placeholder="e.g., 150"
+                    id="price-min-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Maximum Price (MAD)</label>
+                  <Input 
+                    type="number" 
+                    defaultValue={currentPriceMax}
+                    placeholder="e.g., 500"
+                    id="price-max-input"
+                  />
+                </div>
+                <div className="flex gap-3 md:col-span-2">
+                  <Button 
+                    onClick={() => {
+                      const min = parseInt((document.getElementById('price-min-input') as HTMLInputElement).value);
+                      const max = parseInt((document.getElementById('price-max-input') as HTMLInputElement).value);
+                      if (min > 0 && max >= min) {
+                        priceMutation.mutate({ priceMin: min, priceMax: max });
+                      } else {
+                        toast({ variant: "destructive", title: "Invalid prices", description: "Max must be >= min and both must be positive" });
+                      }
+                    }}
+                    disabled={priceMutation.isPending}
+                    className="bg-secondary hover:bg-secondary/90"
+                  >
+                    {priceMutation.isPending && <Loader2 className="animate-spin mr-2" />} Save Pricing
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditingPrice(false)}>Cancel</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Price Range</p>
+                  <p className="text-xl font-bold text-secondary">
+                    {currentPriceMin > 0 || currentPriceMax > 0 
+                      ? `${currentPriceMin.toLocaleString()} - ${currentPriceMax.toLocaleString()} MAD`
+                      : "Not set"}
+                  </p>
+                </div>
+                <Button variant="outline" onClick={() => setEditingPrice(true)}>
+                  {currentPriceMin > 0 || currentPriceMax > 0 ? "Edit" : "Set Pricing"}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {selectedCategory !== null && (
           <div className="mb-8">
@@ -277,7 +411,7 @@ function PhotoGallery({ userId }: { userId: string }) {
           .insert({
             user_id: userId,
             image_url: publicUrl,
-            description: null // Description is now separate
+            description: null
           });
 
         if (dbError) throw dbError;
