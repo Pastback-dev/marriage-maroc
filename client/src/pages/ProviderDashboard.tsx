@@ -358,6 +358,12 @@ function PhotoGallery({ userId }: { userId: string }) {
   const uploadMutation = useMutation({
     mutationFn: async () => {
       if (previews.length === 0) return;
+      
+      const currentCount = photos?.length || 0;
+      if (currentCount + previews.length > 5) {
+        throw new Error("Maximum 5 photos allowed in portfolio");
+      }
+      
       setIsUploading(true);
 
       for (const preview of previews) {
@@ -411,7 +417,35 @@ function PhotoGallery({ userId }: { userId: string }) {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
+    const currentCount = photos?.length || 0;
+    const pendingCount = previews.length;
+    
+    const totalPotential = currentCount + pendingCount + files.length;
+    
+    if (totalPotential > 5) {
+      const allowedCount = 5 - (currentCount + pendingCount);
+      if (allowedCount <= 0) {
+        toast({ 
+          variant: "destructive", 
+          title: "Limit reached", 
+          description: "You already have 5 photos in your portfolio." 
+        });
+        return;
+      }
+      
+      toast({ 
+        variant: "destructive", 
+        title: "Partial selection", 
+        description: `Only ${allowedCount} more photo(s) can be added to reach the limit of 5.` 
+      });
+      
+      const allowedFiles = files.slice(0, allowedCount);
+      const newPreviews = allowedFiles.map(file => ({
+        url: URL.createObjectURL(file),
+        file
+      }));
+      setPreviews(prev => [...prev, ...newPreviews]);
+    } else {
       const newPreviews = files.map(file => ({
         url: URL.createObjectURL(file),
         file
@@ -420,11 +454,13 @@ function PhotoGallery({ userId }: { userId: string }) {
     }
   };
 
+  const isAtLimit = (photos?.length || 0) >= 5;
+
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
         <CardTitle className="flex items-center gap-2"><ImageIcon className="w-5 h-5 text-primary" /> Portfolio Gallery</CardTitle>
-        <CardDescription>Upload photos of your work. You can select multiple images at once.</CardDescription>
+        <CardDescription>Upload photos of your work. Maximum 5 photos allowed.</CardDescription>
       </CardHeader>
       <CardContent>
         <input 
@@ -434,6 +470,7 @@ function PhotoGallery({ userId }: { userId: string }) {
           onChange={handleFileSelect} 
           accept="image/*" 
           multiple 
+          disabled={isAtLimit}
         />
         
         {previews.length > 0 && (
@@ -463,13 +500,18 @@ function PhotoGallery({ userId }: { userId: string }) {
 
         <button 
           onClick={() => fileInputRef.current?.click()} 
-          className="w-full mb-8 p-12 border-2 border-dashed rounded-2xl hover:bg-primary/5 hover:border-primary/30 transition-all group"
+          disabled={isAtLimit}
+          className="w-full mb-8 p-12 border-2 border-dashed rounded-2xl hover:bg-primary/5 hover:border-primary/30 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/10 transition-colors">
             <ImagePlus className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
-          <p className="text-lg font-bold text-secondary">Add Portfolio Photos</p>
-          <p className="text-sm text-muted-foreground">Click to select one or many pictures</p>
+          <p className="text-lg font-bold text-secondary">
+            {isAtLimit ? "Portfolio Limit Reached" : "Add Portfolio Photos"}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {isAtLimit ? "You have reached the maximum of 5 photos." : "Click to select one or many pictures (Max 5 total)"}
+          </p>
         </button>
 
         {isLoading ? (
