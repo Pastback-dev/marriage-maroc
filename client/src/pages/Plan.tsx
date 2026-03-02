@@ -96,7 +96,7 @@ export default function Plan() {
                               <UsersIcon className="w-3 h-3 text-primary/70" /> {t("guest_count")}
                             </FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-guests" />
+                              <Input type="number" {...field} className="bg-white border border-border/50 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-guests" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -111,7 +111,7 @@ export default function Plan() {
                               <Receipt className="w-3 h-3 text-primary/70" /> {t("budget")}
                             </FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-budget" />
+                              <Input type="number" {...field} className="bg-white border border-border/50 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-budget" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -130,11 +130,11 @@ export default function Plan() {
                             </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-city">
+                                <SelectTrigger className="bg-white border border-border/50 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-city">
                                   <SelectValue placeholder={t("select_city")} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5">
+                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
                                 {cities.map(c => (
                                   <SelectItem key={c.id} value={c.id} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
                                 ))}
@@ -154,11 +154,11 @@ export default function Plan() {
                             </FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-style">
+                                <SelectTrigger className="bg-white border border-border/50 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-style">
                                   <SelectValue placeholder={t("select_style")} />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5">
+                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
                                 <SelectItem value="Traditional" className="rounded-lg py-2.5">{t("style_traditional")}</SelectItem>
                                 <SelectItem value="Modern" className="rounded-lg py-2.5">{t("style_modern")}</SelectItem>
                                 <SelectItem value="Royal" className="rounded-lg py-2.5">{t("style_royal")}</SelectItem>

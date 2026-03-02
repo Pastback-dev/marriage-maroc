@@ -40,7 +40,7 @@ export default function ProvidersList() {
               <SelectTrigger className="w-full sm:w-48 bg-white">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white">
                 <SelectItem value="all">All Categories</SelectItem>
                 <SelectItem value="traiteur">Catering</SelectItem>
                 <SelectItem value="hall">Wedding Venues</SelectItem>
