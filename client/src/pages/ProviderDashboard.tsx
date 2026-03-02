@@ -45,10 +45,14 @@ export default function ProviderDashboard() {
 
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
+      if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .update({ city })
-        .eq('id', user?.id);
+        .upsert({ 
+          id: user.id, 
+          city: city,
+          role: 'provider' // Ensure role is preserved
+        });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -63,10 +67,14 @@ export default function ProviderDashboard() {
 
   const categoryMutation = useMutation({
     mutationFn: async (serviceCategory: string) => {
+      if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .update({ service_category: serviceCategory })
-        .eq('id', user?.id);
+        .upsert({ 
+          id: user.id, 
+          service_category: serviceCategory,
+          role: 'provider' // Ensure role is preserved
+        });
       if (error) throw error;
     },
     onSuccess: () => {
