@@ -31,7 +31,8 @@ export async function setupVite(server: Server, app: Express) {
 
   app.use(vite.middlewares);
 
-  app.use("/{*path}", async (req, res, next) => {
+  // Standard Express catch-all for SPA routing in development
+  app.get("*", async (req, res, next) => {
     const url = req.originalUrl;
 
     try {
