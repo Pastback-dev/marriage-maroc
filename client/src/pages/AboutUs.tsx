@@ -14,7 +14,6 @@ export default function AboutUs() {
   ];
 
   const stats = [
-    { value: "500+", label: t("about_stat_providers") },
     { value: "6", label: t("about_stat_cities") },
     { value: "6", label: t("about_stat_categories") },
     { value: "24/7", label: t("about_stat_support") },
@@ -52,7 +51,7 @@ export default function AboutUs() {
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, idx) => (
               <motion.div
                 key={idx}
