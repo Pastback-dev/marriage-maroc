@@ -23,7 +23,7 @@ export default function ProvidersList() {
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-display font-bold text-secondary mb-2">Our Vendors</h1>
-            <p className="text-muted-foreground">Discover the finest wedding services in Morocco</p>
+            <p className="text-muted-foreground">Discover wedding professionals in Morocco</p>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -42,12 +42,12 @@ export default function ProvidersList() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="traiteur">Traiteur</SelectItem>
-                <SelectItem value="hall">Hall</SelectItem>
-                <SelectItem value="dj">DJ / Music</SelectItem>
+                <SelectItem value="traiteur">Catering</SelectItem>
+                <SelectItem value="hall">Wedding Venues</SelectItem>
+                <SelectItem value="dj">DJ & Music</SelectItem>
                 <SelectItem value="cameraman">Photography</SelectItem>
-                <SelectItem value="neggafa">Neggafa</SelectItem>
-                <SelectItem value="decoration">Decoration</SelectItem>
+                <SelectItem value="neggafa">Bridal Makeup</SelectItem>
+                <SelectItem value="decoration">Decor</SelectItem>
               </SelectContent>
             </Select>
           </div>
