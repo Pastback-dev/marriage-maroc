@@ -120,7 +120,7 @@ export default function ProviderProfile() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
-              <CardHeader className="border-b border-border/50 bg-white/50">
+              <CardHeader className="border-b border-border/50 bg-white">
                 <CardTitle className="flex items-center gap-2 text-secondary">
                   <Info className="w-5 h-5 text-primary" /> About this Professional
                 </CardTitle>

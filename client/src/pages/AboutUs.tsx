@@ -36,7 +36,7 @@ export default function AboutUs() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full mb-6">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-white/80 text-sm font-medium">{t("about_badge")}</span>
             </div>

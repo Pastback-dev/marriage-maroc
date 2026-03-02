@@ -82,8 +82,8 @@ export function ProviderCard({ provider }: ProviderCardProps) {
           </CarouselContent>
           {displayImages && displayImages.length > 1 && (
             <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <CarouselPrevious className="left-2 bg-background/80 backdrop-blur-sm border-0" />
-              <CarouselNext className="right-2 bg-background/80 backdrop-blur-sm border-0" />
+              <CarouselPrevious className="left-2 bg-background border-0" />
+              <CarouselNext className="right-2 bg-background border-0" />
             </div>
           )}
         </Carousel>

@@ -62,7 +62,7 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="bg-background/80 backdrop-blur-md sticky top-0 z-50 border-b border-border/50 shadow-sm">
+    <nav className="bg-background sticky top-0 z-50 border-b border-border/50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}

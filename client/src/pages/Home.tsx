@@ -91,7 +91,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/providers">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-semibold backdrop-blur-sm rounded-full min-h-12">
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 font-semibold rounded-full min-h-12">
                     {t("browse_providers")}
                   </Button>
                 </Link>
@@ -104,7 +104,7 @@ export default function Home() {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <Card className="bg-white/95 backdrop-blur-md shadow-2xl border-none rounded-[2.5rem] overflow-hidden">
+              <Card className="bg-white shadow-2xl border-none rounded-[2.5rem] overflow-hidden">
                 <CardHeader className="bg-gradient-to-r from-primary/5 to-amber-50/50 pb-5 pt-8 px-8">
                   <CardTitle className="flex items-center gap-3 text-xl font-display text-secondary" data-testid="text-ai-title">
                     <div className="p-2 bg-gradient-to-br from-primary/20 to-amber-200/30 rounded-xl">
