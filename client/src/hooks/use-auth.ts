@@ -130,8 +130,7 @@ export function useLogout() {
       await supabase.auth.signOut();
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/user"], null);
-      queryClient.clear();
+      // The AuthProvider handles the cache clearing via onAuthStateChange
       toast({ title: "Logged out", description: "See you soon!" });
     },
   });

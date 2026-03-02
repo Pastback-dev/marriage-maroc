@@ -27,13 +27,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
       
-      // Invalidate the user query so the rest of the app gets the new data
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+      if (event === 'SIGNED_OUT') {
+        // Completely clear the cache on logout
+        queryClient.clear();
+        queryClient.setQueryData(["/api/user"], null);
+      } else if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+        // Refresh user data on login or update
         queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       }
     });
@@ -43,8 +47,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    queryClient.setQueryData(["/api/user"], null);
-    queryClient.clear();
   };
 
   return (
