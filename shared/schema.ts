@@ -10,6 +10,7 @@ export const insertUserSchema = z.object({
   role: z.enum(["client", "provider"]).default("client"),
   serviceCategory: z.string().optional(),
   city: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export const insertGuestSchema = z.object({
@@ -38,6 +39,7 @@ export type User = {
   role: string;
   serviceCategory: string | null;
   city: string | null;
+  description: string | null;
   isAdmin: boolean;
   createdAt: Date | null;
 };
