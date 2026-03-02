@@ -270,7 +270,7 @@ export default function Home() {
             <Link href="/categories" className="hover:text-primary transition-colors">{t("nav_categories")}</Link>
             <Link href="/rules" className="hover:text-primary transition-colors">{t("nav_rules")}</Link>
           </div>
-          <p className="text-white/40 text-xs">&copy; 2025 Arsi</p>
+          <p className="text-white/40 text-xs">Developed by m3akcoder.com @ 2026 Arsi</p>
         </div>
       </footer>
     </div>

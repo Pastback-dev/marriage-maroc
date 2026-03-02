@@ -125,7 +125,7 @@ export default function AboutUs() {
 
       <footer className="bg-secondary text-secondary-foreground py-8">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-white/40 text-xs">&copy; 2024 Arsi Wedding Planner</p>
+          <p className="text-white/40 text-xs">Developed by m3akcoder.com @ 2026 Arsi</p>
         </div>
       </footer>
     </div>
