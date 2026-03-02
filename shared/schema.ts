@@ -52,7 +52,7 @@ export type User = {
 };
 
 export type Provider = {
-  id: number;
+  id: string | number;
   category: string;
   name: string;
   description: string;
