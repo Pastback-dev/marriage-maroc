@@ -100,14 +100,14 @@ export function useRegister() {
     },
     onSuccess: (user) => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      
-      const message = user?.identities?.length === 0 
-        ? "Account already exists or needs verification." 
+
+      const message = user?.identities?.length === 0
+        ? "Account already exists or needs verification."
         : "Account created! You can now log in.";
-        
-      toast({ 
-        title: "Registration Successful", 
-        description: message 
+
+      toast({
+        title: "Registration Successful",
+        description: message
       });
     },
     onError: (error: any) => {
@@ -126,11 +126,12 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
+      // Clear cache BEFORE sign out so the login page never sees stale user data
+      queryClient.clear();
+      queryClient.setQueryData(["/api/user"], null);
       await supabase.auth.signOut();
     },
     onSuccess: () => {
-      // Force a hard reload to the login page to clear all memory state
-      queryClient.clear();
       window.location.href = "/login";
     },
   });

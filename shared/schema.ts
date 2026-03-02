@@ -5,13 +5,20 @@ import { z } from "zod";
 export const insertUserSchema = z.object({
   username: z.string().email(),
   password: z.string().min(6),
-  displayName: z.string().min(2, "Name is required"),
+  displayName: z.string().min(2, "Name is required").optional().or(z.literal("")),
   phone: z.string().optional(),
   role: z.enum(["client", "provider"]).default("client"),
   serviceCategory: z.string().optional(),
   city: z.string().optional(),
   description: z.string().optional(),
 });
+
+export const loginSchema = z.object({
+  username: z.string().email("Please enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+export type LoginSchema = z.infer<typeof loginSchema>;
 
 export const insertGuestSchema = z.object({
   userId: z.string(),
