@@ -3,7 +3,6 @@ import { useParams, Link } from "wouter";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { 
   MapPin, 
   ArrowLeft, 
@@ -11,7 +10,6 @@ import {
   Phone, 
   Mail, 
   Banknote, 
-  Sparkles,
   ImageIcon,
   FileText,
   Utensils,
@@ -27,7 +25,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
 const SERVICE_CATEGORIES = [
   { id: "traiteur", name: "Catering", icon: Utensils, bg: "bg-orange-50", text: "text-orange-600" },
@@ -104,7 +101,7 @@ export default function ProviderProfile() {
           <p className="text-muted-foreground mt-2">Professional Wedding Service Provider</p>
         </div>
 
-        {/* Info Cards Grid - Matching Dashboard */}
+        {/* Info Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card className="border-primary/20 shadow-sm">
             <CardContent className="pt-6 flex items-center gap-4">
@@ -138,7 +135,7 @@ export default function ProviderProfile() {
               <div className="flex-1">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Pricing Range</p>
                 <p className="text-xl font-bold text-secondary">
-                  {provider.priceMin !== null ? `${provider.priceMin.toLocaleString()} - ${provider.priceMax?.toLocaleString()} MAD` : "Contact for price"}
+                  {provider.priceMin ? `${provider.priceMin.toLocaleString()} - ${provider.priceMax?.toLocaleString()} MAD` : "Contact for price"}
                 </p>
               </div>
             </CardContent>
@@ -147,7 +144,6 @@ export default function ProviderProfile() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            {/* Description Card - Matching Dashboard */}
             <Card className="border-primary/20 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -162,7 +158,6 @@ export default function ProviderProfile() {
               </CardContent>
             </Card>
 
-            {/* Portfolio Gallery Card - Matching Dashboard */}
             <Card className="border-primary/10 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -190,7 +185,6 @@ export default function ProviderProfile() {
             </Card>
           </div>
 
-          {/* Sidebar Actions */}
           <div className="space-y-6">
             <Card className="border-primary/20 shadow-sm sticky top-24">
               <CardHeader>
