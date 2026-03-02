@@ -73,12 +73,11 @@ export default function ProviderProfile() {
     <div className="min-h-screen bg-background pb-20">
       <Navigation />
       
-      {/* Header / Hero */}
-      <div className="bg-secondary text-white py-16 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -mr-48 -mt-48" />
+      {/* Header / Hero - Simplified without green background */}
+      <div className="bg-white border-b border-border py-12 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <Link href="/providers">
-            <button className="flex items-center text-white/70 hover:text-white mb-8 transition-colors group">
+            <button className="flex items-center text-muted-foreground hover:text-primary mb-8 transition-colors group">
               <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" /> 
               Back to all vendors
             </button>
@@ -86,13 +85,13 @@ export default function ProviderProfile() {
           
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <Badge className="bg-primary text-white border-none mb-4 uppercase tracking-widest text-[10px] font-bold px-3 py-1">
+              <Badge className="bg-primary/10 text-primary border-primary/20 mb-4 uppercase tracking-widest text-[10px] font-bold px-3 py-1">
                 {categoryLabel}
               </Badge>
-              <h1 className="text-4xl md:text-5xl font-display font-bold mb-4">
+              <h1 className="text-4xl md:text-5xl font-display font-bold mb-4 text-secondary">
                 {provider.displayName || provider.username}
               </h1>
-              <div className="flex items-center gap-4 text-white/80">
+              <div className="flex items-center gap-4 text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-primary" />
                   {provider.city || "Location not set"}
@@ -115,12 +114,12 @@ export default function ProviderProfile() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-20">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
-              <CardHeader className="border-b border-border/50 bg-white">
+            <Card className="border-none shadow-sm rounded-3xl overflow-hidden">
+              <CardHeader className="border-b border-border/50 bg-slate-50/50">
                 <CardTitle className="flex items-center gap-2 text-secondary">
                   <Info className="w-5 h-5 text-primary" /> About this Professional
                 </CardTitle>
@@ -152,14 +151,13 @@ export default function ProviderProfile() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.1 }}
-                      className="group relative aspect-square rounded-2xl overflow-hidden shadow-md"
+                      className="group relative aspect-square rounded-2xl overflow-hidden shadow-sm border border-border"
                     >
                       <img 
                         src={photo.image_url} 
                         alt={`Portfolio ${idx + 1}`}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </motion.div>
                   ))}
                 </div>
@@ -174,8 +172,8 @@ export default function ProviderProfile() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <Card className="border-none shadow-xl rounded-3xl overflow-hidden sticky top-24">
-              <CardHeader className="bg-primary/5 border-b border-primary/10">
+            <Card className="border-none shadow-sm rounded-3xl overflow-hidden sticky top-24">
+              <CardHeader className="bg-slate-50/50 border-b border-border/50">
                 <CardTitle className="text-lg font-display text-secondary">Quick Details</CardTitle>
               </CardHeader>
               <CardContent className="p-6 space-y-6">
