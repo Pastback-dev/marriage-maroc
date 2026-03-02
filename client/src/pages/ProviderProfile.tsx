@@ -8,7 +8,6 @@ import {
   ArrowLeft, 
   Loader2, 
   Phone, 
-  Mail, 
   Banknote, 
   ImageIcon,
   FileText,
@@ -18,9 +17,7 @@ import {
   Camera,
   UserRound,
   Paintbrush,
-  Store,
-  MessageSquare,
-  Calendar
+  Store
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -194,28 +191,13 @@ export default function ProviderProfile() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center">
-                      <Mail className="w-4 h-4" />
-                    </div>
-                    <span className="text-sm font-medium">{provider.username}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center">
                       <Phone className="w-4 h-4" />
                     </div>
                     <span className="text-sm font-medium">{provider.phone || "+212 6XX XXX XXX"}</span>
                   </div>
                 </div>
-
-                <div className="pt-6 border-t border-border/50 space-y-3">
-                  <Button className="w-full bg-secondary hover:bg-secondary/90 text-white font-bold h-12 rounded-xl">
-                    <MessageSquare className="mr-2 w-4 h-4" /> Send Message
-                  </Button>
-                  <Button variant="outline" className="w-full border-primary/20 text-primary hover:bg-primary/5 font-bold h-12 rounded-xl">
-                    <Calendar className="mr-2 w-4 h-4" /> Check Availability
-                  </Button>
-                </div>
                 
-                <p className="text-[10px] text-center text-muted-foreground font-medium">
+                <p className="text-[10px] text-center text-muted-foreground font-medium pt-4 border-t border-border/50">
                   Direct contact with the professional
                 </p>
               </CardContent>
