@@ -202,7 +202,7 @@ export default function ProviderProfile() {
                     <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center">
                       <Phone className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-medium">+212 6XX XXX XXX</span>
+                    <span className="text-sm font-medium">{provider.phone || "+212 6XX XXX XXX"}</span>
                   </div>
                 </div>
 

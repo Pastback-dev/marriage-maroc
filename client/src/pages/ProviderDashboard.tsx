@@ -12,7 +12,7 @@ import {
   Store, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Loader2,
   Upload, ImagePlus, Trash2, ImageIcon, MapPin, Sparkles,
-  FileText, Banknote
+  FileText, Banknote, Phone
 } from "lucide-react";
 import {
   Select,
@@ -45,6 +45,7 @@ export default function ProviderDashboard() {
   const [changingCity, setChangingCity] = useState(false);
   const [editingDescription, setEditingDescription] = useState(false);
   const [editingPrice, setEditingPrice] = useState(false);
+  const [editingPhone, setEditingPhone] = useState(false);
 
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
@@ -135,6 +136,28 @@ export default function ProviderDashboard() {
     }
   });
 
+  const phoneMutation = useMutation({
+    mutationFn: async (phone: string) => {
+      if (!user?.id) throw new Error("User not found");
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          phone: phone,
+          role: 'provider'
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({ title: "Phone number saved" });
+      setEditingPhone(false);
+    },
+    onError: (error: any) => {
+      toast({ variant: "destructive", title: "Error saving phone", description: error.message });
+    }
+  });
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   
   if (!user || user.role !== "provider") { 
@@ -154,18 +177,18 @@ export default function ProviderDashboard() {
           <p className="text-muted-foreground mt-2">Welcome back, {user.displayName || user.username}!</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="border-primary/20 shadow-sm">
             <CardContent className="pt-6 flex items-center gap-4">
               <div className={`w-14 h-14 rounded-2xl ${currentCatInfo?.bg || 'bg-slate-100'} flex items-center justify-center`}>
                 {currentCatInfo ? <currentCatInfo.icon className="w-7 h-7 opacity-80" /> : <Store className="w-7 h-7 opacity-40" />}
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your Service</p>
-                <p className="text-xl font-bold text-secondary">{currentCatInfo?.name || "Not selected"}</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Service</p>
+                <p className="text-xl font-bold text-secondary">{currentCatInfo?.name || "Not set"}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setSelectedCategory(currentCategory || "")}>
-                {currentCategory ? "Change" : "Select"}
+                Edit
               </Button>
             </CardContent>
           </Card>
@@ -176,11 +199,11 @@ export default function ProviderDashboard() {
                 <MapPin className="w-7 h-7 text-emerald-600 opacity-80" />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your City</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">City</p>
                 <p className="text-xl font-bold text-secondary">{user.city || "Not set"}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setChangingCity(true)}>
-                {user.city ? "Change" : "Set City"}
+                Edit
               </Button>
             </CardContent>
           </Card>
@@ -191,13 +214,28 @@ export default function ProviderDashboard() {
                 <Banknote className="w-7 h-7 text-amber-600 opacity-80" />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Pricing Range</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Price</p>
                 <p className="text-xl font-bold text-secondary">
-                  {user.priceMin !== null ? `${user.priceMin.toLocaleString()} - ${user.priceMax?.toLocaleString()} MAD` : "Not set"}
+                  {user.priceMin !== null ? `${user.priceMin.toLocaleString()} MAD` : "Not set"}
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setEditingPrice(true)}>
-                {user.priceMin !== null ? "Change" : "Set Price"}
+                Edit
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-primary/20 shadow-sm">
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center">
+                <Phone className="w-7 h-7 text-blue-600 opacity-80" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Phone</p>
+                <p className="text-xl font-bold text-secondary">{user.phone || "Not set"}</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setEditingPhone(true)}>
+                Edit
               </Button>
             </CardContent>
           </Card>
@@ -234,6 +272,17 @@ export default function ProviderDashboard() {
               onConfirm={(min, max) => priceMutation.mutate({ min, max })}
               onCancel={() => setEditingPrice(false)}
               isPending={priceMutation.isPending}
+            />
+          </div>
+        )}
+
+        {editingPhone && (
+          <div className="mb-8">
+            <PhonePicker
+              currentPhone={user.phone}
+              onConfirm={(phone) => phoneMutation.mutate(phone)}
+              onCancel={() => setEditingPhone(false)}
+              isPending={phoneMutation.isPending}
             />
           </div>
         )}
@@ -557,6 +606,34 @@ function PricePicker({ currentMin, currentMax, onConfirm, onCancel, isPending }:
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(min, max)} disabled={isPending} className="bg-secondary hover:bg-secondary/90">
               {isPending && <Loader2 className="animate-spin mr-2" />} Save Pricing
+            </Button>
+            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PhonePicker({ currentPhone, onConfirm, onCancel, isPending }: any) {
+  const [phone, setPhone] = useState(currentPhone || "");
+  return (
+    <Card className="border-primary/10 shadow-sm">
+      <CardHeader>
+        <CardTitle>Update your phone number</CardTitle>
+        <CardDescription>This will be visible to couples who want to contact you.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="max-w-xs space-y-6">
+          <Input 
+            value={phone} 
+            onChange={(e) => setPhone(e.target.value)} 
+            placeholder="+212 6XX XXX XXX"
+            className="h-12 rounded-xl"
+          />
+          <div className="flex gap-3">
+            <Button onClick={() => onConfirm(phone)} disabled={!phone || isPending} className="bg-secondary hover:bg-secondary/90">
+              {isPending && <Loader2 className="animate-spin mr-2" />} Save Phone
             </Button>
             <Button variant="outline" onClick={onCancel}>Cancel</Button>
           </div>
