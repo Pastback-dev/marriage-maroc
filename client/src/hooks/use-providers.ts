@@ -1,29 +1,40 @@
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { type Provider } from "@shared/schema";
-import { mockProviders } from "@/lib/mockData";
 
 export function useProviders(filters?: { category?: string; city?: string }) {
   return useQuery<Provider[]>({
-    queryKey: ["/api/providers", filters],
-    queryFn: () => {
-      let results = mockProviders;
-      if (filters?.category) {
-        results = results.filter((p) => p.category === filters.category);
+    queryKey: ["providers", filters],
+    queryFn: async () => {
+      let query = supabase.from('providers').select('*');
+      
+      if (filters?.category && filters.category !== 'all') {
+        query = query.eq('category', filters.category);
       }
       if (filters?.city) {
-        results = results.filter((p) => p.city === filters.city);
+        query = query.ilike('city', `%${filters.city}%`);
       }
-      return results;
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as Provider[];
     },
-    staleTime: Infinity,
   });
 }
 
 export function useProvider(id: number) {
   return useQuery<Provider | null>({
-    queryKey: ["/api/providers", id],
-    queryFn: () => mockProviders.find((p) => p.id === id) ?? null,
+    queryKey: ["providers", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('providers')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) throw error;
+      return data as Provider;
+    },
     enabled: !!id,
-    staleTime: Infinity,
   });
 }

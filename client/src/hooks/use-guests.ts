@@ -1,31 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { type Guest, type InsertGuest } from "@shared/schema";
-
-// ─── LocalStorage helpers ────────────────────────────────────────────────────
-
-const GUESTS_KEY = "app_guests";
-
-function getStoredGuests(): Guest[] {
-  try {
-    const raw = localStorage.getItem(GUESTS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveGuests(guests: Guest[]) {
-  localStorage.setItem(GUESTS_KEY, JSON.stringify(guests));
-}
-
-// ─── Hooks ───────────────────────────────────────────────────────────────────
 
 export function useGuests() {
   return useQuery<Guest[]>({
-    queryKey: ["/api/guests"],
-    queryFn: () => getStoredGuests(),
-    staleTime: Infinity,
+    queryKey: ["guests"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('guests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data as Guest[];
+    },
   });
 }
 
@@ -34,21 +23,27 @@ export function useCreateGuest() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: InsertGuest): Promise<Guest> => {
-      const guests = getStoredGuests();
-      const newGuest: Guest = {
-        id: Date.now(),
-        userId: data.userId,
-        planId: data.planId ?? null,
-        name: data.name,
-        type: data.type,
-        pricePerGuest: data.pricePerGuest ?? 0,
-      };
-      saveGuests([...guests, newGuest]);
-      return newGuest;
+    mutationFn: async (data: InsertGuest) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data: guest, error } = await supabase
+        .from('guests')
+        .insert({
+          user_id: user.id,
+          name: data.name,
+          type: data.type,
+          price_per_guest: data.pricePerGuest,
+          plan_id: data.planId
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return guest;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/guests"] });
+      queryClient.invalidateQueries({ queryKey: ["guests"] });
       toast({ title: "Guest Added", description: "Your guest list has been updated." });
     },
     onError: (error: Error) => {
@@ -63,11 +58,15 @@ export function useDeleteGuest() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const guests = getStoredGuests().filter((g) => g.id !== id);
-      saveGuests(guests);
+      const { error } = await supabase
+        .from('guests')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/guests"] });
+      queryClient.invalidateQueries({ queryKey: ["guests"] });
       toast({ title: "Guest Removed", description: "The guest has been removed from your list." });
     },
   });
