@@ -26,15 +26,11 @@ export const insertGuestSchema = z.object({
   name: z.string().min(1),
   type: z.enum(["local", "foreign"]),
   pricePerGuest: z.number().default(0),
+  numberOfGuests: z.number().min(1).default(1),
+  gender: z.enum(["male", "female", "other"]).default("male"),
 });
 
-export const insertPlanSchema = z.object({
-  userId: z.string(),
-  guestCount: z.number().min(1),
-  totalBudget: z.number().min(1000),
-  city: z.string(),
-  weddingStyle: z.string(),
-});
+export type InsertGuest = z.infer<typeof insertGuestSchema>;
 
 // ─── TypeScript Types ────────────────────────────────────────────────────────
 
@@ -89,9 +85,10 @@ export type Guest = {
   name: string;
   type: string;
   pricePerGuest: number | null;
+  numberOfGuests: number;
+  gender: string;
 };
 
-export type InsertGuest = z.infer<typeof insertGuestSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
 export type LoginRequest = {

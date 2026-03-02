@@ -13,7 +13,12 @@ export function useGuests() {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as Guest[];
+      
+      return (data as any[]).map(g => ({
+        ...g,
+        numberOfGuests: g.number_of_guests,
+        pricePerGuest: g.price_per_guest,
+      })) as Guest[];
     },
   });
 }
@@ -34,6 +39,8 @@ export function useCreateGuest() {
           name: data.name,
           type: data.type,
           price_per_guest: data.pricePerGuest,
+          number_of_guests: data.numberOfGuests,
+          gender: data.gender,
           plan_id: data.planId
         })
         .select()
