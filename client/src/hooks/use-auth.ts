@@ -1,31 +1,34 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { type User, type LoginRequest, type RegisterRequest } from "@shared/schema";
-
-// ─── LocalStorage helpers ────────────────────────────────────────────────────
-
-const USER_KEY = "app_user";
-
-function getStoredUser(): User | null {
-  try {
-    const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function setStoredUser(user: User | null) {
-  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
-  else localStorage.removeItem(USER_KEY);
-}
-
-// ─── Hooks ───────────────────────────────────────────────────────────────────
+import { supabase } from "@/integrations/supabase/client";
+import { type LoginRequest, type RegisterRequest } from "@shared/schema";
 
 export function useUser() {
-  return useQuery<User | null>({
+  return useQuery({
     queryKey: ["/api/user"],
-    queryFn: () => getStoredUser(),
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return null;
+
+      // Fetch profile data from public.profiles table
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return {
+          id: session.user.id,
+          username: session.user.email,
+          role: 'client',
+          isAdmin: false,
+        };
+      }
+
+      return profile;
+    },
     staleTime: Infinity,
   });
 }
@@ -35,30 +38,23 @@ export function useLogin() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (credentials: LoginRequest): Promise<User> => {
-      // Accept any email+password — simulate local auth
-      const user: User = {
-        id: 1,
-        username: credentials.username,
-        password: "",
-        displayName: credentials.username.split("@")[0],
-        role: credentials.role ?? "client",
-        serviceCategory: null,
-        city: null,
-        isAdmin: false,
-        createdAt: new Date(),
-      };
-      setStoredUser(user);
-      return user;
+    mutationFn: async (credentials: LoginRequest) => {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.username,
+        password: credentials.password,
+      });
+
+      if (error) throw error;
+      return data.user;
     },
-    onSuccess: (user) => {
-      queryClient.setQueryData(["/api/user"], user);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: "Welcome back!",
-        description: `Logged in as ${user.displayName || user.username}`,
+        description: "Successfully logged in with Supabase.",
       });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({ variant: "destructive", title: "Login failed", description: error.message });
     },
   });
@@ -69,26 +65,26 @@ export function useRegister() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: RegisterRequest): Promise<User> => {
-      const user: User = {
-        id: Date.now(),
-        username: data.username,
-        password: "",
-        displayName: data.displayName ?? data.username.split("@")[0],
-        role: data.role ?? "client",
-        serviceCategory: data.serviceCategory ?? null,
-        city: data.city ?? null,
-        isAdmin: false,
-        createdAt: new Date(),
-      };
-      setStoredUser(user);
-      return user;
+    mutationFn: async (data: RegisterRequest) => {
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.username,
+        password: data.password,
+        options: {
+          data: {
+            display_name: data.displayName,
+            role: data.role || 'client',
+          }
+        }
+      });
+
+      if (error) throw error;
+      return authData.user;
     },
-    onSuccess: (user) => {
-      queryClient.setQueryData(["/api/user"], user);
-      toast({ title: "Account created", description: "You are now logged in." });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({ title: "Account created", description: "Please check your email for verification." });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({ variant: "destructive", title: "Registration failed", description: error.message });
     },
   });
@@ -100,7 +96,7 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
-      setStoredUser(null);
+      await supabase.auth.signOut();
     },
     onSuccess: () => {
       queryClient.setQueryData(["/api/user"], null);
