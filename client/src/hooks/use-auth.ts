@@ -29,8 +29,6 @@ export function useUser() {
           serviceCategory: null,
           city: null,
           description: null,
-          priceMin: null,
-          priceMax: null,
         };
       }
 
@@ -45,8 +43,6 @@ export function useUser() {
         serviceCategory: profile.service_category,
         city: profile.city,
         description: profile.description,
-        priceMin: profile.price_min,
-        priceMax: profile.price_max,
       };
     },
     refetchOnWindowFocus: true,
