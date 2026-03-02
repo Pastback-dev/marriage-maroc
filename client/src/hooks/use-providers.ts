@@ -17,9 +17,7 @@ export function useProviders(filters?: { category?: string; city?: string }) {
           service_category,
           city,
           description,
-          phone,
-          price_min,
-          price_max
+          phone
         `)
         .eq('role', 'provider');
       
@@ -59,8 +57,8 @@ export function useProviders(filters?: { category?: string; city?: string }) {
         name: profile.display_name || profile.username?.split('@')[0] || 'Unnamed Provider',
         description: profile.description || '',
         city: profile.city || '',
-        priceMin: profile.price_min || 0,
-        priceMax: profile.price_max || 0,
+        priceMin: 0, 
+        priceMax: 0,
         images: photosByUserId[profile.id] && photosByUserId[profile.id].length > 0 
           ? photosByUserId[profile.id]
           : ["https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800"],
@@ -87,9 +85,7 @@ export function useProvider(id: string | number) {
           service_category,
           city,
           description,
-          phone,
-          price_min,
-          price_max
+          phone
         `)
         .eq('id', id)
         .single();
@@ -111,8 +107,8 @@ export function useProvider(id: string | number) {
         name: profile.display_name || profile.username?.split('@')[0] || 'Unnamed Provider',
         description: profile.description || '',
         city: profile.city || '',
-        priceMin: profile.price_min || 0,
-        priceMax: profile.price_max || 0,
+        priceMin: 0,
+        priceMax: 0,
         images: photos && photos.length > 0 
           ? photos.map(p => p.image_url)
           : ["https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800"],
