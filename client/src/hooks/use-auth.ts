@@ -18,18 +18,26 @@ export function useUser() {
         .single();
 
       if (error) {
-        console.error("Error fetching profile:", error);
+        console.warn("Profile not found or error fetching, using session data:", error.message);
+        // Fallback to basic session data if profile isn't ready yet
         return {
           id: session.user.id,
           username: session.user.email,
-          role: 'client',
+          role: session.user.user_metadata?.role || 'client',
           isAdmin: false,
+          displayName: session.user.user_metadata?.display_name || null,
         };
       }
 
-      return profile;
+      // Map snake_case from DB to camelCase for the frontend
+      return {
+        ...profile,
+        displayName: profile.display_name,
+        isAdmin: profile.is_admin,
+        serviceCategory: profile.service_category,
+      };
     },
-    staleTime: Infinity,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -51,7 +59,7 @@ export function useLogin() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
         title: "Welcome back!",
-        description: "Successfully logged in with Supabase.",
+        description: "Successfully logged in.",
       });
     },
     onError: (error: any) => {
