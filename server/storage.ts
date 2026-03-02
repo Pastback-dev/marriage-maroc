@@ -26,11 +26,10 @@ export interface IStorage {
   updateUserPassword(id: number, hashedPassword: string): Promise<void>;
   updateUserServiceCategory(id: number, serviceCategory: string): Promise<User>;
   updateUserCity(id: number, city: string): Promise<User>;
-  updateUserPricing(id: number, priceMin: number, priceMax: number): Promise<void>;
   getAllUsers(): Promise<User[]>;
   deleteUser(id: number): Promise<void>;
 
-  // Providers (now stored in profiles with pricing)
+  // Providers
   getProviders(category?: string, city?: string): Promise<Provider[]>;
   getProvider(id: number): Promise<Provider | undefined>;
   seedProviders(): Promise<void>;
@@ -104,10 +103,6 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async updateUserPricing(id: number, priceMin: number, priceMax: number): Promise<void> {
-    await db.update(users).set({ priceMin, priceMax }).where(eq(users.id, id));
-  }
-
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users);
   }
@@ -118,7 +113,7 @@ export class DatabaseStorage implements IStorage {
     await db.delete(users).where(eq(users.id, id));
   }
 
-  // Providers (now stored in profiles with pricing)
+  // Providers
   async getProviders(category?: string, city?: string): Promise<Provider[]> {
     let query = db.select().from(providers);
     const conditions = [];
@@ -185,6 +180,16 @@ export class DatabaseStorage implements IStorage {
         priceMax: 10000,
         images: ["https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800"],
         packages: [{ name: "Gold", price: 6000, features: ["Drone", "Photo Album"] }]
+      },
+      {
+        category: "traiteur",
+        name: "Atlas Catering",
+        description: "Modern touch on traditional dishes.",
+        city: "Marrakech",
+        priceMin: 250,
+        priceMax: 600,
+        images: ["https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=800"],
+        packages: [{ name: "Standard", price: 400, features: ["Chicken Tagine", "Fruits"] }]
       },
     ];
 
