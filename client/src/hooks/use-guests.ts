@@ -1,16 +1,31 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, buildUrl, type InsertGuest } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
+import { type Guest, type InsertGuest } from "@shared/schema";
+
+// ─── LocalStorage helpers ────────────────────────────────────────────────────
+
+const GUESTS_KEY = "app_guests";
+
+function getStoredGuests(): Guest[] {
+  try {
+    const raw = localStorage.getItem(GUESTS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveGuests(guests: Guest[]) {
+  localStorage.setItem(GUESTS_KEY, JSON.stringify(guests));
+}
+
+// ─── Hooks ───────────────────────────────────────────────────────────────────
 
 export function useGuests() {
-  return useQuery({
-    queryKey: [api.guests.list.path],
-    queryFn: async () => {
-      const res = await fetch(api.guests.list.path);
-      if (res.status === 401) return [];
-      if (!res.ok) throw new Error("Failed to fetch guests");
-      return api.guests.list.responses[200].parse(await res.json());
-    },
+  return useQuery<Guest[]>({
+    queryKey: ["/api/guests"],
+    queryFn: () => getStoredGuests(),
+    staleTime: Infinity,
   });
 }
 
@@ -19,28 +34,25 @@ export function useCreateGuest() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (data: InsertGuest) => {
-      const res = await fetch(api.guests.create.path, {
-        method: api.guests.create.method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error("Failed to add guest");
-      return api.guests.create.responses[201].parse(await res.json());
+    mutationFn: async (data: InsertGuest): Promise<Guest> => {
+      const guests = getStoredGuests();
+      const newGuest: Guest = {
+        id: Date.now(),
+        userId: data.userId,
+        planId: data.planId ?? null,
+        name: data.name,
+        type: data.type,
+        pricePerGuest: data.pricePerGuest ?? 0,
+      };
+      saveGuests([...guests, newGuest]);
+      return newGuest;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.guests.list.path] });
-      toast({
-        title: "Guest Added",
-        description: "Your guest list has been updated.",
-      });
+      queryClient.invalidateQueries({ queryKey: ["/api/guests"] });
+      toast({ title: "Guest Added", description: "Your guest list has been updated." });
     },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
+    onError: (error: Error) => {
+      toast({ variant: "destructive", title: "Error", description: error.message });
     },
   });
 }
@@ -51,16 +63,12 @@ export function useDeleteGuest() {
 
   return useMutation({
     mutationFn: async (id: number) => {
-      const url = buildUrl(api.guests.delete.path, { id });
-      const res = await fetch(url, { method: api.guests.delete.method });
-      if (!res.ok) throw new Error("Failed to delete guest");
+      const guests = getStoredGuests().filter((g) => g.id !== id);
+      saveGuests(guests);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [api.guests.list.path] });
-      toast({
-        title: "Guest Removed",
-        description: "The guest has been removed from your list.",
-      });
+      queryClient.invalidateQueries({ queryKey: ["/api/guests"] });
+      toast({ title: "Guest Removed", description: "The guest has been removed from your list." });
     },
   });
 }

@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Store, Star, Eye, MessageSquare, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Check, Loader2,
@@ -128,8 +127,11 @@ export default function ProviderDashboard() {
 
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
-      const res = await apiRequest("PATCH", "/api/provider/city", { city });
-      return res.json();
+      const raw = localStorage.getItem("app_user");
+      const stored = raw ? JSON.parse(raw) : {};
+      const updated = { ...stored, city };
+      localStorage.setItem("app_user", JSON.stringify(updated));
+      return updated;
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/user"], data);
@@ -143,8 +145,11 @@ export default function ProviderDashboard() {
 
   const categoryMutation = useMutation({
     mutationFn: async (serviceCategory: string) => {
-      const res = await apiRequest("PATCH", "/api/provider/service-category", { serviceCategory });
-      return res.json();
+      const raw = localStorage.getItem("app_user");
+      const stored = raw ? JSON.parse(raw) : {};
+      const updated = { ...stored, serviceCategory };
+      localStorage.setItem("app_user", JSON.stringify(updated));
+      return updated;
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/user"], data);
@@ -335,9 +340,10 @@ export default function ProviderDashboard() {
   );
 }
 
+type LocalPhoto = { id: number; imageUrl: string; description: string };
+
 function PhotoGallery() {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadDescription, setUploadDescription] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -345,33 +351,24 @@ function PhotoGallery() {
   const [isUploading, setIsUploading] = useState(false);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const { data: photos = [], isLoading } = useQuery({
-    queryKey: ["/api/provider/photos"],
-    queryFn: async () => {
-      const res = await fetch("/api/provider/photos");
-      if (!res.ok) throw new Error("Failed to load photos");
-      return res.json();
-    },
-  });
+  const [photos, setPhotos] = useState<LocalPhoto[]>([]);
+  const isLoading = false;
 
   const deleteMutation = useMutation({
     mutationFn: async (photoId: number) => {
-      await apiRequest("DELETE", `/api/provider/photos/${photoId}`);
+      setPhotos((prev) => prev.filter((p) => p.id !== photoId));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/provider/photos"] });
       toast({ title: "Photo deleted" });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, description }: { id: number; description: string }) => {
-      const res = await apiRequest("PATCH", `/api/provider/photos/${id}`, { description });
-      return res.json();
+      setPhotos((prev) => prev.map((p) => p.id === id ? { ...p, description } : p));
+      return { id, description };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/provider/photos"] });
       setEditingId(null);
       toast({ title: "Description updated" });
     },
@@ -401,29 +398,25 @@ function PhotoGallery() {
     setIsUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("photo", previewFile);
-      if (uploadDescription.trim()) formData.append("description", uploadDescription.trim());
-
-      const res = await fetch("/api/provider/photos", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ message: "Upload failed" }));
-        throw new Error(err.message);
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["/api/provider/photos"] });
-      toast({ title: "Photo uploaded", description: "Your photo has been added to your portfolio." });
-      setPreviewFile(null);
-      setPreviewUrl(null);
-      setUploadDescription("");
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      // Local preview — create a data URL since there's no server
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const newPhoto: LocalPhoto = {
+          id: Date.now(),
+          imageUrl: ev.target?.result as string,
+          description: uploadDescription.trim(),
+        };
+        setPhotos((prev) => [...prev, newPhoto]);
+        toast({ title: "Photo uploaded", description: "Your photo has been added to your portfolio." });
+        setPreviewFile(null);
+        setPreviewUrl(null);
+        setUploadDescription("");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(previewFile);
     } catch (err: any) {
       toast({ variant: "destructive", title: "Upload failed", description: err.message });
-    } finally {
       setIsUploading(false);
     }
   };
@@ -637,11 +630,10 @@ function ServiceCategoryPicker({
                 key={cat.id}
                 type="button"
                 onClick={() => onSelect(cat.id)}
-                className={`relative text-left p-5 rounded-2xl border-2 transition-all duration-200 ${
-                  isSelected
-                    ? `ring-2 ${cat.selected} ${cat.border} shadow-md`
-                    : "border-border hover:border-primary/30 hover:shadow-sm"
-                }`}
+                className={`relative text-left p-5 rounded-2xl border-2 transition-all duration-200 ${isSelected
+                  ? `ring-2 ${cat.selected} ${cat.border} shadow-md`
+                  : "border-border hover:border-primary/30 hover:shadow-sm"
+                  }`}
                 data-testid={`button-service-${cat.id}`}
               >
                 {isSelected && (

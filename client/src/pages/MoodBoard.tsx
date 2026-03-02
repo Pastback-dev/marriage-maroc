@@ -1,77 +1,64 @@
 import { Navigation } from "@/components/Navigation";
 import { useUser } from "@/hooks/use-auth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, Plus, Image as ImageIcon, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Image as ImageIcon, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+
+type MoodBoardItem = { id: number; imageUrl: string };
+type MoodBoardType = { id: number; title: string; items: MoodBoardItem[] };
+
+const MB_KEY = "app_moodboards";
+function loadBoards(): MoodBoardType[] {
+  try { return JSON.parse(localStorage.getItem(MB_KEY) || "[]"); } catch { return []; }
+}
+function saveBoards(boards: MoodBoardType[]) {
+  localStorage.setItem(MB_KEY, JSON.stringify(boards));
+}
 
 export default function MoodBoard() {
   const { t } = useTranslation();
   const { data: user } = useUser();
   const { toast } = useToast();
+  const [boards, setBoards] = useState<MoodBoardType[]>(loadBoards);
   const [newBoardTitle, setNewBoardTitle] = useState("");
   const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null);
   const [newItemUrl, setNewItemUrl] = useState("");
 
-  const { data: boards, isLoading: boardsLoading } = useQuery({
-    queryKey: ["/api/moodboards"],
-  });
+  const selectedBoard = boards.find((b) => b.id === selectedBoardId);
+  const items = selectedBoard?.items ?? [];
 
-  const { data: items, isLoading: itemsLoading } = useQuery({
-    queryKey: ["/api/moodboards", selectedBoardId, "items"],
-    enabled: !!selectedBoardId,
-    queryFn: async () => {
-      const res = await fetch(`/api/moodboards/${selectedBoardId}/items`);
-      return res.json();
-    },
-  });
+  const createBoard = () => {
+    if (!newBoardTitle.trim()) return;
+    const updated = [...boards, { id: Date.now(), title: newBoardTitle.trim(), items: [] }];
+    setBoards(updated);
+    saveBoards(updated);
+    setNewBoardTitle("");
+    toast({ title: "Mood board created!" });
+  };
 
-  const createBoardMutation = useMutation({
-    mutationFn: async (title: string) => {
-      const res = await apiRequest("POST", "/api/moodboards", { title });
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/moodboards"] });
-      setNewBoardTitle("");
-      toast({ title: "Mood board created!" });
-    },
-  });
-
-  const addItemMutation = useMutation({
-    mutationFn: async ({ boardId, imageUrl }: { boardId: number; imageUrl: string }) => {
-      const res = await apiRequest("POST", `/api/moodboards/${boardId}/items`, { imageUrl });
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/moodboards", selectedBoardId, "items"] });
-      setNewItemUrl("");
-      toast({ title: "Inspiration added!" });
-    },
-  });
-
-  const deleteItemMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await apiRequest("DELETE", `/api/moodboard-items/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/moodboards", selectedBoardId, "items"] });
-      toast({ title: "Item removed" });
-    },
-  });
-
-  if (boardsLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
+  const addItem = (boardId: number, imageUrl: string) => {
+    if (!imageUrl.trim()) return;
+    const updated = boards.map((b) =>
+      b.id === boardId ? { ...b, items: [...b.items, { id: Date.now(), imageUrl: imageUrl.trim() }] } : b
     );
-  }
+    setBoards(updated);
+    saveBoards(updated);
+    setNewItemUrl("");
+    toast({ title: "Inspiration added!" });
+  };
+
+  const deleteItem = (boardId: number, itemId: number) => {
+    const updated = boards.map((b) =>
+      b.id === boardId ? { ...b, items: b.items.filter((i) => i.id !== itemId) } : b
+    );
+    setBoards(updated);
+    saveBoards(updated);
+    toast({ title: "Item removed" });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,13 +67,13 @@ export default function MoodBoard() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-display font-bold text-secondary">Inspiration Mood Boards</h1>
           <div className="flex gap-2">
-            <Input 
-              placeholder="Board Title" 
+            <Input
+              placeholder="Board Title"
               value={newBoardTitle}
               onChange={(e) => setNewBoardTitle(e.target.value)}
               className="w-48"
             />
-            <Button onClick={() => createBoardMutation.mutate(newBoardTitle)} disabled={!newBoardTitle}>
+            <Button onClick={() => createBoard()} disabled={!newBoardTitle}>
               <Plus className="w-4 h-4 mr-2" /> New Board
             </Button>
           </div>
@@ -116,39 +103,36 @@ export default function MoodBoard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="flex gap-2">
-                    <Input 
-                      placeholder="Image URL" 
+                    <Input
+                      placeholder="Image URL"
                       value={newItemUrl}
                       onChange={(e) => setNewItemUrl(e.target.value)}
                     />
-                    <Button onClick={() => addItemMutation.mutate({ boardId: selectedBoardId, imageUrl: newItemUrl })} disabled={!newItemUrl}>
+                    <Button onClick={() => addItem(selectedBoardId, newItemUrl)} disabled={!newItemUrl}>
                       Add
                     </Button>
                   </CardContent>
                 </Card>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {itemsLoading ? (
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                  ) : (
-                    items?.map((item: any) => (
-                      <div key={item.id} className="relative group">
-                        <img 
-                          src={item.imageUrl} 
-                          alt="Inspiration" 
-                          className="w-full h-48 object-cover rounded-lg shadow-sm"
-                        />
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => deleteItemMutation.mutate(item.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    ))
-                  )}
+                  {items.map((item) => (
+                    <div key={item.id} className="relative group">
+                      <img
+                        src={item.imageUrl}
+                        alt="Inspiration"
+                        className="w-full h-48 object-cover rounded-lg shadow-sm"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => deleteItem(selectedBoardId!, item.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))
+                  }
                 </div>
               </>
             ) : (
