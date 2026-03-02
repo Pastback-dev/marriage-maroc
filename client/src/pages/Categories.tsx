@@ -21,7 +21,7 @@ export default function Categories() {
   ];
 
   const getProviderCount = (catId: string) => {
-    return providers?.filter((p: any) => p.category === catId).length || 0;
+    return providers?.filter((p: any) => p.serviceCategory === catId).length || 0;
   };
 
   return (
@@ -50,42 +50,47 @@ export default function Categories() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {categories.map((cat, idx) => (
-              <motion.div
-                key={cat.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.08, duration: 0.5 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="group cursor-pointer"
-                onClick={() => setLocation(`/providers?category=${cat.id}`)}
-                data-testid={`card-category-${cat.id}`}
-              >
-                <div className="relative rounded-3xl overflow-hidden bg-white shadow-md border border-slate-100/60 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300">
-                  <div className={`h-2 w-full bg-gradient-to-r ${cat.color}`} />
-                  <div className="p-8">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className={`w-16 h-16 rounded-2xl ${cat.bg} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                        <cat.icon className="w-8 h-8 text-current opacity-80" />
+            {categories.map((cat, idx) => {
+              const count = getProviderCount(cat.id);
+              return (
+                <motion.div
+                  key={cat.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.08, duration: 0.5 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="group cursor-pointer"
+                  onClick={() => setLocation(`/providers?category=${cat.id}`)}
+                  data-testid={`card-category-${cat.id}`}
+                >
+                  <div className="relative rounded-3xl overflow-hidden bg-white shadow-md border border-slate-100/60 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300">
+                    <div className={`h-2 w-full bg-gradient-to-r ${cat.color}`} />
+                    <div className="p-8">
+                      <div className="flex items-start justify-between mb-6">
+                        <div className={`w-16 h-16 rounded-2xl ${cat.bg} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                          <cat.icon className="w-8 h-8 text-current opacity-80" />
+                        </div>
+                        {count > 0 && (
+                          <span className="text-xs font-bold text-muted-foreground bg-muted/50 px-3 py-1 rounded-full" data-testid={`text-provider-count-${cat.id}`}>
+                            {count} {t("nav_providers")}
+                          </span>
+                        )}
                       </div>
-                      <span className="text-xs font-bold text-muted-foreground bg-muted/50 px-3 py-1 rounded-full" data-testid={`text-provider-count-${cat.id}`}>
-                        {getProviderCount(cat.id)} {t("nav_providers")}
-                      </span>
-                    </div>
-                    <h3 className="text-2xl font-bold text-secondary mb-2 group-hover:text-primary transition-colors">
-                      {cat.name}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      {cat.desc}
-                    </p>
-                    <div className="flex items-center gap-2 text-primary font-semibold text-sm group-hover:gap-3 transition-all">
-                      {t("browse_providers")} <ArrowRight className="w-4 h-4" />
+                      <h3 className="text-2xl font-bold text-secondary mb-2 group-hover:text-primary transition-colors">
+                        {cat.name}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed mb-6">
+                        {cat.desc}
+                      </p>
+                      <div className="flex items-center gap-2 text-primary font-semibold text-sm group-hover:gap-3 transition-all">
+                        {t("browse_providers")} <ArrowRight className="w-4 h-4" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
