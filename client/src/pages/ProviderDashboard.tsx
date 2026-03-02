@@ -43,17 +43,6 @@ export default function ProviderDashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [changingCity, setChangingCity] = useState(false);
 
-  // Debugging log
-  useEffect(() => {
-    if (user) {
-      console.log("Current User Data:", {
-        role: user.role,
-        serviceCategory: user.serviceCategory,
-        city: user.city
-      });
-    }
-  }, [user]);
-
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
       const { error } = await supabase
@@ -92,9 +81,7 @@ export default function ProviderDashboard() {
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   
-  // If user is not a provider, redirect
   if (!user || user.role !== "provider") { 
-    console.log("User is not a provider, redirecting...", user?.role);
     setLocation("/login"); 
     return null; 
   }
@@ -111,74 +98,72 @@ export default function ProviderDashboard() {
           <p className="text-muted-foreground mt-2">Welcome back, {user.displayName || user.username}!</p>
         </div>
 
-        {currentCategory && currentCatInfo ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <Card className="border-primary/20 shadow-sm">
-                <CardContent className="pt-6 flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-2xl ${currentCatInfo.bg} flex items-center justify-center`}>
-                    <currentCatInfo.icon className="w-7 h-7 opacity-80" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your Service</p>
-                    <p className="text-xl font-bold text-secondary">{currentCatInfo.name}</p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => setSelectedCategory(currentCategory)}>Change</Button>
-                </CardContent>
-              </Card>
-
-              <Card className="border-primary/20 shadow-sm">
-                <CardContent className="pt-6 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center">
-                    <MapPin className="w-7 h-7 text-emerald-600 opacity-80" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your City</p>
-                    <p className="text-xl font-bold text-secondary">{user.city || "Not set"}</p>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => setChangingCity(true)}>Change</Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {selectedCategory && (
-              <ServiceCategoryPicker
-                pendingSelection={selectedCategory}
-                onSelect={setSelectedCategory}
-                onConfirm={() => categoryMutation.mutate(selectedCategory)}
-                onCancel={() => setSelectedCategory(null)}
-                isPending={categoryMutation.isPending}
-              />
-            )}
-
-            {changingCity && (
-              <CityPicker
-                currentCity={user.city}
-                onConfirm={(city) => cityMutation.mutate(city)}
-                onCancel={() => setChangingCity(false)}
-                isPending={cityMutation.isPending}
-              />
-            )}
-
-            <PhotoGallery userId={user.id} />
-          </>
-        ) : (
-          <div className="space-y-6">
-            <div className="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex items-center gap-4">
-              <Sparkles className="w-8 h-8 text-primary" />
-              <div>
-                <h2 className="text-xl font-bold text-secondary">Complete Your Profile</h2>
-                <p className="text-muted-foreground">Select your service category below to start uploading your portfolio.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <Card className="border-primary/20 shadow-sm">
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className={`w-14 h-14 rounded-2xl ${currentCatInfo?.bg || 'bg-slate-100'} flex items-center justify-center`}>
+                {currentCatInfo ? <currentCatInfo.icon className="w-7 h-7 opacity-80" /> : <Store className="w-7 h-7 opacity-40" />}
               </div>
-            </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your Service</p>
+                <p className="text-xl font-bold text-secondary">{currentCatInfo?.name || "Not selected"}</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setSelectedCategory(currentCategory || "")}>
+                {currentCategory ? "Change" : "Select"}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-primary/20 shadow-sm">
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center">
+                <MapPin className="w-7 h-7 text-emerald-600 opacity-80" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your City</p>
+                <p className="text-xl font-bold text-secondary">{user.city || "Not set"}</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setChangingCity(true)}>
+                {user.city ? "Change" : "Set City"}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {selectedCategory !== null && (
+          <div className="mb-8">
             <ServiceCategoryPicker
               pendingSelection={selectedCategory}
               onSelect={setSelectedCategory}
-              onConfirm={() => selectedCategory && categoryMutation.mutate(selectedCategory)}
+              onConfirm={() => categoryMutation.mutate(selectedCategory)}
+              onCancel={() => setSelectedCategory(null)}
               isPending={categoryMutation.isPending}
             />
           </div>
         )}
+
+        {changingCity && (
+          <div className="mb-8">
+            <CityPicker
+              currentCity={user.city}
+              onConfirm={(city) => cityMutation.mutate(city)}
+              onCancel={() => setChangingCity(false)}
+              isPending={cityMutation.isPending}
+            />
+          </div>
+        )}
+
+        {!currentCategory && !selectedCategory && (
+          <div className="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex items-center gap-4 mb-8">
+            <Sparkles className="w-8 h-8 text-primary" />
+            <div>
+              <h2 className="text-xl font-bold text-secondary">Complete Your Profile</h2>
+              <p className="text-muted-foreground">Select your service category to help couples find you more easily.</p>
+            </div>
+          </div>
+        )}
+
+        <PhotoGallery userId={user.id} />
       </div>
     </div>
   );
