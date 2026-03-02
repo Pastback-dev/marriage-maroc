@@ -5,14 +5,15 @@ import { z } from "zod";
 export const insertUserSchema = z.object({
   username: z.string().email(),
   password: z.string().min(6),
-  displayName: z.string().optional(),
+  displayName: z.string().min(2, "Name is required"),
+  phone: z.string().optional(),
   role: z.enum(["client", "provider"]).default("client"),
   serviceCategory: z.string().optional(),
   city: z.string().optional(),
 });
 
 export const insertGuestSchema = z.object({
-  userId: z.number(),
+  userId: z.string(),
   planId: z.number().optional(),
   name: z.string().min(1),
   type: z.enum(["local", "foreign"]),
@@ -20,7 +21,7 @@ export const insertGuestSchema = z.object({
 });
 
 export const insertPlanSchema = z.object({
-  userId: z.number(),
+  userId: z.string(),
   guestCount: z.number().min(1),
   totalBudget: z.number().min(1000),
   city: z.string(),
@@ -30,10 +31,10 @@ export const insertPlanSchema = z.object({
 // ─── TypeScript Types ────────────────────────────────────────────────────────
 
 export type User = {
-  id: number;
+  id: string;
   username: string;
-  password: string;
   displayName: string | null;
+  phone: string | null;
   role: string;
   serviceCategory: string | null;
   city: string | null;
@@ -57,7 +58,7 @@ export type Provider = {
 
 export type Plan = {
   id: number;
-  userId: number;
+  userId: string;
   guestCount: number;
   totalBudget: number;
   city: string;
@@ -74,7 +75,7 @@ export type Plan = {
 
 export type Guest = {
   id: number;
-  userId: number;
+  userId: string;
   planId: number | null;
   name: string;
   type: string;
@@ -84,7 +85,9 @@ export type Guest = {
 export type InsertGuest = z.infer<typeof insertGuestSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 
-export type LoginRequest = Pick<InsertUser, "username" | "password"> & {
+export type LoginRequest = {
+  username: string;
+  password: string;
   role?: "client" | "provider";
 };
 export type RegisterRequest = InsertUser;

@@ -1,17 +1,24 @@
-import { useUser } from "@/hooks/use-auth";
+import { useUser, useLogin, useRegister } from "@/hooks/use-auth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useLocation, Link } from "wouter";
 import { useState, useEffect } from "react";
-import { User, Store } from "lucide-react";
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { supabase } from "@/integrations/supabase/client";
+import { User, Store, Mail, Lock, Phone, UserCircle, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { insertUserSchema, type InsertUser } from "@shared/schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
   const { data: user } = useUser();
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
   const [role, setRole] = useState<"client" | "provider">("client");
+  const [mode, setMode] = useState<"login" | "register">("login");
 
   useEffect(() => {
     if (user) {
@@ -19,8 +26,32 @@ export default function AuthPage() {
     }
   }, [user, setLocation]);
 
+  const form = useForm<InsertUser>({
+    resolver: zodResolver(insertUserSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      displayName: "",
+      phone: "",
+      role: role,
+    },
+  });
+
+  // Update role in form when tab changes
+  useEffect(() => {
+    form.setValue("role", role);
+  }, [role, form]);
+
+  const onSubmit = (data: InsertUser) => {
+    if (mode === "login") {
+      loginMutation.mutate({ username: data.username, password: data.password });
+    } else {
+      registerMutation.mutate(data);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-4">
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden px-4 py-12">
       <div className="absolute top-0 left-0 w-full h-1/2 bg-secondary/10 skew-y-6 transform origin-top-left -z-10" />
       <Card className="w-full max-w-md shadow-2xl border-primary/20">
         <CardHeader className="text-center space-y-2">
@@ -30,12 +61,12 @@ export default function AuthPage() {
             </div>
           </Link>
           <CardTitle className="text-2xl font-display text-secondary" data-testid="text-auth-title">
-            Welcome to Arsi
+            {mode === "login" ? "Welcome Back" : "Join Arsi"}
           </CardTitle>
           <CardDescription>
             {role === "provider" 
-              ? "Join as a wedding professional" 
-              : "Start planning your dream wedding"}
+              ? (mode === "login" ? "Login to your provider account" : "Register as a wedding professional")
+              : (mode === "login" ? "Login to start planning" : "Start planning your dream wedding")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -52,25 +83,98 @@ export default function AuthPage() {
             </TabsList>
           </Tabs>
 
-          <Auth
-            supabaseClient={supabase}
-            appearance={{ 
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: 'hsl(43 74% 49%)',
-                    brandAccent: 'hsl(43 74% 40%)',
-                  }
-                }
-              }
-            }}
-            theme="light"
-            providers={[]}
-            additionalData={{
-              role: role
-            }}
-          />
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {mode === "register" && (
+                <FormField
+                  control={form.control}
+                  name="displayName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <UserCircle className="w-4 h-4 text-primary" /> Full Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your name" {...field} data-testid="input-name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-primary" /> Email Address
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="email@example.com" {...field} data-testid="input-email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {mode === "register" && role === "provider" && (
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-primary" /> Phone Number
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="+212 6XX XXX XXX" {...field} data-testid="input-phone" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-primary" /> Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button 
+                type="submit" 
+                className="w-full bg-secondary hover:bg-secondary/90 text-white font-bold h-11"
+                disabled={loginMutation.isPending || registerMutation.isPending}
+                data-testid="button-auth-submit"
+              >
+                {(loginMutation.isPending || registerMutation.isPending) && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                {mode === "login" ? "Sign In" : "Create Account"}
+              </Button>
+            </form>
+          </Form>
+
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setMode(mode === "login" ? "register" : "login")}
+              className="text-sm text-primary hover:underline font-medium"
+              data-testid="button-toggle-mode"
+            >
+              {mode === "login" ? "Don't have an account? Register" : "Already have an account? Sign In"}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>
