@@ -7,6 +7,7 @@ import AuthPage from "@/pages/Auth";
 import Plan from "@/pages/Plan";
 import Guests from "@/pages/Guests";
 import ProvidersList from "@/pages/ProvidersList";
+import ProviderProfile from "@/pages/ProviderProfile";
 import MoodBoard from "@/pages/MoodBoard";
 import Categories from "@/pages/Categories";
 import Rules from "@/pages/Rules";
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/plan" component={Plan} />
       <Route path="/guests" component={Guests} />
       <Route path="/providers" component={ProvidersList} />
+      <Route path="/providers/:id" component={ProviderProfile} />
       <Route path="/moodboard" component={MoodBoard} />
       <Route path="/categories" component={Categories} />
       <Route path="/rules" component={Rules} />
