@@ -8,12 +8,9 @@ import { Loader2, Search } from "lucide-react";
 
 export default function ProvidersList() {
   const [city, setCity] = useState<string>("");
-  const [category, setCategory] = useState<string>("all");
+  const [category, setCategory] = useState<string>("");
   
-  const { data: providers, isLoading } = useProviders({ 
-    city, 
-    category: category === "all" ? undefined : category 
-  });
+  const { data: providers, isLoading } = useProviders({ city, category: category === "all" ? undefined : category });
 
   return (
     <div className="min-h-screen bg-background">
@@ -34,11 +31,10 @@ export default function ProvidersList() {
                 className="pl-9 bg-white"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                data-testid="input-filter-city"
               />
             </div>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="w-full sm:w-48 bg-white" data-testid="select-filter-category">
+              <SelectTrigger className="w-full sm:w-48 bg-white">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -48,7 +44,6 @@ export default function ProvidersList() {
                 <SelectItem value="dj">DJ / Music</SelectItem>
                 <SelectItem value="cameraman">Photography</SelectItem>
                 <SelectItem value="neggafa">Neggafa</SelectItem>
-                <SelectItem value="decoration">Decoration</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -58,13 +53,13 @@ export default function ProvidersList() {
           <div className="flex justify-center py-20">
             <Loader2 className="w-12 h-12 animate-spin text-primary" />
           </div>
-        ) : !providers || providers.length === 0 ? (
+        ) : providers?.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-border">
             <p className="text-lg text-muted-foreground">No providers found matching your criteria.</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {providers.map((provider) => (
+            {providers?.map((provider) => (
               <ProviderCard key={provider.id} provider={provider} />
             ))}
           </div>
