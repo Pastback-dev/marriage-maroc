@@ -53,7 +53,6 @@ export function Navigation() {
 
   const userNavItems = [
     { label: t("nav_guests"), path: "/guests", icon: Users },
-    { label: "Mood Board", path: "/moodboard", icon: Layout },
   ];
 
   const languages = [
