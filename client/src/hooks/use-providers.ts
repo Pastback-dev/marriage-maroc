@@ -25,7 +25,15 @@ export function useProviders(filters?: { category?: string; city?: string }) {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as ProviderProfile[];
+      
+      return (data as any[]).map(profile => ({
+        id: profile.id,
+        displayName: profile.display_name,
+        serviceCategory: profile.service_category,
+        city: profile.city,
+        description: profile.description,
+        username: profile.username || '',
+      }));
     },
   });
 }
@@ -47,7 +55,16 @@ export function useProvider(id: string) {
         }
         throw error;
       }
-      return data as ProviderProfile;
+      
+      const profile = data as any;
+      return {
+        id: profile.id,
+        displayName: profile.display_name,
+        serviceCategory: profile.service_category,
+        city: profile.city,
+        description: profile.description,
+        username: profile.username || '',
+      };
     },
     enabled: !!id,
   });

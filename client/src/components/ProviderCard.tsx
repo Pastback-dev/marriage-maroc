@@ -11,7 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 
@@ -20,6 +20,7 @@ interface ProviderCardProps {
 }
 
 export function ProviderCard({ provider }: ProviderCardProps) {
+  const { t } = useTranslation();
   const [photos, setPhotos] = useState<any[]>([]);
   const [loadingPhotos, setLoadingPhotos] = useState(true);
 
@@ -39,6 +40,9 @@ export function ProviderCard({ provider }: ProviderCardProps) {
   }, [provider.id]);
 
   const displayImages = photos.map(p => p.image_url);
+  const categoryLabel = provider.serviceCategory 
+    ? t(`category_${provider.serviceCategory}`) 
+    : t("all_categories");
 
   return (
     <Card className="group overflow-hidden border border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:shadow-primary/5">
@@ -88,7 +92,7 @@ export function ProviderCard({ provider }: ProviderCardProps) {
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-2">
           <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 uppercase tracking-wide text-xs font-bold">
-            {provider.serviceCategory || "Uncategorized"}
+            {categoryLabel}
           </Badge>
         </div>
         
