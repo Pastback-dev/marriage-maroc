@@ -10,6 +10,8 @@ import { useProviders } from "@/hooks/use-providers";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
+import { GuestTable } from "@/components/GuestTable";
+import { useGuests } from "@/hooks/use-guests";
 import heroWedding from "@/assets/hero-moroccan-hall.png";
 import traditionalHall from "@/assets/moroccan-traditional-hall.png";
 
@@ -17,11 +19,12 @@ export default function Home() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [budget, setBudget] = useState<string>("");
-  const [guests, setGuests] = useState<string>("");
+  const [guestsCount, setGuestsCount] = useState<string>("");
   const [city, setCity] = useState<string>("");
   const { toast } = useToast();
   
   const { data: providers } = useProviders();
+  const { data: allGuests, isLoading: guestsLoading } = useGuests();
 
   const cities = [
     { id: "Casablanca", name: t("city_casablanca") },
@@ -41,7 +44,7 @@ export default function Home() {
       });
       return;
     }
-    setLocation(`/plan?city=${city}&budget=${budget}&guests=${guests}`);
+    setLocation(`/plan?city=${city}&budget=${budget}&guests=${guestsCount}`);
   };
 
   const categories = [
@@ -119,8 +122,8 @@ export default function Home() {
                       <Input 
                         type="number" 
                         placeholder="200"
-                        value={guests}
-                        onChange={(e) => setGuests(e.target.value)}
+                        value={guestsCount}
+                        onChange={(e) => setGuestsCount(e.target.value)}
                         className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all"
                         data-testid="input-guests"
                       />
@@ -133,7 +136,7 @@ export default function Home() {
                         <SelectTrigger className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-city">
                           <SelectValue placeholder={t("select_city")} />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5">
+                        <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
                           {cities.map(c => (
                             <SelectItem key={c.id} value={c.id} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
                           ))}
@@ -168,7 +171,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories Section - Redesigned UI */}
+      {/* Categories Section */}
       <section className="py-24 bg-slate-50/40 relative overflow-hidden">
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center opacity-5 pointer-events-none" 
@@ -207,7 +210,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section - Improved Spacing & Style */}
+      {/* Features Section */}
       <section className="py-32 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
@@ -218,7 +221,7 @@ export default function Home() {
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">{t("features_intro")}</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12 lg:gap-16">
+          <div className="grid md:grid-cols-3 gap-12 lg:gap-16 mb-24">
             {[
               {
                 icon: Sparkles,
@@ -255,6 +258,28 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+
+          {/* Global Guest List Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="space-y-8"
+          >
+            <div className="text-center">
+              <h2 className="text-3xl font-display font-bold text-secondary mb-4">Community Guest List</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">See how other couples are planning their celebrations across Morocco.</p>
+            </div>
+            <Card className="border-primary/10 shadow-xl rounded-3xl overflow-hidden">
+              <CardContent className="p-0">
+                <GuestTable 
+                  guests={allGuests} 
+                  isLoading={guestsLoading} 
+                />
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </section>
       
