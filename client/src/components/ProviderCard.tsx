@@ -1,7 +1,9 @@
 import { type ProviderProfile } from "@/hooks/use-providers";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Loader2 } from "lucide-react";
+import { Star, MapPin, ExternalLink, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import {
   Carousel,
   CarouselContent,
@@ -103,10 +105,18 @@ export function ProviderCard({ provider }: ProviderCardProps) {
           {provider.city || "Location not set"}
         </div>
         
-        <p className="text-sm text-muted-foreground line-clamp-2">
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
           {provider.description || "No description provided yet."}
         </p>
       </CardContent>
+      
+      <CardFooter className="p-6 pt-0">
+        <Link href={`/providers/${provider.id}`} className="w-full">
+          <Button className="w-full bg-secondary hover:bg-secondary/90 text-white gap-2 group-hover:translate-x-1 transition-transform">
+            View Profile <ExternalLink className="w-4 h-4 opacity-50" />
+          </Button>
+        </Link>
+      </CardFooter>
     </Card>
   );
 }
