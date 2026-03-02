@@ -11,8 +11,6 @@ export const insertUserSchema = z.object({
   serviceCategory: z.string().optional(),
   city: z.string().optional(),
   description: z.string().optional(),
-  priceMin: z.number().optional(),
-  priceMax: z.number().optional(),
 });
 
 export const loginSchema = z.object({
@@ -49,8 +47,6 @@ export type User = {
   serviceCategory: string | null;
   city: string | null;
   description: string | null;
-  priceMin: number | null;
-  priceMax: number | null;
   isAdmin: boolean;
   createdAt: Date | null;
 };
@@ -66,6 +62,7 @@ export type Provider = {
   images: string[];
   packages: { name: string; price: number; features: string[] }[];
   rating: number | null;
+  contactInfo: string | null;
 };
 
 export type Plan = {
