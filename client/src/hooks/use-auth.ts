@@ -28,6 +28,7 @@ export function useUser() {
           displayName: session.user.user_metadata?.display_name || null,
           serviceCategory: null,
           city: null,
+          description: null,
         };
       }
 
@@ -41,9 +42,9 @@ export function useUser() {
         isAdmin: !!profile.is_admin,
         serviceCategory: profile.service_category,
         city: profile.city,
+        description: profile.description,
       };
     },
-    // Refetch more often during development to catch profile updates
     refetchOnWindowFocus: true,
     staleTime: 1000 * 5, // 5 seconds
   });
@@ -89,6 +90,7 @@ export function useRegister() {
           data: {
             display_name: data.displayName,
             role: data.role || 'client',
+            phone: data.phone || null,
           }
         }
       });
@@ -96,12 +98,25 @@ export function useRegister() {
       if (error) throw error;
       return authData.user;
     },
-    onSuccess: () => {
+    onSuccess: (user) => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      toast({ title: "Account created", description: "Please check your email for verification." });
+      
+      // If email confirmation is off, they might be logged in immediately
+      const message = user?.identities?.length === 0 
+        ? "Account already exists or needs verification." 
+        : "Account created! You can now log in.";
+        
+      toast({ 
+        title: "Registration Successful", 
+        description: message 
+      });
     },
     onError: (error: any) => {
-      toast({ variant: "destructive", title: "Registration failed", description: error.message });
+      let description = error.message;
+      if (error.message.includes("rate limit")) {
+        description = "Too many attempts. Please wait a few minutes or disable 'Confirm Email' in your Supabase dashboard settings.";
+      }
+      toast({ variant: "destructive", title: "Registration failed", description });
     },
   });
 }
