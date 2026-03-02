@@ -9,9 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Store, Star, Eye, MessageSquare, Utensils, Home as HomeIcon,
-  Music, Camera, UserRound, Paintbrush, Check, Loader2,
-  Upload, ImagePlus, Trash2, Pencil, X, Image as ImageIcon, MapPin
+  Store, Utensils, Home as HomeIcon,
+  Music, Camera, UserRound, Paintbrush, Loader2,
+  Upload, ImagePlus, Trash2, ImageIcon, MapPin, Sparkles
 } from "lucide-react";
 import {
   Select,
@@ -91,26 +91,26 @@ export default function ProviderDashboard() {
         {currentCategory && currentCatInfo ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <Card className="border-primary/20">
+              <Card className="border-primary/20 shadow-sm">
                 <CardContent className="pt-6 flex items-center gap-4">
                   <div className={`w-14 h-14 rounded-2xl ${currentCatInfo.bg} flex items-center justify-center`}>
                     <currentCatInfo.icon className="w-7 h-7 opacity-80" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Your Service</p>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your Service</p>
                     <p className="text-xl font-bold text-secondary">{currentCatInfo.name}</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setSelectedCategory(currentCategory)}>Change</Button>
                 </CardContent>
               </Card>
 
-              <Card className="border-primary/20">
+              <Card className="border-primary/20 shadow-sm">
                 <CardContent className="pt-6 flex items-center gap-4">
                   <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center">
                     <MapPin className="w-7 h-7 text-emerald-600 opacity-80" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm text-muted-foreground">Your City</p>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Your City</p>
                     <p className="text-xl font-bold text-secondary">{user.city || "Not set"}</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setChangingCity(true)}>Change</Button>
@@ -140,12 +140,21 @@ export default function ProviderDashboard() {
             <PhotoGallery userId={user.id} />
           </>
         ) : (
-          <ServiceCategoryPicker
-            pendingSelection={selectedCategory}
-            onSelect={setSelectedCategory}
-            onConfirm={() => selectedCategory && categoryMutation.mutate(selectedCategory)}
-            isPending={categoryMutation.isPending}
-          />
+          <div className="space-y-6">
+            <div className="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex items-center gap-4">
+              <Sparkles className="w-8 h-8 text-primary" />
+              <div>
+                <h2 className="text-xl font-bold text-secondary">Complete Your Profile</h2>
+                <p className="text-muted-foreground">Select your service category below to start uploading your portfolio.</p>
+              </div>
+            </div>
+            <ServiceCategoryPicker
+              pendingSelection={selectedCategory}
+              onSelect={setSelectedCategory}
+              onConfirm={() => selectedCategory && categoryMutation.mutate(selectedCategory)}
+              isPending={categoryMutation.isPending}
+            />
+          </div>
         )}
       </div>
     </div>
@@ -182,19 +191,16 @@ function PhotoGallery({ userId }: { userId: string }) {
       const fileExt = previewFile.name.split('.').pop();
       const fileName = `${userId}/${Math.random()}.${fileExt}`;
       
-      // 1. Upload to Storage
       const { error: uploadError } = await supabase.storage
         .from('portfolios')
         .upload(fileName, previewFile);
 
       if (uploadError) throw uploadError;
 
-      // 2. Get Public URL
       const { data: { publicUrl } } = supabase.storage
         .from('portfolios')
         .getPublicUrl(fileName);
 
-      // 3. Save to Database
       const { error: dbError } = await supabase
         .from('provider_photos')
         .insert({
@@ -221,7 +227,6 @@ function PhotoGallery({ userId }: { userId: string }) {
 
   const deleteMutation = useMutation({
     mutationFn: async (photo: any) => {
-      // Extract path from URL
       const path = photo.image_url.split('/portfolios/')[1];
       await supabase.storage.from('portfolios').remove([path]);
       await supabase.from('provider_photos').delete().eq('id', photo.id);
@@ -241,51 +246,74 @@ function PhotoGallery({ userId }: { userId: string }) {
   };
 
   return (
-    <Card>
+    <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><ImageIcon className="w-5 h-5" /> My Portfolio</CardTitle>
+        <CardTitle className="flex items-center gap-2"><ImageIcon className="w-5 h-5 text-primary" /> My Portfolio</CardTitle>
         <CardDescription>Showcase your work to potential clients.</CardDescription>
       </CardHeader>
       <CardContent>
         <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} accept="image/*" />
         
         {previewUrl ? (
-          <div className="mb-6 p-4 border-2 border-dashed rounded-2xl bg-primary/5 flex gap-4">
-            <img src={previewUrl} className="w-32 h-32 object-cover rounded-xl" />
-            <div className="flex-1 space-y-3">
-              <Textarea 
-                placeholder="Describe this photo..." 
-                value={uploadDescription} 
-                onChange={(e) => setUploadDescription(e.target.value)} 
-              />
-              <div className="flex gap-2">
-                <Button onClick={() => uploadMutation.mutate()} disabled={isUploading}>
-                  {isUploading ? <Loader2 className="animate-spin mr-2" /> : <Upload className="mr-2" />} Upload
+          <div className="mb-6 p-6 border-2 border-dashed rounded-2xl bg-primary/5 flex flex-col sm:flex-row gap-6">
+            <img src={previewUrl} className="w-full sm:w-48 h-48 object-cover rounded-xl shadow-md" />
+            <div className="flex-1 space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase">Photo Description</label>
+                <Textarea 
+                  placeholder="Tell clients about this work (e.g., 'Traditional wedding in Marrakech')" 
+                  value={uploadDescription} 
+                  onChange={(e) => setUploadDescription(e.target.value)} 
+                  className="bg-white"
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button onClick={() => uploadMutation.mutate()} disabled={isUploading} className="bg-primary hover:bg-primary/90">
+                  {isUploading ? <Loader2 className="animate-spin mr-2" /> : <Upload className="mr-2 w-4 h-4" />} Start Upload
                 </Button>
-                <Button variant="outline" onClick={() => setPreviewUrl(null)}>Cancel</Button>
+                <Button variant="outline" onClick={() => { setPreviewUrl(null); setPreviewFile(null); }}>Cancel</Button>
               </div>
             </div>
           </div>
         ) : (
-          <button onClick={() => fileInputRef.current?.click()} className="w-full mb-6 p-8 border-2 border-dashed rounded-2xl hover:bg-primary/5 transition-all">
-            <ImagePlus className="w-10 h-10 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm font-medium">Click to add photos of your work</p>
+          <button 
+            onClick={() => fileInputRef.current?.click()} 
+            className="w-full mb-8 p-12 border-2 border-dashed rounded-2xl hover:bg-primary/5 hover:border-primary/30 transition-all group"
+          >
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/10 transition-colors">
+              <ImagePlus className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
+            <p className="text-lg font-bold text-secondary">Add Portfolio Photos</p>
+            <p className="text-sm text-muted-foreground">Click to browse your files (JPG, PNG, WebP)</p>
           </button>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {photos?.map((photo) => (
-            <div key={photo.id} className="group relative rounded-xl overflow-hidden border">
-              <img src={photo.image_url} className="aspect-square w-full object-cover" />
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-between">
-                <p className="text-white text-sm">{photo.description}</p>
-                <Button variant="destructive" size="icon" onClick={() => deleteMutation.mutate(photo)}>
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+        {isLoading ? (
+          <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>
+        ) : photos?.length === 0 ? (
+          <div className="text-center py-12 border rounded-2xl bg-slate-50/50">
+            <p className="text-muted-foreground">Your portfolio is empty. Upload your first photo above!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {photos?.map((photo) => (
+              <div key={photo.id} className="group relative rounded-2xl overflow-hidden border shadow-sm aspect-square">
+                <img src={photo.image_url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                  <p className="text-white text-sm font-medium mb-4 line-clamp-3">{photo.description}</p>
+                  <Button 
+                    variant="destructive" 
+                    size="sm" 
+                    className="w-fit gap-2"
+                    onClick={() => { if(confirm("Delete this photo?")) deleteMutation.mutate(photo); }}
+                  >
+                    <Trash2 className="w-4 h-4" /> Delete
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -293,24 +321,37 @@ function PhotoGallery({ userId }: { userId: string }) {
 
 function ServiceCategoryPicker({ pendingSelection, onSelect, onConfirm, onCancel, isPending }: any) {
   return (
-    <Card className="mb-8">
-      <CardHeader><CardTitle>Select Your Service</CardTitle></CardHeader>
+    <Card className="border-primary/10 shadow-sm">
+      <CardHeader>
+        <CardTitle>What service do you provide?</CardTitle>
+        <CardDescription>This helps us show your profile to the right couples.</CardDescription>
+      </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {SERVICE_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
               onClick={() => onSelect(cat.id)}
-              className={`p-5 rounded-2xl border-2 text-left transition-all ${pendingSelection === cat.id ? `ring-2 ${cat.selected} ${cat.border}` : "border-border hover:border-primary/30"}`}
+              className={`p-6 rounded-2xl border-2 text-left transition-all duration-200 ${
+                pendingSelection === cat.id 
+                  ? `ring-2 ${cat.selected} ${cat.border}` 
+                  : "border-border hover:border-primary/30 hover:bg-slate-50"
+              }`}
             >
-              <div className={`w-12 h-12 rounded-xl ${cat.bg} flex items-center justify-center mb-3`}><cat.icon className="w-6 h-6" /></div>
-              <h3 className="font-bold text-secondary">{cat.name}</h3>
-              <p className="text-sm text-muted-foreground">{cat.desc}</p>
+              <div className={`w-12 h-12 rounded-xl ${cat.bg} flex items-center justify-center mb-4 shadow-sm`}>
+                <cat.icon className="w-6 h-6" />
+              </div>
+              <h3 className="font-bold text-secondary text-lg">{cat.name}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{cat.desc}</p>
             </button>
           ))}
         </div>
         <div className="flex gap-3">
-          <Button onClick={onConfirm} disabled={!pendingSelection || isPending}>
+          <Button 
+            onClick={onConfirm} 
+            disabled={!pendingSelection || isPending}
+            className="bg-secondary hover:bg-secondary/90 px-8"
+          >
             {isPending && <Loader2 className="animate-spin mr-2" />} Confirm Selection
           </Button>
           {onCancel && <Button variant="outline" onClick={onCancel}>Cancel</Button>}
@@ -323,18 +364,25 @@ function ServiceCategoryPicker({ pendingSelection, onSelect, onConfirm, onCancel
 function CityPicker({ currentCity, onConfirm, onCancel, isPending }: any) {
   const [city, setCity] = useState(currentCity || "");
   return (
-    <Card className="mb-8">
-      <CardHeader><CardTitle>Select Your City</CardTitle></CardHeader>
+    <Card className="border-primary/10 shadow-sm">
+      <CardHeader>
+        <CardTitle>Where are you located?</CardTitle>
+        <CardDescription>Couples often search for vendors in specific cities.</CardDescription>
+      </CardHeader>
       <CardContent>
-        <Select value={city} onValueChange={setCity}>
-          <SelectTrigger className="w-full max-w-xs mb-6"><SelectValue placeholder="Choose a city..." /></SelectTrigger>
-          <SelectContent>{MOROCCO_CITIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-        </Select>
-        <div className="flex gap-3">
-          <Button onClick={() => onConfirm(city)} disabled={!city || isPending}>
-            {isPending && <Loader2 className="animate-spin mr-2" />} Confirm City
-          </Button>
-          <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <div className="max-w-xs space-y-6">
+          <Select value={city} onValueChange={setCity}>
+            <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Choose a city..." /></SelectTrigger>
+            <SelectContent className="rounded-xl">
+              {MOROCCO_CITIES.map(c => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <div className="flex gap-3">
+            <Button onClick={() => onConfirm(city)} disabled={!city || isPending} className="bg-secondary hover:bg-secondary/90">
+              {isPending && <Loader2 className="animate-spin mr-2" />} Save City
+            </Button>
+            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          </div>
         </div>
       </CardContent>
     </Card>
