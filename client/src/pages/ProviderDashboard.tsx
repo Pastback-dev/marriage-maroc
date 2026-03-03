@@ -180,7 +180,7 @@ export default function ProviderDashboard() {
           <p className="text-muted-foreground mt-2">Welcome back, {user.displayName || user.username}!</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card className="border-primary/20 shadow-sm">
             <CardContent className="pt-6 flex items-center gap-4">
               <div className={`w-14 h-14 rounded-2xl ${currentCatInfo?.bg || 'bg-slate-100'} flex items-center justify-center`}>
@@ -227,34 +227,48 @@ export default function ProviderDashboard() {
               </Button>
             </CardContent>
           </Card>
+        </div>
 
-          <Card className="border-primary/20 shadow-sm">
-            <CardContent className="pt-6 flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center">
-                <Phone className="w-7 h-7 text-blue-600 opacity-80" />
+        {/* Large Phone Card */}
+        <Card className="mb-8 border-primary/30 shadow-md bg-gradient-to-br from-white to-blue-50/30 overflow-hidden">
+          <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-3xl bg-blue-100 flex items-center justify-center shadow-inner shrink-0">
+                <Phone className="w-10 h-10 text-blue-600" />
               </div>
-              <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Phone</p>
-                <p className="text-xl font-bold text-secondary">{user.phone || "Not set"}</p>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Button variant="outline" size="sm" onClick={() => setEditingPhone(true)}>
-                  Edit
-                </Button>
-                {whatsappNumber && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
-                    onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
-                  >
-                    <MessageCircle className="w-4 h-4 mr-1" /> WhatsApp
-                  </Button>
+              <div>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">Contact Phone Number</p>
+                <p className="text-3xl md:text-4xl font-bold text-secondary tracking-tight">
+                  {user.phone || "Not set"}
+                </p>
+                {user.phone && (
+                  <p className="text-xs text-emerald-600 font-semibold mt-2 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" /> Visible to all potential clients
+                  </p>
                 )}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="h-14 px-8 text-lg font-semibold rounded-2xl border-primary/20 hover:bg-primary/5" 
+                onClick={() => setEditingPhone(true)}
+              >
+                Edit Number
+              </Button>
+              {whatsappNumber && (
+                <Button 
+                  size="lg" 
+                  className="h-14 px-8 text-lg font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 rounded-2xl transition-all active:scale-95"
+                  onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
+                >
+                  <MessageCircle className="w-6 h-6 mr-2" /> Open WhatsApp
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {selectedCategory !== null && (
           <div className="mb-8">
