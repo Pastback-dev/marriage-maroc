@@ -1,273 +1,183 @@
 import { Navigation } from "@/components/Navigation";
-import { usePlans, useCreatePlan } from "@/hooks/use-plans";
-import { useUser } from "@/hooks/use-auth";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { useLocation } from "wouter";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Sparkles, Receipt, Calendar, Users as UsersIcon, MapPin } from "lucide-react";
-import { ProviderCard } from "@/components/ProviderCard";
-import { type PlanResponse } from "@shared/routes";
-
-const planSchema = z.object({
-  guestCount: z.coerce.number().min(1, "At least 1 guest required"),
-  totalBudget: z.coerce.number().min(5000, "Minimum budget 5000 MAD"),
-  city: z.string().min(1, "City is required"),
-  weddingStyle: z.string().min(1, "Style is required"),
-});
-
-type PlanFormValues = z.infer<typeof planSchema>;
+import { useState } from "react";
+import { Loader2, Sparkles } from "lucide-react";
+import { useProviders } from "@/hooks/use-providers";
+import { t } from "i18next";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Plan() {
   const { t } = useTranslation();
-  const { data: user, isLoading: userLoading } = useUser();
-  const { data: plans, isLoading: plansLoading } = usePlans();
-  const createPlan = useCreatePlan();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const { data: providers } = useProviders(); // This will fetch providers from API
+  const [selectedCity, setSelectedCity] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const cities = [
-    { id: "Casablanca", name: t("city_casablanca") },
-    { id: "Rabat", name: t("city_rabat") },
-    { id: "Marrakech", name: t("city_marrakech") },
-    { id: "Fes", name: t("city_fes") },
-    { id: "Tangier", name: t("city_tangier") },
-    { id: "Agadir", name: t("city_agadir") },
-  ];
-  
-  const form = useForm<PlanFormValues>({
-    resolver: zodResolver(planSchema),
-    defaultValues: {
-      guestCount: parseInt(new URLSearchParams(window.location.search).get("guests") || "100"),
-      totalBudget: parseInt(new URLSearchParams(window.location.search).get("budget") || "50000"),
-      city: new URLSearchParams(window.location.search).get("city") || "Casablanca",
-      weddingStyle: "Traditional",
-    },
-  });
+  // Get distinct categories from providers for dropdown
+  const categories = Array.from(
+    new Set(providers?.map((p) => p.category) || [])
+  ).sort();
 
-  const onSubmit = (data: PlanFormValues) => {
-    createPlan.mutate(data);
+  const handleGenerate = async () => {
+    if (!selectedCity || !selectedCategory) {
+      toast({
+        title: t("select_city_and_category"),
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    // Filter providers by city and category
+    const filtered = providers?.filter(
+      (p) => p.city === selectedCity && p.category === selectedCategory
+    ) || [];
+
+    setSearchResults(filtered);
+    setLoading(false);
+
+    // Navigate to a simple results view or just display here
+    if (filtered.length === 0) {
+      toast({
+        title: t("no_providers_found"),
+        variant: "destructive"
+      });
+    }
   };
 
-  if (userLoading || plansLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  const currentPlan = plans?.[0] as PlanResponse | undefined;
-
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background py-12">
       <Navigation />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {!currentPlan ? (
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-10">
-              <h1 className="text-4xl font-display font-bold text-secondary mb-3" data-testid="text-plan-title">{t("ai_box_title")}</h1>
-              <p className="text-muted-foreground/80 text-sm">{t("hero_subtitle")}</p>
-            </div>
-
-            <Card className="border-none shadow-xl rounded-3xl overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-primary/5 to-amber-50/50 pb-4 pt-7 px-8">
-                <CardTitle className="flex items-center gap-3 text-lg font-display text-secondary" data-testid="text-generator-title">
-                  <div className="p-2 bg-gradient-to-br from-primary/20 to-amber-200/30 rounded-xl">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                  </div>
-                  {t("ai_box_title")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-8 pt-6">
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                    <div className="grid md:grid-cols-2 gap-5">
-                      <FormField
-                        control={form.control}
-                        name="guestCount"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                              <UsersIcon className="w-3 h-3 text-primary/70" /> {t("guest_count")}
-                            </FormLabel>
-                            <FormControl>
-                              <Input type="number" {...field} className="bg-white border border-border/50 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-guests" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="totalBudget"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                              <Receipt className="w-3 h-3 text-primary/70" /> {t("budget")}
-                            </FormLabel>
-                            <FormControl>
-                              <Input type="number" {...field} className="bg-white border border-border/50 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="input-plan-budget" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    
-                    <div className="grid md:grid-cols-2 gap-5">
-                      <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                              <MapPin className="w-3 h-3 text-primary/70" /> {t("city")}
-                            </FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="bg-white border border-border/50 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-city">
-                                  <SelectValue placeholder={t("select_city")} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
-                                {cities.map(c => (
-                                  <SelectItem key={c.id} value={c.id} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="weddingStyle"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                              <Calendar className="w-3 h-3 text-primary/70" /> {t("style_label")}
-                            </FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="bg-white border border-border/50 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-plan-style">
-                                  <SelectValue placeholder={t("select_style")} />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
-                                <SelectItem value="Traditional" className="rounded-lg py-2.5">{t("style_traditional")}</SelectItem>
-                                <SelectItem value="Modern" className="rounded-lg py-2.5">{t("style_modern")}</SelectItem>
-                                <SelectItem value="Royal" className="rounded-lg py-2.5">{t("style_royal")}</SelectItem>
-                                <SelectItem value="Intimate" className="rounded-lg py-2.5">{t("style_intimate")}</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <Button type="submit" size="lg" className="w-full h-12 text-base font-bold bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg shadow-secondary/15 rounded-xl transition-all active:scale-[0.98]" disabled={createPlan.isPending} data-testid="button-generate-plan">
-                      {createPlan.isPending ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("generating")}
-                        </>
-                      ) : (
-                        t("get_recommendation")
-                      )}
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-4xl md:text-6xl font-display font-bold text-secondary">
+            {t("ai_box_title")}
+          </h1>
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-5 h-5" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-300 text-xl font-display">
+              {t("ai_box_title").split(t("ai_box_title"))[1]}
+            </span>
           </div>
-        ) : (
-          <div className="space-y-12 animate-in fade-in duration-700">
-            <div className="grid md:grid-cols-4 gap-6">
-              <Card className="bg-secondary text-secondary-foreground border-none rounded-2xl">
-                <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 bg-white/10 rounded-xl">
-                    <Receipt className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wider opacity-60 font-semibold">{t("total_estimated")}</p>
-                    <p className="text-xl font-bold font-display" data-testid="text-total-cost">{currentPlan.totalCost.toLocaleString()} MAD</p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="rounded-2xl">
-                <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 text-primary rounded-xl">
-                    <UsersIcon className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-semibold">{t("guest_count")}</p>
-                    <p className="text-xl font-bold font-display" data-testid="text-guest-count">{currentPlan.guestCount}</p>
-                  </div>
-                </CardContent>
-              </Card>
+        </div>
 
-              <Card className="rounded-2xl">
-                <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 bg-accent/10 text-accent rounded-xl">
-                    <Calendar className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-semibold">{t("style_label")}</p>
-                    <p className="text-xl font-bold font-display" data-testid="text-style">{currentPlan.weddingStyle}</p>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card className="rounded-2xl">
-                <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 text-primary rounded-xl">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground/70 font-semibold">{t("remaining_budget")}</p>
-                    <p className="text-xl font-bold font-display text-emerald-600" data-testid="text-remaining">{(currentPlan.totalBudget - currentPlan.totalCost).toLocaleString()} MAD</p>
-                  </div>
-                </CardContent>
-              </Card>
+        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          {/* City Selection */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary" />
+              <label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                {t("city")}
+              </label>
+              <Select value={selectedCity} onValueChange={setSelectedCity}>
+                <SelectTrigger className="flex-1 min-w-64 bg-white border border-border/30 rounded-xl px-3 py-2 text-base font-medium focus:ring-primary/20 focus:border-primary/30 transition-all">
+                  <SelectValue placeholder={t("select_city")} />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+          </div>
 
-            <div>
-              <h2 className="text-3xl font-display font-bold text-secondary mb-6 flex items-center gap-3">
-                <span className="bg-primary/20 p-2 rounded-lg"><Sparkles className="w-6 h-6 text-primary" /></span>
-                {t("curated_team")}
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {currentPlan.breakdown.traiteur && <ProviderCard provider={currentPlan.breakdown.traiteur} />}
-                {currentPlan.breakdown.hall && <ProviderCard provider={currentPlan.breakdown.hall} />}
-                {currentPlan.breakdown.dj && <ProviderCard provider={currentPlan.breakdown.dj} />}
-                {currentPlan.breakdown.cameraman && <ProviderCard provider={currentPlan.breakdown.cameraman} />}
-              </div>
+          {/* Category Selection */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Utensils className="w-4 h-4 text-primary" />
+              <label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                {t("category")}
+              </label>
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="flex-1 min-w-64 bg-white border border-border/30 rounded-xl px-3 py-2 text-base font-medium focus:ring-primary/20 focus:border-primary/30 transition-all">
+                  <SelectValue placeholder={t("select_category")} />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
+                  {["traiteur", "hall", "dj", "cameraman", "neggafa", "decoration", "other"].map((cat) => (
+                    <SelectItem key={cat} value={cat} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">
+                      {t(`category_${cat}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div className="flex justify-center mt-12">
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="text-muted-foreground hover:text-destructive hover:border-destructive rounded-xl"
-                onClick={() => {
-                  if(confirm(t("reset_confirm"))) {
-                    window.location.reload(); 
-                  }
-                }}
-                data-testid="button-reset-plan"
-              >
-                {t("reset_plan")}
-              </Button>
+          </div>
+        </div>
+
+        {/* Generate Button */}
+        <div className="flex justify-center">
+          <Button
+            onClick={handleGenerate}
+            className="w-full h-12 text-base font-bold bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg shadow-secondary/15 rounded-xl transition-all active:scale-[0.98]"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("generating")}
+              </>
+            ) : (
+              {t("generate_plan")}
+            )}
+          </Button>
+        </div>
+
+        {/* Search Results */}
+        {searchResults?.length > 0 && (
+          <div className="space-y-8">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-secondary mb-4">
+              {t("providers_found")}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {searchResults.map((provider) => (
+                <Card key={provider.id} className="border-primary/20 shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 uppercase tracking-wide text-xs font-bold">
+                        {provider.category}
+                      </Badge>
+                    </div>
+                    <h3 className="text-xl font-bold text-secondary mb-2 line-clamp-1">
+                      {provider.displayName || provider.username}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                      {provider.description || "No description available."}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium text-primary">
+                        {provider.city}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         )}
-      </div>
+
+        {/* Fallback when no results */}
+        {!loading && searchResults?.length === 0 && selectedCity && selectedCategory && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">{t("no_providers_match")}</p>
+            <Button variant="outline" onClick={() => setLocation("/providers")}>
+              {t("browse_providers")}
+            </Button>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
