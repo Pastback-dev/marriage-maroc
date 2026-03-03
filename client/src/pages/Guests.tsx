@@ -115,43 +115,43 @@ export default function Guests() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
           <div>
-            <h1 className="text-3xl font-display font-bold text-secondary">Guest List</h1>
-            <p className="text-muted-foreground">Manage invites and expected gifts (Gharamah)</p>
+            <h1 className="text-2xl md:text-3xl font-display font-bold text-secondary">Guest List</h1>
+            <p className="text-sm text-muted-foreground">Manage invites and expected gifts (Gharamah)</p>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-border shadow-sm">
-              <div className="p-2 bg-blue-100 text-blue-700 rounded-full">
-                <UsersIcon className="w-5 h-5" />
+          <div className="grid grid-cols-2 gap-3 w-full md:w-auto">
+            <div className="flex items-center gap-3 bg-white p-3 md:p-4 rounded-xl border border-border shadow-sm">
+              <div className="p-2 bg-blue-100 text-blue-700 rounded-full shrink-0">
+                <UsersIcon className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-bold uppercase">Total People</p>
-                <p className="text-xl font-bold text-secondary">{totalPeople}</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase">People</p>
+                <p className="text-lg md:text-xl font-bold text-secondary">{totalPeople}</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-border shadow-sm">
-              <div className="p-2 bg-emerald-100 text-emerald-700 rounded-full">
-                <Calculator className="w-5 h-5" />
+            <div className="flex items-center gap-3 bg-white p-3 md:p-4 rounded-xl border border-border shadow-sm">
+              <div className="p-2 bg-emerald-100 text-emerald-700 rounded-full shrink-0">
+                <Calculator className="w-4 h-4 md:w-5 md:h-5" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-bold uppercase">Expected Gifts</p>
-                <p className="text-xl font-bold text-secondary">{totalExpectedGift.toLocaleString()} MAD</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase">Gifts</p>
+                <p className="text-lg md:text-xl font-bold text-secondary">{totalExpectedGift.toLocaleString()} <span className="text-[10px]">MAD</span></p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-1">
-             <Card className="sticky top-24">
-               <CardHeader>
-                 <CardTitle className="flex items-center gap-2">
+          <div className="lg:col-span-1 order-2 lg:order-1">
+             <Card className="lg:sticky lg:top-24">
+               <CardHeader className="pb-4">
+                 <CardTitle className="flex items-center gap-2 text-lg">
                    {editingGuest ? <Edit2 className="w-5 h-5 text-primary" /> : <UserPlus className="w-5 h-5 text-primary" />} 
                    {editingGuest ? "Edit Guest" : "Add Guest"}
                  </CardTitle>
-                 <CardDescription>
+                 <CardDescription className="text-xs">
                    {editingGuest ? `Updating ${editingGuest.name}` : "Add a new guest or family to your list."}
                  </CardDescription>
                </CardHeader>
@@ -163,9 +163,9 @@ export default function Guests() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Guest/Family Name</FormLabel>
+                            <FormLabel className="text-xs">Guest/Family Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="e.g. Family El Mansouri" {...field} />
+                              <Input placeholder="e.g. Family El Mansouri" {...field} className="h-10" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -178,10 +178,10 @@ export default function Guests() {
                           name="gender"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Gender</FormLabel>
+                              <FormLabel className="text-xs">Gender</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="h-10">
                                     <SelectValue placeholder="Gender" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -200,13 +200,14 @@ export default function Guests() {
                           name="numberOfGuests"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Number of People</FormLabel>
+                              <FormLabel className="text-xs">People</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
                                   {...field} 
                                   value={field.value || ""}
                                   onChange={e => field.onChange(Number(e.target.value))}
+                                  className="h-10"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -221,10 +222,10 @@ export default function Guests() {
                           name="type"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Origin</FormLabel>
+                              <FormLabel className="text-xs">Origin</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="h-10">
                                     <SelectValue placeholder="Type" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -242,7 +243,7 @@ export default function Guests() {
                           name="pricePerGuest"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Gift per Person (MAD)</FormLabel>
+                              <FormLabel className="text-xs">Gift/Person (MAD)</FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
@@ -250,6 +251,7 @@ export default function Guests() {
                                   {...field} 
                                   value={field.value || ""}
                                   onChange={e => field.onChange(Number(e.target.value))}
+                                  className="h-10"
                                 />
                               </FormControl>
                               <FormMessage />
@@ -259,21 +261,21 @@ export default function Guests() {
                       </div>
 
                       <div className="h-px bg-border my-2" />
-                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Event Details</p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Event Details</p>
 
                       <FormField
                         control={form.control}
                         name="city"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="flex items-center gap-2"><MapPin className="w-3 h-3" /> Moroccan City</FormLabel>
+                            <FormLabel className="flex items-center gap-2 text-xs"><MapPin className="w-3 h-3" /> Moroccan City</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-10">
                                   <SelectValue placeholder="Select City" />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent className="bg-white max-h-[300px]">
+                              <SelectContent className="bg-white max-h-[250px]">
                                 {MOROCCAN_CITIES.map(city => (
                                   <SelectItem key={city} value={city}>{city}</SelectItem>
                                 ))}
@@ -290,9 +292,9 @@ export default function Guests() {
                           name="eventDate"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="flex items-center gap-2"><Calendar className="w-3 h-3" /> Date</FormLabel>
+                              <FormLabel className="flex items-center gap-2 text-xs"><Calendar className="w-3 h-3" /> Date</FormLabel>
                               <FormControl>
-                                <Input type="date" {...field} />
+                                <Input type="date" {...field} className="h-10 text-xs" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -303,9 +305,9 @@ export default function Guests() {
                           name="eventTime"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="flex items-center gap-2"><Clock className="w-3 h-3" /> Time</FormLabel>
+                              <FormLabel className="flex items-center gap-2 text-xs"><Clock className="w-3 h-3" /> Time</FormLabel>
                               <FormControl>
-                                <Input type="time" {...field} />
+                                <Input type="time" {...field} className="h-10 text-xs" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -318,9 +320,9 @@ export default function Guests() {
                         name="description"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="flex items-center gap-2"><FileText className="w-3 h-3" /> Description</FormLabel>
+                            <FormLabel className="flex items-center gap-2 text-xs"><FileText className="w-3 h-3" /> Description</FormLabel>
                             <FormControl>
-                              <Textarea placeholder="Additional notes..." {...field} className="resize-none" />
+                              <Textarea placeholder="Additional notes..." {...field} className="resize-none text-xs min-h-[80px]" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -329,12 +331,12 @@ export default function Guests() {
                       
                       <div className="flex gap-2 pt-2">
                         {editingGuest && (
-                          <Button type="button" variant="outline" className="flex-1" onClick={cancelEdit}>
+                          <Button type="button" variant="outline" className="flex-1 h-11" onClick={cancelEdit}>
                             <X className="w-4 h-4 mr-2" /> Cancel
                           </Button>
                         )}
-                        <Button type="submit" className="flex-1 bg-secondary hover:bg-secondary/90" disabled={createGuest.isPending || updateGuest.isPending}>
-                          {editingGuest ? (updateGuest.isPending ? "Updating..." : "Update Guest") : (createGuest.isPending ? "Add Guest" : "Add Guest")}
+                        <Button type="submit" className="flex-1 bg-secondary hover:bg-secondary/90 h-11 font-bold" disabled={createGuest.isPending || updateGuest.isPending}>
+                          {editingGuest ? (updateGuest.isPending ? "Updating..." : "Update") : (createGuest.isPending ? "Adding..." : "Add Guest")}
                         </Button>
                       </div>
                    </form>
@@ -343,14 +345,19 @@ export default function Guests() {
              </Card>
           </div>
 
-          <div className="lg:col-span-2">
-            <Card>
+          <div className="lg:col-span-2 order-1 lg:order-2">
+            <Card className="border-none lg:border lg:border-border shadow-none lg:shadow-sm">
               <CardContent className="p-0">
                 <GuestTable 
                   guests={guests} 
                   isLoading={guestsLoading} 
-                  onEdit={(guest) => setEditingGuest(guest)}
-                  onDelete={(id) => deleteGuest.mutate(id)} 
+                  onEdit={(guest) => {
+                    setEditingGuest(guest);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  onDelete={(id) => {
+                    if(confirm("Remove this guest?")) deleteGuest.mutate(id);
+                  }} 
                 />
               </CardContent>
             </Card>
