@@ -11,28 +11,28 @@ export default function ProvidersList() {
   const { t } = useTranslation();
   const [city, setCity] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
-  
-  const { data: providers, isLoading } = useProviders({ 
-    city: city || undefined, 
-    category: category === "all" ? undefined : category 
+
+  const { data: providers, isLoading } = useProviders({
+    city: city || undefined,
+    category: category === "all" ? undefined : category
   });
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-display font-bold text-secondary mb-2">Our Vendors</h1>
             <p className="text-muted-foreground">Discover wedding professionals in Morocco</p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input 
-                placeholder="Filter by city..." 
+              <Input
+                placeholder="Filter by city..."
                 className="pl-9 bg-white"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}

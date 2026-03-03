@@ -4,15 +4,14 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useProviders } from "@/hooks/use-providers";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import { GuestTable } from "@/components/GuestTable";
 import { useGuests } from "@/hooks/use-guests";
 import { Footer } from "@/components/Footer";
+import { SearchResultsDialog } from "@/components/SearchResultsDialog";
 import heroWedding from "@/assets/hero-moroccan-hall.png";
 import traditionalHall from "@/assets/moroccan-traditional-hall.png";
 
@@ -21,9 +20,9 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [city, setCity] = useState<string>("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { toast } = useToast();
-  
-  const { data: providers } = useProviders();
+
   const { data: allGuests, isLoading: guestsLoading } = useGuests();
 
   const cities = [
@@ -53,7 +52,7 @@ export default function Home() {
       });
       return;
     }
-    
+
     if (selectedCategories.length === 0) {
       toast({
         title: "Category Required",
@@ -63,17 +62,12 @@ export default function Home() {
       return;
     }
 
-    // Navigate to providers page with filters
-    const params = new URLSearchParams();
-    params.set('city', city);
-    selectedCategories.forEach(cat => params.append('category', cat));
-    
-    setLocation(`/providers?${params.toString()}`);
+    setIsSearchOpen(true);
   };
 
   const toggleCategory = (categoryId: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(categoryId) 
+    setSelectedCategories(prev =>
+      prev.includes(categoryId)
         ? prev.filter(c => c !== categoryId)
         : [...prev, categoryId]
     );
@@ -82,15 +76,15 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background font-body">
       <Navigation />
-      
+
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden py-12">
-        <div 
-          className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none" 
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center pointer-events-none"
           style={{ backgroundImage: `url(${heroWedding})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30 z-10" />
-        
+
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -106,7 +100,7 @@ export default function Home() {
               <p className="text-base md:text-lg text-white/90 mb-8 max-w-xl leading-relaxed drop-shadow-sm">
                 {t("hero_subtitle")}
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/register">
                   <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all rounded-full min-h-12">
@@ -165,11 +159,10 @@ export default function Home() {
                             key={cat.id}
                             type="button"
                             onClick={() => toggleCategory(cat.id)}
-                            className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
-                              isSelected 
-                                ? "border-primary bg-primary/5 shadow-md" 
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${isSelected
+                                ? "border-primary bg-primary/5 shadow-md"
                                 : "border-border/50 hover:border-primary/30 hover:bg-slate-50"
-                            }`}
+                              }`}
                             data-testid={`category-${cat.id}`}
                           >
                             <cat.icon className={`w-6 h-6 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
@@ -182,7 +175,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleSearch}
                     className="w-full h-12 text-base font-bold bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg shadow-secondary/15 rounded-xl transition-all active:scale-[0.98]"
                     data-testid="button-search-providers"
@@ -196,10 +189,18 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Search Results Dialog */}
+      <SearchResultsDialog 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+        city={city} 
+        categories={selectedCategories} 
+      />
+
       {/* Categories Section */}
       <section className="py-24 bg-slate-50/40 relative overflow-hidden">
-        <div 
-          className="absolute inset-0 z-0 bg-cover bg-center opacity-5 pointer-events-none" 
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center opacity-5 pointer-events-none"
           style={{ backgroundImage: `url(${traditionalHall})` }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -220,10 +221,9 @@ export default function Home() {
                 whileTap={{ scale: 0.98 }}
                 className="group cursor-pointer"
                 onClick={() => {
+                  setCity(""); // Clear city for broad category search
                   setSelectedCategories([cat.id]);
-                  if (city) {
-                    setLocation(`/providers?category=${cat.id}&city=${city}`);
-                  }
+                  setIsSearchOpen(true);
                 }}
               >
                 <div className="flex flex-col items-center gap-4 p-8 rounded-[2.5rem] bg-white shadow-sm border border-slate-100/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
@@ -244,7 +244,7 @@ export default function Home() {
       <section className="py-32 bg-white relative overflow-hidden">
         <div className="absolute top-0 right-0 -mr-24 -mt-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -ml-24 -mb-24 w-96 h-96 bg-secondary/5 rounded-full blur-3xl pointer-events-none" />
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-secondary mb-6">{t("why_choose")}</h2>
@@ -272,7 +272,7 @@ export default function Home() {
                 accent: "border-blue-200 bg-blue-50/30"
               }
             ].map((feature, idx) => (
-              <motion.div 
+              <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -303,16 +303,16 @@ export default function Home() {
             </div>
             <Card className="border-primary/10 shadow-xl rounded-3xl overflow-hidden">
               <CardContent className="p-0">
-                <GuestTable 
-                  guests={allGuests} 
-                  isLoading={guestsLoading} 
+                <GuestTable
+                  guests={allGuests}
+                  isLoading={guestsLoading}
                 />
               </CardContent>
             </Card>
           </motion.div>
         </div>
       </section>
-      
+
       <Footer />
     </div>
   );

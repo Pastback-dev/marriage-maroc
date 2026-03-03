@@ -13,16 +13,17 @@ export type ProviderProfile = {
   priceMax: number | null;
 };
 
-export function useProviders(filters?: { category?: string; city?: string }) {
+export function useProviders(filters?: { categories?: string[]; city?: string }) {
   return useQuery<ProviderProfile[]>({
     queryKey: ["providers", filters],
     queryFn: async () => {
       let query = supabase.from('profiles').select('*').eq('role', 'provider');
       
-      if (filters?.category && filters.category !== 'all') {
-        query = query.eq('service_category', filters.category);
+      if (filters?.categories && filters.categories.length > 0 && !filters.categories.includes('all')) {
+        query = query.in('service_category', filters.categories);
       }
-      if (filters?.city) {
+      
+      if (filters?.city && filters.city !== "") {
         query = query.ilike('city', `%${filters.city}%`);
       }
 
