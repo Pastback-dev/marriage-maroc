@@ -216,28 +216,7 @@ export default function Guests() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="type"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-xs">Origin</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-10">
-                                    <SelectValue placeholder="Type" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="bg-white">
-                                  <SelectItem value="local">Local</SelectItem>
-                                  <SelectItem value="foreign">Foreign</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                      <div className="grid grid-cols-1 gap-4">
                          <FormField
                           control={form.control}
                           name="pricePerGuest"
