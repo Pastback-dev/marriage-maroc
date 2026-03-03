@@ -16,8 +16,6 @@ export function useGuests() {
       
       return (data as any[]).map(g => ({
         ...g,
-        userId: g.user_id,
-        planId: g.plan_id,
         numberOfGuests: g.number_of_guests,
         pricePerGuest: g.price_per_guest,
       })) as Guest[];
