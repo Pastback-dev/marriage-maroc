@@ -14,6 +14,7 @@ import Rules from "@/pages/Rules";
 import AboutUs from "@/pages/AboutUs";
 import AdminDashboard from "@/pages/AdminDashboard";
 import ProviderDashboard from "@/pages/ProviderDashboard";
+import Policies from "@/pages/Policies";
 
 function Router() {
   return (
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/about" component={AboutUs} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/provider-dashboard" component={ProviderDashboard} />
+      <Route path="/policies" component={Policies} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -25,6 +25,7 @@ export function Footer() {
             <Link href="/categories" className="hover:text-primary transition-colors">{t("nav_categories")}</Link>
             <Link href="/rules" className="hover:text-primary transition-colors">{t("nav_rules")}</Link>
             <Link href="/about" className="hover:text-primary transition-colors">{t("nav_about")}</Link>
+            <Link href="/policies" className="hover:text-primary transition-colors">{t("nav_policies")}</Link>
           </div>
 
           {/* Social Icons */}
