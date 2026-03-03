@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { Loader2, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ProvidersList() {
+  const { t } = useTranslation();
   const [city, setCity] = useState<string>("");
   const [category, setCategory] = useState<string>("all");
   
@@ -42,12 +44,13 @@ export default function ProvidersList() {
               </SelectTrigger>
               <SelectContent className="bg-white">
                 <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="traiteur">Catering</SelectItem>
-                <SelectItem value="hall">Wedding Venues</SelectItem>
-                <SelectItem value="dj">DJ & Music</SelectItem>
-                <SelectItem value="cameraman">Photography</SelectItem>
-                <SelectItem value="neggafa">Bridal Makeup</SelectItem>
-                <SelectItem value="decoration">Decor</SelectItem>
+                <SelectItem value="traiteur">{t("category_traiteur")}</SelectItem>
+                <SelectItem value="hall">{t("category_hall")}</SelectItem>
+                <SelectItem value="dj">{t("category_dj")}</SelectItem>
+                <SelectItem value="cameraman">{t("category_cameraman")}</SelectItem>
+                <SelectItem value="neggafa">{t("category_neggafa")}</SelectItem>
+                <SelectItem value="decoration">{t("category_decoration")}</SelectItem>
+                <SelectItem value="other">{t("category_other")}</SelectItem>
               </SelectContent>
             </Select>
           </div>

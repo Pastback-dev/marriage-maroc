@@ -98,7 +98,7 @@ export async function registerRoutes(
     const user = req.user as User;
     if (user.role !== "provider") return res.status(403).json({ message: "Provider access required" });
 
-    const validCategories = ["traiteur", "hall", "dj", "cameraman", "neggafa", "decoration"];
+    const validCategories = ["traiteur", "hall", "dj", "cameraman", "neggafa", "decoration", "other"];
     const { serviceCategory } = req.body;
     if (!serviceCategory || !validCategories.includes(serviceCategory)) {
       return res.status(400).json({ message: "Invalid service category" });

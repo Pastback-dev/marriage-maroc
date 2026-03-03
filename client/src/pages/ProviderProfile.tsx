@@ -17,7 +17,8 @@ import {
   Camera,
   UserRound,
   Paintbrush,
-  Store
+  Store,
+  Sparkles
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +31,7 @@ const SERVICE_CATEGORIES = [
   { id: "cameraman", name: "Photography", icon: Camera, bg: "bg-rose-50", text: "text-rose-600" },
   { id: "neggafa", name: "Bridal Makeup", icon: UserRound, bg: "bg-amber-50", text: "text-amber-600" },
   { id: "decoration", name: "Decor", icon: Paintbrush, bg: "bg-emerald-50", text: "text-emerald-600" },
+  { id: "other", name: "Other Services", icon: Sparkles, bg: "bg-slate-50", text: "text-slate-600" },
 ];
 
 export default function ProviderProfile() {

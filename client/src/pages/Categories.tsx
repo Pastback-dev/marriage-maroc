@@ -2,7 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { Utensils, Home as HomeIcon, Music, Camera, UserRound, Paintbrush, ArrowRight } from "lucide-react";
+import { Utensils, Home as HomeIcon, Music, Camera, UserRound, Paintbrush, ArrowRight, Sparkles } from "lucide-react";
 import { useProviders } from "@/hooks/use-providers";
 import traditionalHall from "@/assets/moroccan-traditional-hall.png";
 
@@ -18,6 +18,7 @@ export default function Categories() {
     { id: "cameraman", name: t("category_cameraman"), icon: Camera, color: "from-rose-400 to-rose-600", bg: "bg-rose-50", desc: t("cat_desc_cameraman") },
     { id: "neggafa", name: t("category_neggafa"), icon: UserRound, color: "from-amber-400 to-amber-600", bg: "bg-amber-50", desc: t("cat_desc_neggafa") },
     { id: "decoration", name: t("category_decoration"), icon: Paintbrush, color: "from-emerald-400 to-emerald-600", bg: "bg-emerald-50", desc: t("cat_desc_decoration") },
+    { id: "other", name: t("category_other"), icon: Sparkles, color: "from-slate-400 to-slate-600", bg: "bg-slate-50", desc: t("cat_desc_other") },
   ];
 
   const getProviderCount = (catId: string) => {

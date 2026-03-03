@@ -34,6 +34,7 @@ const SERVICE_CATEGORIES = [
   { id: "cameraman", name: "Photography", desc: "Cinematic storytelling.", icon: Camera, color: "from-rose-400 to-rose-600", bg: "bg-rose-50", border: "border-rose-300", selected: "ring-rose-500 bg-rose-50" },
   { id: "neggafa", name: "Bridal Makeup", desc: "The art of bridal beauty.", icon: UserRound, color: "from-amber-400 to-amber-600", bg: "bg-amber-50", border: "border-amber-300", selected: "ring-amber-500 bg-amber-50" },
   { id: "decoration", name: "Decor", desc: "Magical Moroccan paradise.", icon: Paintbrush, color: "from-emerald-400 to-emerald-600", bg: "bg-emerald-50", border: "border-emerald-300", selected: "ring-emerald-500 bg-emerald-50" },
+  { id: "other", name: "Other", desc: "Other wedding services.", icon: Sparkles, color: "from-slate-400 to-slate-600", bg: "bg-slate-50", border: "border-slate-300", selected: "ring-slate-500 bg-slate-50" },
 ];
 
 export default function ProviderDashboard() {
