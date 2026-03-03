@@ -2,6 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Heart, Shield, Users, Sparkles, MapPin, Star } from "lucide-react";
+import { Footer } from "@/components/Footer";
 import traditionalHall from "@/assets/moroccan-traditional-hall.png";
 
 export default function AboutUs() {
@@ -122,11 +123,7 @@ export default function AboutUs() {
         </div>
       </section>
 
-      <footer className="bg-secondary text-secondary-foreground py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-white/40 text-xs">Developed by m3akcoder.com @ 2026 Arsi</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

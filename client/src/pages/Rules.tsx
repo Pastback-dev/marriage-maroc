@@ -2,6 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { ShieldCheck, ImageIcon, Package, DollarSign, Star, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Footer } from "@/components/Footer";
 
 export default function Rules() {
   const { t } = useTranslation();
@@ -63,11 +64,7 @@ export default function Rules() {
         </div>
       </section>
 
-      <footer className="bg-secondary text-secondary-foreground py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-white/40 text-xs">Developed by m3akcoder.com @ 2026 Arsi</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

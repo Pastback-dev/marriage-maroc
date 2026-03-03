@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import { GuestTable } from "@/components/GuestTable";
 import { useGuests } from "@/hooks/use-guests";
+import { Footer } from "@/components/Footer";
 import heroWedding from "@/assets/hero-moroccan-hall.png";
 import traditionalHall from "@/assets/moroccan-traditional-hall.png";
 
@@ -108,7 +109,7 @@ export default function Home() {
                 <CardHeader className="bg-gradient-to-r from-primary/5 to-amber-50/50 pb-5 pt-8 px-8">
                   <CardTitle className="flex items-center gap-3 text-xl font-display text-secondary" data-testid="text-ai-title">
                     <div className="p-2 bg-gradient-to-br from-primary/20 to-amber-200/30 rounded-xl">
-                      <Sparkles className="w-5 h-5 text-primary" />
+                      <span className="text-primary"><Sparkles className="w-5 h-5" /></span>
                     </div>
                     {t("ai_box_title")}
                   </CardTitle>
@@ -283,21 +284,7 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Footer */}
-      <footer className="bg-secondary text-secondary-foreground py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div>
-            <span className="text-2xl font-display font-bold">ARSI</span>
-            <p className="text-white/60 text-sm mt-2">{t("footer_tagline")}</p>
-          </div>
-          <div className="flex gap-8 text-sm text-white/80">
-            <Link href="/providers" className="hover:text-primary transition-colors">{t("nav_providers")}</Link>
-            <Link href="/categories" className="hover:text-primary transition-colors">{t("nav_categories")}</Link>
-            <Link href="/rules" className="hover:text-primary transition-colors">{t("nav_rules")}</Link>
-          </div>
-          <p className="text-white/40 text-xs">Developed by m3akcoder.com @ 2026 Arsi</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
