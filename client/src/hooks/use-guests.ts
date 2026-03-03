@@ -16,6 +16,7 @@ export function useGuests() {
       
       return (data as any[]).map(g => ({
         ...g,
+        userId: g.user_id, // Map snake_case to camelCase
         numberOfGuests: g.number_of_guests,
         pricePerGuest: g.price_per_guest,
       })) as Guest[];
