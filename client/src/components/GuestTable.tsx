@@ -1,16 +1,17 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Home as HomeIcon, Plane } from "lucide-react";
+import { Trash2, Home as HomeIcon, Plane, Edit2 } from "lucide-react";
 import { type Guest } from "@shared/schema";
 import { useUser } from "@/hooks/use-auth";
 
 interface GuestTableProps {
   guests: Guest[] | undefined;
   isLoading: boolean;
+  onEdit?: (guest: Guest) => void;
   onDelete?: (id: number) => void;
 }
 
-export function GuestTable({ guests, isLoading, onDelete }: GuestTableProps) {
+export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTableProps) {
   const { data: user } = useUser();
 
   return (
@@ -59,17 +60,30 @@ export function GuestTable({ guests, isLoading, onDelete }: GuestTableProps) {
                 {((guest.pricePerGuest || 0) * (guest.numberOfGuests || 1)).toLocaleString()} MAD
               </TableCell>
               <TableCell className="text-right">
-                {onDelete && user?.id === guest.userId && (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-muted-foreground hover:text-destructive"
-                    onClick={() => onDelete(guest.id)}
-                    data-testid={`button-delete-guest-${guest.id}`}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
+                <div className="flex justify-end gap-2">
+                  {onEdit && user?.id === guest.userId && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-muted-foreground hover:text-primary"
+                      onClick={() => onEdit(guest)}
+                      data-testid={`button-edit-guest-${guest.id}`}
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                  {onDelete && user?.id === guest.userId && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="text-muted-foreground hover:text-destructive"
+                      onClick={() => onDelete(guest.id)}
+                      data-testid={`button-delete-guest-${guest.id}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))

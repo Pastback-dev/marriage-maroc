@@ -59,6 +59,36 @@ export function useCreateGuest() {
   });
 }
 
+export function useUpdateGuest() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, ...data }: InsertGuest & { id: number }) => {
+      const { error } = await supabase
+        .from('guests')
+        .update({
+          name: data.name,
+          type: data.type,
+          price_per_guest: data.pricePerGuest,
+          number_of_guests: data.numberOfGuests,
+          gender: data.gender,
+          plan_id: data.planId
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["guests"] });
+      toast({ title: "Guest Updated", description: "The guest details have been saved." });
+    },
+    onError: (error: Error) => {
+      toast({ variant: "destructive", title: "Error", description: error.message });
+    },
+  });
+}
+
 export function useDeleteGuest() {
   const queryClient = useQueryClient();
   const { toast } = useToast();

@@ -1,24 +1,28 @@
 import { Navigation } from "@/components/Navigation";
-import { useGuests, useCreateGuest, useDeleteGuest } from "@/hooks/use-guests";
+import { useGuests, useCreateGuest, useUpdateGuest, useDeleteGuest } from "@/hooks/use-guests";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertGuestSchema, type InsertGuest } from "@shared/schema";
+import { insertGuestSchema, type InsertGuest, type Guest } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { UserPlus, Calculator, Users as UsersIcon } from "lucide-react";
+import { UserPlus, Calculator, Users as UsersIcon, Edit2, X } from "lucide-react";
 import { useUser } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { GuestTable } from "@/components/GuestTable";
+import { useState, useEffect } from "react";
 
 export default function Guests() {
   const { data: user, isLoading: userLoading } = useUser();
   const [, setLocation] = useLocation();
   const { data: guests, isLoading: guestsLoading } = useGuests();
   const createGuest = useCreateGuest();
+  const updateGuest = useUpdateGuest();
   const deleteGuest = useDeleteGuest();
+  
+  const [editingGuest, setEditingGuest] = useState<Guest | null>(null);
 
   if (!userLoading && !user) {
     setLocation("/login");
@@ -37,10 +41,47 @@ export default function Guests() {
     },
   });
 
+  // Load guest data into form when editing
+  useEffect(() => {
+    if (editingGuest) {
+      form.reset({
+        name: editingGuest.name,
+        type: editingGuest.type as "local" | "foreign",
+        pricePerGuest: editingGuest.pricePerGuest || 0,
+        numberOfGuests: editingGuest.numberOfGuests,
+        gender: editingGuest.gender as "male" | "female",
+        userId: editingGuest.userId,
+      });
+    } else {
+      form.reset({
+        name: "",
+        type: "local",
+        pricePerGuest: 0,
+        numberOfGuests: 1,
+        gender: "male",
+        userId: user?.id,
+      });
+    }
+  }, [editingGuest, form, user]);
+
   const onSubmit = (data: InsertGuest) => {
-    createGuest.mutate({ ...data, userId: user!.id }, {
-      onSuccess: () => form.reset({ name: "", type: "local", pricePerGuest: 0, numberOfGuests: 1, gender: "male", userId: user!.id })
-    });
+    if (editingGuest) {
+      updateGuest.mutate({ ...data, id: editingGuest.id }, {
+        onSuccess: () => {
+          setEditingGuest(null);
+          form.reset();
+        }
+      });
+    } else {
+      createGuest.mutate({ ...data, userId: user!.id }, {
+        onSuccess: () => form.reset()
+      });
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingGuest(null);
+    form.reset();
   };
 
   const totalExpectedGift = guests?.reduce((sum, g) => sum + ((g.pricePerGuest || 0) * (g.numberOfGuests || 1)), 0) || 0;
@@ -79,12 +120,17 @@ export default function Guests() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Add Guest Form */}
+          {/* Add/Edit Guest Form */}
           <div className="lg:col-span-1">
              <Card className="sticky top-24">
                <CardHeader>
-                 <CardTitle className="flex items-center gap-2"><UserPlus className="w-5 h-5 text-primary" /> Add Guest</CardTitle>
-                 <CardDescription>Add a new guest or family to your list.</CardDescription>
+                 <CardTitle className="flex items-center gap-2">
+                   {editingGuest ? <Edit2 className="w-5 h-5 text-primary" /> : <UserPlus className="w-5 h-5 text-primary" />} 
+                   {editingGuest ? "Edit Guest" : "Add Guest"}
+                 </CardTitle>
+                 <CardDescription>
+                   {editingGuest ? `Updating ${editingGuest.name}` : "Add a new guest or family to your list."}
+                 </CardDescription>
                </CardHeader>
                <CardContent>
                  <Form {...form}>
@@ -110,7 +156,7 @@ export default function Guests() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Gender</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Gender" />
@@ -152,7 +198,7 @@ export default function Guests() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Origin</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Type" />
@@ -188,9 +234,16 @@ export default function Guests() {
                         />
                       </div>
                       
-                      <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90" disabled={createGuest.isPending}>
-                        {createGuest.isPending ? "Adding..." : "Add Guest"}
-                      </Button>
+                      <div className="flex gap-2">
+                        {editingGuest && (
+                          <Button type="button" variant="outline" className="flex-1" onClick={cancelEdit}>
+                            <X className="w-4 h-4 mr-2" /> Cancel
+                          </Button>
+                        )}
+                        <Button type="submit" className="flex-1 bg-secondary hover:bg-secondary/90" disabled={createGuest.isPending || updateGuest.isPending}>
+                          {editingGuest ? (updateGuest.isPending ? "Updating..." : "Update Guest") : (createGuest.isPending ? "Adding..." : "Add Guest")}
+                        </Button>
+                      </div>
                    </form>
                  </Form>
                </CardContent>
@@ -204,6 +257,7 @@ export default function Guests() {
                 <GuestTable 
                   guests={guests} 
                   isLoading={guestsLoading} 
+                  onEdit={(guest) => setEditingGuest(guest)}
                   onDelete={(id) => deleteGuest.mutate(id)} 
                 />
               </CardContent>
