@@ -29,7 +29,7 @@ export const insertGuestSchema = z.object({
   type: z.enum(["local", "foreign"]),
   pricePerGuest: z.number().default(0),
   numberOfGuests: z.number().min(1).default(1),
-  gender: z.enum(["male", "female", "other"]).default("male"),
+  gender: z.enum(["male", "female"]).default("male"),
 });
 
 export type InsertGuest = z.infer<typeof insertGuestSchema>;
