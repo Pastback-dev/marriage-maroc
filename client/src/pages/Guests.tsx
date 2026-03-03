@@ -1,3 +1,5 @@
+"use client";
+
 import { Navigation } from "@/components/Navigation";
 import { useGuests, useCreateGuest, useUpdateGuest, useDeleteGuest } from "@/hooks/use-guests";
 import { useForm } from "react-hook-form";
@@ -63,7 +65,7 @@ export default function Guests() {
         type: editingGuest.type as "local" | "foreign",
         pricePerGuest: editingGuest.pricePerGuest || 0,
         numberOfGuests: editingGuest.numberOfGuests,
-        gender: editingGuest.gender as "male" | "female",
+        gender: editingGuest.gender as "male" | "female" | "both",
         userId: editingGuest.userId,
         city: editingGuest.city || "",
         eventDate: editingGuest.eventDate || "",
@@ -186,6 +188,7 @@ export default function Guests() {
                                 <SelectContent className="bg-white">
                                   <SelectItem value="male">Male</SelectItem>
                                   <SelectItem value="female">Female</SelectItem>
+                                  <SelectItem value="both">Both</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
