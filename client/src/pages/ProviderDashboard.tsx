@@ -12,7 +12,7 @@ import {
   Store, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Loader2,
   Upload, ImagePlus, Trash2, ImageIcon, MapPin, Sparkles,
-  FileText, Banknote, Phone, MessageCircle
+  FileText, Banknote, Phone, MessageCircle, UserCircle
 } from "lucide-react";
 import {
   Select,
@@ -46,6 +46,29 @@ export default function ProviderDashboard() {
   const [editingDescription, setEditingDescription] = useState(false);
   const [editingPrice, setEditingPrice] = useState(false);
   const [editingPhone, setEditingPhone] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+
+  const nameMutation = useMutation({
+    mutationFn: async (name: string) => {
+      if (!user?.id) throw new Error("User not found");
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          display_name: name,
+          role: 'provider'
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({ title: "Name updated" });
+      setEditingName(false);
+    },
+    onError: (error: any) => {
+      toast({ variant: "destructive", title: "Error saving name", description: error.message });
+    }
+  });
 
   const cityMutation = useMutation({
     mutationFn: async (city: string) => {
@@ -184,7 +207,22 @@ export default function ProviderDashboard() {
           <PhotoGallery userId={user.id} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="border-primary/20 shadow-sm">
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <UserCircle className="w-7 h-7 text-primary opacity-80" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Business Name</p>
+                <p className="text-xl font-bold text-secondary truncate max-w-[120px]">{user.displayName || "Not set"}</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setEditingName(true)}>
+                Edit
+              </Button>
+            </CardContent>
+          </Card>
+
           <Card className="border-primary/20 shadow-sm">
             <CardContent className="pt-6 flex items-center gap-4">
               <div className={`w-14 h-14 rounded-2xl ${currentCatInfo?.bg || 'bg-slate-100'} flex items-center justify-center`}>
@@ -273,6 +311,17 @@ export default function ProviderDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {editingName && (
+          <div className="mb-8">
+            <NamePicker
+              currentName={user.displayName}
+              onConfirm={(name) => nameMutation.mutate(name)}
+              onCancel={() => setEditingName(false)}
+              isPending={nameMutation.isPending}
+            />
+          </div>
+        )}
 
         {selectedCategory !== null && (
           <div className="mb-8">
@@ -570,6 +619,34 @@ function PhotoGallery({ userId }: { userId: string }) {
             ))}
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function NamePicker({ currentName, onConfirm, onCancel, isPending }: any) {
+  const [name, setName] = useState(currentName || "");
+  return (
+    <Card className="border-primary/10 shadow-sm">
+      <CardHeader>
+        <CardTitle>Update Business Name</CardTitle>
+        <CardDescription>This is the name couples will see on your profile.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="max-w-xs space-y-6">
+          <Input 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            placeholder="Enter your business name"
+            className="h-12 rounded-xl"
+          />
+          <div className="flex gap-3">
+            <Button onClick={() => onConfirm(name)} disabled={!name || isPending} className="bg-secondary hover:bg-secondary/90">
+              {isPending && <Loader2 className="animate-spin mr-2" />} Save Name
+            </Button>
+            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
