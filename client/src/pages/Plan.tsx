@@ -11,14 +11,12 @@ import { Loader2, Sparkles } from "lucide-react";
 import { useProviders } from "@/hooks/use-providers";
 import { t } from "i18next";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Utensils } from "lucide-react";
 
 export default function Plan() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { data: providers } = useProviders();
+  const { data: providers } = useProviders(); // This will fetch providers from API
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -27,11 +25,6 @@ export default function Plan() {
   // Get distinct categories from providers for dropdown
   const categories = Array.from(
     new Set(providers?.map((p) => p.category) || [])
-  ).sort();
-
-  // Get distinct cities from providers for dropdown
-  const cities = Array.from(
-    new Set(providers?.map((p) => p.city) || [])
   ).sort();
 
   const handleGenerate = async () => {
@@ -91,9 +84,9 @@ export default function Plan() {
                   <SelectValue placeholder={t("select_city")} />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
-                  {cities.map((city) => (
-                    <SelectItem key={city} value={city} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">
-                      {city}
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">
+                      {cat}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -136,7 +129,7 @@ export default function Plan() {
                 <Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("generating")}
               </>
             ) : (
-              t("generate_plan")
+              {t("generate_plan")}
             )}
           </Button>
         </div>
@@ -148,7 +141,7 @@ export default function Plan() {
               {t("providers_found")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {searchResults.map((provider: any) => (
+              {searchResults.map((provider) => (
                 <Card key={provider.id} className="border-primary/20 shadow-sm">
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start mb-2">
