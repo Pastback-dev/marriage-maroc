@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Home as HomeIcon, Plane, Edit2 } from "lucide-react";
+import { Trash2, Home as HomeIcon, Plane, Edit2, MapPin, Calendar, Clock, FileText } from "lucide-react";
 import { type Guest } from "@shared/schema";
 import { useUser } from "@/hooks/use-auth";
 
@@ -24,17 +24,21 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
           <TableHead>Origin</TableHead>
           <TableHead>Gift/Person</TableHead>
           <TableHead>Total Gift</TableHead>
+          <TableHead>City</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Time</TableHead>
+          <TableHead>Description</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {isLoading ? (
           <TableRow>
-            <TableCell colSpan={7} className="text-center py-8">Loading...</TableCell>
+            <TableCell colSpan={11} className="text-center py-8">Loading...</TableCell>
           </TableRow>
         ) : !guests || guests.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
+            <TableCell colSpan={11} className="text-center py-12 text-muted-foreground">
               No guests found.
             </TableCell>
           </TableRow>
@@ -58,6 +62,30 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
               <TableCell>{guest.pricePerGuest} MAD</TableCell>
               <TableCell className="font-bold text-emerald-600">
                 {((guest.pricePerGuest || 0) * (guest.numberOfGuests || 1)).toLocaleString()} MAD
+              </TableCell>
+              <TableCell>
+                {guest.city ? (
+                  <div className="flex items-center gap-1 text-xs">
+                    <MapPin className="w-3 h-3 text-primary" /> {guest.city}
+                  </div>
+                ) : "—"}
+              </TableCell>
+              <TableCell>
+                {guest.eventDate ? (
+                  <div className="flex items-center gap-1 text-xs">
+                    <Calendar className="w-3 h-3 text-primary" /> {guest.eventDate}
+                  </div>
+                ) : "—"}
+              </TableCell>
+              <TableCell>
+                {guest.eventTime ? (
+                  <div className="flex items-center gap-1 text-xs">
+                    <Clock className="w-3 h-3 text-primary" /> {guest.eventTime}
+                  </div>
+                ) : "—"}
+              </TableCell>
+              <TableCell className="max-w-[150px] truncate text-xs text-muted-foreground">
+                {guest.description || "—"}
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
