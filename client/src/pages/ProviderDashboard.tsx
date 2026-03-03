@@ -180,6 +180,10 @@ export default function ProviderDashboard() {
           <p className="text-muted-foreground mt-2">Welcome back, {user.displayName || user.username}!</p>
         </div>
 
+        <div className="mb-8">
+          <PhotoGallery userId={user.id} />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card className="border-primary/20 shadow-sm">
             <CardContent className="pt-6 flex items-center gap-4">
@@ -357,8 +361,6 @@ export default function ProviderDashboard() {
             )}
           </CardContent>
         </Card>
-
-        <PhotoGallery userId={user.id} />
       </div>
     </div>
   );
