@@ -12,7 +12,7 @@ import {
   Store, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Loader2,
   Upload, ImagePlus, Trash2, ImageIcon, MapPin, Sparkles,
-  FileText, Banknote, Phone
+  FileText, Banknote, Phone, MessageCircle
 } from "lucide-react";
 import {
   Select,
@@ -168,6 +168,9 @@ export default function ProviderDashboard() {
   const currentCategory = user.serviceCategory;
   const currentCatInfo = SERVICE_CATEGORIES.find(c => c.id === currentCategory);
 
+  // Clean phone number for WhatsApp link (remove non-digits)
+  const whatsappNumber = user.phone?.replace(/\D/g, '');
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -234,9 +237,21 @@ export default function ProviderDashboard() {
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Phone</p>
                 <p className="text-xl font-bold text-secondary">{user.phone || "Not set"}</p>
               </div>
-              <Button variant="outline" size="sm" onClick={() => setEditingPhone(true)}>
-                Edit
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button variant="outline" size="sm" onClick={() => setEditingPhone(true)}>
+                  Edit
+                </Button>
+                {whatsappNumber && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                    onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
+                  >
+                    <MessageCircle className="w-4 h-4 mr-1" /> WhatsApp
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
