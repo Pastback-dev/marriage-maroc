@@ -8,11 +8,22 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { UserPlus, Calculator, Users as UsersIcon, Edit2, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { UserPlus, Calculator, Users as UsersIcon, Edit2, X, MapPin, Calendar, Clock, FileText } from "lucide-react";
 import { useUser } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { GuestTable } from "@/components/GuestTable";
 import { useState, useEffect } from "react";
+
+const MOROCCAN_CITIES = [
+  "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda", "Kenitra", "Tetouan",
+  "Safi", "Mohammedia", "Khouribga", "El Jadida", "Beni Mellal", "Nador", "Taza", "Settat", "Berrechid",
+  "Khemisset", "Guelmim", "Ksar El Kebir", "Larache", "Berkane", "Khenifra", "Taourirt", "Bouskoura",
+  "Fquih Ben Salah", "Dakhla", "Sidi Slimane", "Errachidia", "Guercif", "Oulad Teima", "Ben Guerir",
+  "Tifelt", "Lqliaa", "Taroudant", "Sefrou", "Essaouira", "Fnideq", "Sidi Kacem", "Tiznit", "Tan-Tan",
+  "Ouarzazate", "Youssoufia", "Martil", "Afourar", "Ahfir", "Ait Melloul", "Azrou", "Ben Slimane",
+  "Boujdour", "Chefchaouen", "El Hajeb", "Ifrane", "Midelt", "Skhirat", "Temara"
+].sort();
 
 export default function Guests() {
   const { data: user, isLoading: userLoading } = useUser();
@@ -38,10 +49,13 @@ export default function Guests() {
       numberOfGuests: 1,
       gender: "male",
       userId: user?.id,
+      city: "",
+      eventDate: "",
+      eventTime: "",
+      description: "",
     },
   });
 
-  // Load guest data into form when editing
   useEffect(() => {
     if (editingGuest) {
       form.reset({
@@ -51,6 +65,10 @@ export default function Guests() {
         numberOfGuests: editingGuest.numberOfGuests,
         gender: editingGuest.gender as "male" | "female",
         userId: editingGuest.userId,
+        city: editingGuest.city || "",
+        eventDate: editingGuest.eventDate || "",
+        eventTime: editingGuest.eventTime || "",
+        description: editingGuest.description || "",
       });
     } else {
       form.reset({
@@ -60,6 +78,10 @@ export default function Guests() {
         numberOfGuests: 1,
         gender: "male",
         userId: user?.id,
+        city: "",
+        eventDate: "",
+        eventTime: "",
+        description: "",
       });
     }
   }, [editingGuest, form, user]);
@@ -120,7 +142,6 @@ export default function Guests() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Add/Edit Guest Form */}
           <div className="lg:col-span-1">
              <Card className="sticky top-24">
                <CardHeader>
@@ -233,15 +254,84 @@ export default function Guests() {
                           )}
                         />
                       </div>
+
+                      <div className="h-px bg-border my-2" />
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Event Details</p>
+
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2"><MapPin className="w-3 h-3" /> Moroccan City</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select City" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-white max-h-[300px]">
+                                {MOROCCAN_CITIES.map(city => (
+                                  <SelectItem key={city} value={city}>{city}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="eventDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2"><Calendar className="w-3 h-3" /> Date</FormLabel>
+                              <FormControl>
+                                <Input type="date" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="eventTime"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex items-center gap-2"><Clock className="w-3 h-3" /> Time</FormLabel>
+                              <FormControl>
+                                <Input type="time" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2"><FileText className="w-3 h-3" /> Description</FormLabel>
+                            <FormControl>
+                              <Textarea placeholder="Additional notes..." {...field} className="resize-none" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 pt-2">
                         {editingGuest && (
                           <Button type="button" variant="outline" className="flex-1" onClick={cancelEdit}>
                             <X className="w-4 h-4 mr-2" /> Cancel
                           </Button>
                         )}
                         <Button type="submit" className="flex-1 bg-secondary hover:bg-secondary/90" disabled={createGuest.isPending || updateGuest.isPending}>
-                          {editingGuest ? (updateGuest.isPending ? "Updating..." : "Update Guest") : (createGuest.isPending ? "Adding..." : "Add Guest")}
+                          {editingGuest ? (updateGuest.isPending ? "Updating..." : "Update Guest") : (createGuest.isPending ? "Add Guest" : "Add Guest")}
                         </Button>
                       </div>
                    </form>
@@ -250,7 +340,6 @@ export default function Guests() {
              </Card>
           </div>
 
-          {/* Guest List Table */}
           <div className="lg:col-span-2">
             <Card>
               <CardContent className="p-0">

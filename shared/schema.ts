@@ -25,11 +25,15 @@ export type LoginSchema = z.infer<typeof loginSchema>;
 export const insertGuestSchema = z.object({
   userId: z.string(),
   planId: z.number().optional(),
-  name: z.string().min(1),
+  name: z.string().min(1, "Name is required"),
   type: z.enum(["local", "foreign"]),
   pricePerGuest: z.number().default(0),
   numberOfGuests: z.number().min(1).default(1),
   gender: z.enum(["male", "female"]).default("male"),
+  city: z.string().optional(),
+  eventDate: z.string().optional(),
+  eventTime: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export type InsertGuest = z.infer<typeof insertGuestSchema>;
@@ -91,6 +95,10 @@ export type Guest = {
   pricePerGuest: number | null;
   numberOfGuests: number;
   gender: string;
+  city: string | null;
+  eventDate: string | null;
+  eventTime: string | null;
+  description: string | null;
 };
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

@@ -16,9 +16,11 @@ export function useGuests() {
       
       return (data as any[]).map(g => ({
         ...g,
-        userId: g.user_id, // Map snake_case to camelCase
+        userId: g.user_id,
         numberOfGuests: g.number_of_guests,
         pricePerGuest: g.price_per_guest,
+        eventDate: g.event_date,
+        eventTime: g.event_time,
       })) as Guest[];
     },
   });
@@ -42,7 +44,11 @@ export function useCreateGuest() {
           price_per_guest: data.pricePerGuest,
           number_of_guests: data.numberOfGuests,
           gender: data.gender,
-          plan_id: data.planId
+          plan_id: data.planId,
+          city: data.city,
+          event_date: data.eventDate,
+          event_time: data.eventTime,
+          description: data.description,
         })
         .select()
         .single();
@@ -74,7 +80,11 @@ export function useUpdateGuest() {
           price_per_guest: data.pricePerGuest,
           number_of_guests: data.numberOfGuests,
           gender: data.gender,
-          plan_id: data.planId
+          plan_id: data.planId,
+          city: data.city,
+          event_date: data.eventDate,
+          event_time: data.eventTime,
+          description: data.description,
         })
         .eq('id', id);
 
