@@ -19,9 +19,8 @@ import traditionalHall from "@/assets/moroccan-traditional-hall.png";
 export default function Home() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
-  const [budget, setBudget] = useState<string>("");
-  const [guestsCount, setGuestsCount] = useState<string>("");
   const [city, setCity] = useState<string>("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const { toast } = useToast();
   
   const { data: providers } = useProviders();
@@ -36,26 +35,49 @@ export default function Home() {
     { id: "Agadir", name: t("city_agadir") },
   ];
 
-  const handleAiRecommendation = () => {
+  const categories = [
+    { id: "traiteur", name: t("category_traiteur"), icon: Utensils },
+    { id: "hall", name: t("category_hall"), icon: HomeIcon },
+    { id: "dj", name: t("category_dj"), icon: Music },
+    { id: "cameraman", name: t("category_cameraman"), icon: Camera },
+    { id: "neggafa", name: t("category_neggafa"), icon: UserRound },
+    { id: "decoration", name: t("category_decoration"), icon: Paintbrush },
+  ];
+
+  const handleSearch = () => {
     if (!city) {
       toast({
-        title: t("city"),
-        description: t("select_city"),
+        title: "City Required",
+        description: "Please select a city to search for providers.",
         variant: "destructive"
       });
       return;
     }
-    setLocation(`/plan?city=${city}&budget=${budget}&guests=${guestsCount}`);
+    
+    if (selectedCategories.length === 0) {
+      toast({
+        title: "Category Required",
+        description: "Please select at least one service category.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Navigate to providers page with filters
+    const params = new URLSearchParams();
+    params.set('city', city);
+    selectedCategories.forEach(cat => params.append('category', cat));
+    
+    setLocation(`/providers?${params.toString()}`);
   };
 
-  const categories = [
-    { id: "traiteur", name: t("category_traiteur"), icon: Utensils, color: "bg-orange-50 text-orange-600" },
-    { id: "hall", name: t("category_hall"), icon: HomeIcon, color: "bg-blue-50 text-blue-600" },
-    { id: "dj", name: t("category_dj"), icon: Music, color: "bg-purple-50 text-purple-600" },
-    { id: "cameraman", name: t("category_cameraman"), icon: Camera, color: "bg-rose-50 text-rose-600" },
-    { id: "neggafa", name: t("category_neggafa"), icon: UserRound, color: "bg-amber-50 text-amber-600" },
-    { id: "decoration", name: t("category_decoration"), icon: Paintbrush, color: "bg-emerald-50 text-emerald-600" },
-  ];
+  const toggleCategory = (categoryId: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(categoryId) 
+        ? prev.filter(c => c !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -99,7 +121,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* AI Recommendation Box */}
+            {/* Provider Search Box */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -107,63 +129,65 @@ export default function Home() {
             >
               <Card className="bg-white shadow-2xl border-none rounded-[2.5rem] overflow-hidden">
                 <CardHeader className="bg-gradient-to-r from-primary/5 to-amber-50/50 pb-5 pt-8 px-8">
-                  <CardTitle className="flex items-center gap-3 text-xl font-display text-secondary" data-testid="text-ai-title">
+                  <CardTitle className="flex items-center gap-3 text-xl font-display text-secondary" data-testid="text-search-title">
                     <div className="p-2 bg-gradient-to-br from-primary/20 to-amber-200/30 rounded-xl">
-                      <span className="text-primary"><Sparkles className="w-5 h-5" /></span>
+                      <span className="text-primary"><MapPin className="w-5 h-5" /></span>
                     </div>
-                    {t("ai_box_title")}
+                    Find Wedding Vendors
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-5 p-8 pt-6">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                        <UsersIcon className="w-3 h-3 text-primary/70" /> {t("guest_count")}
-                      </label>
-                      <Input 
-                        type="number" 
-                        placeholder="200"
-                        value={guestsCount}
-                        onChange={(e) => setGuestsCount(e.target.value)}
-                        className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all"
-                        data-testid="input-guests"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                        <MapPin className="w-3 h-3 text-primary/70" /> {t("city")}
-                      </label>
-                      <Select value={city} onValueChange={setCity}>
-                        <SelectTrigger className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus:ring-primary/20 focus:border-primary/30 transition-all" data-testid="select-city">
-                          <SelectValue placeholder={t("select_city")} />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
-                          {cities.map(c => (
-                            <SelectItem key={c.id} value={c.id} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-3">
                     <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                      <Receipt className="w-3 h-3 text-primary/70" /> {t("budget")}
+                      <MapPin className="w-3 h-3 text-primary/70" /> Select City
                     </label>
-                    <Input 
-                      type="number" 
-                      placeholder="80,000"
-                      value={budget}
-                      onChange={(e) => setBudget(e.target.value)}
-                      className="bg-muted/30 border border-border/30 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all"
-                      data-testid="input-budget"
-                    />
+                    <Select value={city} onValueChange={setCity}>
+                      <SelectTrigger className="bg-white border border-border/50 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="select-city">
+                        <SelectValue placeholder="Choose a city..." />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
+                        {cities.map(c => (
+                          <SelectItem key={c.id} value={c.id} className="rounded-lg py-2.5 focus:bg-primary/8 focus:text-primary transition-colors cursor-pointer">{c.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">
+                      Service Categories
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      {categories.map((cat) => {
+                        const isSelected = selectedCategories.includes(cat.id);
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => toggleCategory(cat.id)}
+                            className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${
+                              isSelected 
+                                ? "border-primary bg-primary/5 shadow-md" 
+                                : "border-border/50 hover:border-primary/30 hover:bg-slate-50"
+                            }`}
+                            data-testid={`category-${cat.id}`}
+                          >
+                            <cat.icon className={`w-6 h-6 ${isSelected ? "text-primary" : "text-muted-foreground"}`} />
+                            <span className={`text-xs font-medium text-center ${isSelected ? "text-primary" : "text-secondary"}`}>
+                              {cat.name}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <Button 
-                    onClick={handleAiRecommendation}
+                    onClick={handleSearch}
                     className="w-full h-12 text-base font-bold bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg shadow-secondary/15 rounded-xl transition-all active:scale-[0.98]"
-                    data-testid="button-generate"
+                    data-testid="button-search-providers"
                   >
-                    {t("get_recommendation")}
+                    Find Providers
                   </Button>
                 </CardContent>
               </Card>
@@ -195,11 +219,16 @@ export default function Home() {
                 whileHover={{ y: -6, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="group cursor-pointer"
-                onClick={() => setLocation(`/providers?category=${cat.id}&city=${city}`)}
+                onClick={() => {
+                  setSelectedCategories([cat.id]);
+                  if (city) {
+                    setLocation(`/providers?category=${cat.id}&city=${city}`);
+                  }
+                }}
               >
                 <div className="flex flex-col items-center gap-4 p-8 rounded-[2.5rem] bg-white shadow-sm border border-slate-100/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
-                  <div className={`w-16 h-16 rounded-2xl ${cat.color} flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm`}>
-                    <cat.icon className="w-8 h-8" />
+                  <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm">
+                    <cat.icon className="w-8 h-8 text-primary" />
                   </div>
                   <span className="text-xl font-bold text-secondary text-center group-hover:text-primary transition-colors duration-300">
                     {cat.name}
