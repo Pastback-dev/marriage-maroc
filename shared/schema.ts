@@ -15,6 +15,7 @@ export const insertUserSchema = z.object({
   description: z.string().optional(),
   priceMin: z.number().optional(),
   priceMax: z.number().optional(),
+  url: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
 });
 
 export const loginSchema = z.object({
@@ -53,6 +54,7 @@ export type User = {
   description: string | null;
   priceMin: number | null;
   priceMax: number | null;
+  url: string | null;
   isAdmin: boolean;
   createdAt: Date | null;
 };

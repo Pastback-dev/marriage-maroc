@@ -31,6 +31,7 @@ export function useUser() {
           description: null,
           priceMin: null,
           priceMax: null,
+          url: null,
         };
       }
 
@@ -47,6 +48,7 @@ export function useUser() {
         description: profile.description,
         priceMin: profile.price_min ? Number(profile.price_min) : null,
         priceMax: profile.price_max ? Number(profile.price_max) : null,
+        url: profile.url,
       };
     },
     refetchOnWindowFocus: true,

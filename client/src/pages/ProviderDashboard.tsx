@@ -12,7 +12,7 @@ import {
   Store, Utensils, Home as HomeIcon,
   Music, Camera, UserRound, Paintbrush, Loader2,
   Upload, ImagePlus, Trash2, ImageIcon, MapPin, Sparkles,
-  FileText, Banknote, Phone, MessageCircle, UserCircle
+  FileText, Banknote, Phone, MessageCircle, UserCircle, Link as LinkIcon, ExternalLink
 } from "lucide-react";
 import {
   Select,
@@ -48,6 +48,7 @@ export default function ProviderDashboard() {
   const [editingPrice, setEditingPrice] = useState(false);
   const [editingPhone, setEditingPhone] = useState(false);
   const [editingName, setEditingName] = useState(false);
+  const [editingUrl, setEditingUrl] = useState(false);
 
   const nameMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -182,6 +183,28 @@ export default function ProviderDashboard() {
     }
   });
 
+  const urlMutation = useMutation({
+    mutationFn: async (url: string) => {
+      if (!user?.id) throw new Error("User not found");
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: user.id, 
+          url: url,
+          role: 'provider'
+        });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({ title: "Link updated" });
+      setEditingUrl(false);
+    },
+    onError: (error: any) => {
+      toast({ variant: "destructive", title: "Error saving link", description: error.message });
+    }
+  });
+
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
   
   if (!user || user.role !== "provider") { 
@@ -272,46 +295,71 @@ export default function ProviderDashboard() {
           </Card>
         </div>
 
-        {/* Large Phone Card */}
-        <Card className="mb-8 border-primary/30 shadow-md bg-gradient-to-br from-white to-blue-50/30 overflow-hidden">
-          <CardContent className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 rounded-3xl bg-blue-100 flex items-center justify-center shadow-inner shrink-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Large Phone Card */}
+          <Card className="border-primary/30 shadow-md bg-gradient-to-br from-white to-blue-50/30 overflow-hidden">
+            <CardContent className="p-8 flex flex-col items-center justify-between gap-6 text-center">
+              <div className="w-20 h-20 rounded-3xl bg-blue-100 flex items-center justify-center shadow-inner">
                 <Phone className="w-10 h-10 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">Contact Phone Number</p>
-                <p className="text-3xl md:text-4xl font-bold text-secondary tracking-tight">
+                <p className="text-3xl font-bold text-secondary tracking-tight">
                   {user.phone || "Not set"}
                 </p>
-                {user.phone && (
-                  <p className="text-xs text-emerald-600 font-semibold mt-2 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" /> Visible to all potential clients
-                  </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 h-12 rounded-xl border-primary/20 hover:bg-primary/5" 
+                  onClick={() => setEditingPhone(true)}
+                >
+                  Edit Number
+                </Button>
+                {whatsappNumber && (
+                  <Button 
+                    className="flex-1 h-12 font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 rounded-xl transition-all active:scale-95"
+                    onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
+                  >
+                    <MessageCircle className="w-5 h-5 mr-2" /> WhatsApp
+                  </Button>
                 )}
               </div>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="h-14 px-8 text-lg font-semibold rounded-2xl border-primary/20 hover:bg-primary/5" 
-                onClick={() => setEditingPhone(true)}
-              >
-                Edit Number
-              </Button>
-              {whatsappNumber && (
+            </CardContent>
+          </Card>
+
+          {/* Website/Social Link Card */}
+          <Card className="border-primary/30 shadow-md bg-gradient-to-br from-white to-purple-50/30 overflow-hidden">
+            <CardContent className="p-8 flex flex-col items-center justify-between gap-6 text-center">
+              <div className="w-20 h-20 rounded-3xl bg-purple-100 flex items-center justify-center shadow-inner">
+                <LinkIcon className="w-10 h-10 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">Website or Social Link</p>
+                <p className="text-xl font-bold text-secondary tracking-tight truncate max-w-[250px]">
+                  {user.url || "No link added"}
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
                 <Button 
-                  size="lg" 
-                  className="h-14 px-8 text-lg font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 rounded-2xl transition-all active:scale-95"
-                  onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
+                  variant="outline" 
+                  className="flex-1 h-12 rounded-xl border-primary/20 hover:bg-primary/5" 
+                  onClick={() => setEditingUrl(true)}
                 >
-                  <MessageCircle className="w-6 h-6 mr-2" /> Open WhatsApp
+                  Edit Link
                 </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                {user.url && (
+                  <Button 
+                    className="flex-1 h-12 font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-200 rounded-xl transition-all active:scale-95"
+                    onClick={() => window.open(user.url!, '_blank')}
+                  >
+                    <ExternalLink className="w-5 h-5 mr-2" /> Visit Link
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {editingName && (
           <div className="mb-8">
@@ -366,6 +414,17 @@ export default function ProviderDashboard() {
               onConfirm={(phone) => phoneMutation.mutate(phone)}
               onCancel={() => setEditingPhone(false)}
               isPending={phoneMutation.isPending}
+            />
+          </div>
+        )}
+
+        {editingUrl && (
+          <div className="mb-8">
+            <UrlPicker
+              currentUrl={user.url}
+              onConfirm={(url) => urlMutation.mutate(url)}
+              onCancel={() => setEditingUrl(false)}
+              isPending={urlMutation.isPending}
             />
           </div>
         )}
@@ -785,6 +844,34 @@ function PhonePicker({ currentPhone, onConfirm, onCancel, isPending }: any) {
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(phone)} disabled={!phone || isPending} className="bg-secondary hover:bg-secondary/90">
               {isPending && <Loader2 className="animate-spin mr-2" />} Save Phone
+            </Button>
+            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function UrlPicker({ currentUrl, onConfirm, onCancel, isPending }: any) {
+  const [url, setUrl] = useState(currentUrl || "");
+  return (
+    <Card className="border-primary/10 shadow-sm">
+      <CardHeader>
+        <CardTitle>Update your website or social link</CardTitle>
+        <CardDescription>Provide a link to your portfolio, Instagram, or website.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="max-w-xs space-y-6">
+          <Input 
+            value={url} 
+            onChange={(e) => setUrl(e.target.value)} 
+            placeholder="https://instagram.com/yourprofile"
+            className="h-12 rounded-xl"
+          />
+          <div className="flex gap-3">
+            <Button onClick={() => onConfirm(url)} disabled={!url || isPending} className="bg-secondary hover:bg-secondary/90">
+              {isPending && <Loader2 className="animate-spin mr-2" />} Save Link
             </Button>
             <Button variant="outline" onClick={onCancel}>Cancel</Button>
           </div>

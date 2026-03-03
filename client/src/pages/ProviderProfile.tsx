@@ -18,7 +18,9 @@ import {
   UserRound,
   Paintbrush,
   Store,
-  Sparkles
+  Sparkles,
+  ExternalLink,
+  Globe
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -197,6 +199,22 @@ export default function ProviderProfile() {
                     </div>
                     <span className="text-sm font-medium">{provider.phone || "+212 6XX XXX XXX"}</span>
                   </div>
+
+                  {provider.url && (
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center">
+                        <Globe className="w-4 h-4" />
+                      </div>
+                      <a 
+                        href={provider.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+                      >
+                        Visit Website <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
                 
                 <p className="text-[10px] text-center text-muted-foreground font-medium pt-4 border-t border-border/50">
