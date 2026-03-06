@@ -27,6 +27,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import logoImg from "@assets/logo.jpeg";
 
 export function Navigation() {
   const { data: user } = useUser();
@@ -67,8 +68,7 @@ export function Navigation() {
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-2xl font-display font-bold text-gradient-gold">ARSI</span>
-            <div className="h-2 w-2 rounded-full bg-primary group-hover:animate-pulse" />
+            <img src={logoImg} alt="ARSI Logo" className="h-12 w-auto object-contain" />
           </Link>
 
           {/* Desktop Nav */}
@@ -195,8 +195,8 @@ export function Navigation() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] border-l-primary/20">
                 <div className="flex flex-col gap-8 mt-8">
-                  <Link href="/" onClick={() => setIsOpen(false)} className="text-2xl font-display font-bold text-center text-gradient-gold">
-                    ARSI
+                  <Link href="/" onClick={() => setIsOpen(false)} className="flex justify-center">
+                    <img src={logoImg} alt="ARSI Logo" className="h-16 w-auto object-contain" />
                   </Link>
 
                   <div className="flex items-center justify-center gap-1 p-1 bg-muted/50 rounded-full">
