@@ -21,6 +21,7 @@ export function useGuests() {
         pricePerGuest: g.price_per_guest,
         eventDate: g.event_date,
         eventTime: g.event_time,
+        validated: !!g.validated,
       })) as Guest[];
     },
   });
@@ -49,6 +50,7 @@ export function useCreateGuest() {
           event_date: data.eventDate,
           event_time: data.eventTime,
           description: data.description,
+          validated: data.validated ?? false,
         })
         .select()
         .single();
@@ -85,6 +87,7 @@ export function useUpdateGuest() {
           event_date: data.eventDate,
           event_time: data.eventTime,
           description: data.description,
+          validated: data.validated,
         })
         .eq('id', id);
 
@@ -93,6 +96,28 @@ export function useUpdateGuest() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["guests"] });
       toast({ title: "Guest Updated", description: "The guest details have been saved." });
+    },
+    onError: (error: Error) => {
+      toast({ variant: "destructive", title: "Error", description: error.message });
+    },
+  });
+}
+
+export function useToggleGuestValidation() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, validated }: { id: number; validated: boolean }) => {
+      const { error } = await supabase
+        .from('guests')
+        .update({ validated })
+        .eq('id', id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["guests"] });
     },
     onError: (error: Error) => {
       toast({ variant: "destructive", title: "Error", description: error.message });

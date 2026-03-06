@@ -1,10 +1,12 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Edit2, MapPin, Calendar, Clock, FileText, Users, Gift } from "lucide-react";
+import { Trash2, Edit2, MapPin, Calendar, Clock, FileText, Users, Gift, CheckCircle2, Circle } from "lucide-react";
 import { type Guest } from "@shared/schema";
 import { useUser } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToggleGuestValidation } from "@/hooks/use-guests";
 
 interface GuestTableProps {
   guests: Guest[] | undefined;
@@ -16,6 +18,7 @@ interface GuestTableProps {
 export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTableProps) {
   const { data: user } = useUser();
   const isMobile = useIsMobile();
+  const toggleValidation = useToggleGuestValidation();
 
   if (isLoading) {
     return (
@@ -39,15 +42,27 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
     return (
       <div className="space-y-4 p-4">
         {guests.map((guest) => (
-          <Card key={guest.id} className="overflow-hidden border-border/50 shadow-sm">
+          <Card key={guest.id} className={`overflow-hidden border-border/50 shadow-sm transition-colors ${guest.validated ? 'bg-emerald-50/30 border-emerald-100' : ''}`}>
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="font-bold text-secondary text-lg">{guest.name}</h3>
-                  <div className="flex gap-2 mt-1">
-                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                      {guest.gender}
-                    </span>
+                <div className="flex items-start gap-3">
+                  <Checkbox 
+                    checked={guest.validated} 
+                    onCheckedChange={(checked) => toggleValidation.mutate({ id: guest.id, validated: !!checked })}
+                    className="mt-1"
+                  />
+                  <div>
+                    <h3 className={`font-bold text-secondary text-lg ${guest.validated ? 'line-through opacity-60' : ''}`}>{guest.name}</h3>
+                    <div className="flex gap-2 mt-1">
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                        {guest.gender}
+                      </span>
+                      {guest.validated && (
+                        <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 flex items-center gap-1">
+                          <CheckCircle2 className="w-2.5 h-2.5" /> Validated
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -118,6 +133,7 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px]">Status</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Gender</TableHead>
             <TableHead>People</TableHead>
@@ -132,8 +148,15 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
         </TableHeader>
         <TableBody>
           {guests.map((guest) => (
-            <TableRow key={guest.id} data-testid={`row-guest-${guest.id}`}>
-              <TableCell className="font-medium">{guest.name}</TableCell>
+            <TableRow key={guest.id} data-testid={`row-guest-${guest.id}`} className={guest.validated ? 'bg-emerald-50/30' : ''}>
+              <TableCell>
+                <Checkbox 
+                  checked={guest.validated} 
+                  onCheckedChange={(checked) => toggleValidation.mutate({ id: guest.id, validated: !!checked })}
+                  data-testid={`checkbox-validate-guest-${guest.id}`}
+                />
+              </TableCell>
+              <TableCell className={`font-medium ${guest.validated ? 'line-through opacity-60' : ''}`}>{guest.name}</TableCell>
               <TableCell className="capitalize">{guest.gender}</TableCell>
               <TableCell>{guest.numberOfGuests}</TableCell>
               <TableCell>{guest.pricePerGuest} MAD</TableCell>
