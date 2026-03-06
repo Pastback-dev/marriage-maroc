@@ -104,6 +104,33 @@ export default function ProviderProfile() {
           <p className="text-muted-foreground mt-2">Professional Wedding Service Provider</p>
         </div>
 
+        {/* Portfolio Gallery - NOW FIRST */}
+        <Card className="border-primary/10 shadow-sm mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-primary" /> Portfolio Gallery
+            </CardTitle>
+            <CardDescription>A showcase of recent work and celebrations.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loadingPhotos ? (
+              <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>
+            ) : photos?.length === 0 ? (
+              <div className="text-center py-12 border rounded-2xl bg-slate-50/50">
+                <p className="text-muted-foreground">No photos available in the gallery yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {photos?.map((photo) => (
+                  <div key={photo.id} className="group relative rounded-2xl overflow-hidden border shadow-sm aspect-square bg-white">
+                    <img src={photo.image_url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Info Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card className="border-primary/20 shadow-sm">
@@ -147,34 +174,7 @@ export default function ProviderProfile() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            {/* Portfolio Gallery - Now First */}
-            <Card className="border-primary/10 shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-primary" /> Portfolio Gallery
-                </CardTitle>
-                <CardDescription>A showcase of recent work and celebrations.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {loadingPhotos ? (
-                  <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>
-                ) : photos?.length === 0 ? (
-                  <div className="text-center py-12 border rounded-2xl bg-slate-50/50">
-                    <p className="text-muted-foreground">No photos available in the gallery yet.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {photos?.map((photo) => (
-                      <div key={photo.id} className="group relative rounded-2xl overflow-hidden border shadow-sm aspect-square bg-white">
-                        <img src={photo.image_url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Business Description - Now Second */}
+            {/* Business Description */}
             <Card className="border-primary/20 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
