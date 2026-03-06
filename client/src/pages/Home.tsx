@@ -1,7 +1,7 @@
 import { ArrowRight, Star, Sparkles, HeartHandshake, Users as UsersIcon, Receipt, MapPin, Utensils, Home as HomeIcon, Music, Camera, UserRound, Paintbrush } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +24,11 @@ export default function Home() {
   const { toast } = useToast();
 
   const { data: allGuests, isLoading: guestsLoading } = useGuests();
+
+  // Filter only validated guests for the community list
+  const validatedGuests = useMemo(() => {
+    return allGuests?.filter(guest => guest.validated) || [];
+  }, [allGuests]);
 
   const cities = [
     { id: "Casablanca", name: t("city_casablanca") },
@@ -305,7 +310,7 @@ export default function Home() {
             <Card className="border-primary/10 shadow-xl rounded-3xl overflow-hidden">
               <CardContent className="p-0">
                 <GuestTable
-                  guests={allGuests}
+                  guests={validatedGuests}
                   isLoading={guestsLoading}
                 />
               </CardContent>
