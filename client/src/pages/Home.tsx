@@ -41,6 +41,7 @@ export default function Home() {
     { id: "cameraman", name: t("category_cameraman"), icon: Camera },
     { id: "neggafa", name: t("category_neggafa"), icon: UserRound },
     { id: "decoration", name: t("category_decoration"), icon: Paintbrush },
+    { id: "other", name: t("category_other"), icon: Sparkles },
   ];
 
   const handleSearch = () => {
@@ -209,7 +210,7 @@ export default function Home() {
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">{t("categories_subtitle")}</p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 md:gap-6">
             {categories.map((cat, idx) => (
               <motion.div
                 key={cat.id}
@@ -226,11 +227,11 @@ export default function Home() {
                   setIsSearchOpen(true);
                 }}
               >
-                <div className="flex flex-col items-center gap-4 p-8 rounded-[2.5rem] bg-white shadow-sm border border-slate-100/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm">
-                    <cat.icon className="w-8 h-8 text-primary" />
+                <div className="flex flex-col items-center gap-4 p-6 rounded-[2rem] bg-white shadow-sm border border-slate-100/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-sm">
+                    <cat.icon className="w-7 h-7 text-primary" />
                   </div>
-                  <span className="text-xl font-bold text-secondary text-center group-hover:text-primary transition-colors duration-300">
+                  <span className="text-sm font-bold text-secondary text-center group-hover:text-primary transition-colors duration-300">
                     {cat.name}
                   </span>
                 </div>
