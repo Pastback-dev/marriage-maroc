@@ -11,6 +11,7 @@ export type ProviderProfile = {
   phone: string | null;
   priceMin: number | null;
   priceMax: number | null;
+  url: string | null;
 };
 
 export function useProviders(filters?: { categories?: string[]; city?: string }) {
@@ -40,6 +41,7 @@ export function useProviders(filters?: { categories?: string[]; city?: string })
         phone: profile.phone,
         priceMin: profile.price_min ? Number(profile.price_min) : null,
         priceMax: profile.price_max ? Number(profile.price_max) : null,
+        url: profile.url,
       }));
     },
   });
@@ -76,6 +78,7 @@ export function useProvider(id: string) {
         phone: profile.phone,
         priceMin: profile.price_min ? Number(profile.price_min) : null,
         priceMax: profile.price_max ? Number(profile.price_max) : null,
+        url: profile.url,
       };
     },
     enabled: !!id,

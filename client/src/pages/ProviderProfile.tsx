@@ -20,7 +20,8 @@ import {
   Store,
   Sparkles,
   ExternalLink,
-  Globe
+  Globe,
+  MessageCircle
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,6 +83,7 @@ export default function ProviderProfile() {
   }
 
   const currentCatInfo = SERVICE_CATEGORIES.find(c => c.id === provider.serviceCategory);
+  const whatsappNumber = provider.phone?.replace(/\D/g, '');
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -145,20 +147,7 @@ export default function ProviderProfile() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            <Card className="border-primary/20 shadow-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-primary" /> Business Description
-                </CardTitle>
-                <CardDescription>Learn more about the services and experience offered.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                  {provider.description || "No description provided yet. This professional is dedicated to making your Moroccan wedding dreams come true with exceptional service and attention to detail."}
-                </p>
-              </CardContent>
-            </Card>
-
+            {/* Portfolio Gallery - Now First */}
             <Card className="border-primary/10 shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -182,6 +171,21 @@ export default function ProviderProfile() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Business Description - Now Second */}
+            <Card className="border-primary/20 shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" /> Business Description
+                </CardTitle>
+                <CardDescription>Learn more about the services and experience offered.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                  {provider.description || "No description provided yet. This professional is dedicated to making your Moroccan wedding dreams come true with exceptional service and attention to detail."}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -209,15 +213,36 @@ export default function ProviderProfile() {
                         href={provider.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+                        className="text-sm font-medium text-primary hover:underline flex items-center gap-1 truncate"
                       >
-                        Visit Website <ExternalLink className="w-3 h-3" />
+                        {provider.url.replace(/^https?:\/\/(www\.)?/, '')} <ExternalLink className="w-3 h-3 shrink-0" />
                       </a>
                     </div>
                   )}
                 </div>
+
+                <div className="pt-4 border-t border-border/50 space-y-3">
+                  {whatsappNumber && (
+                    <Button 
+                      className="w-full h-11 font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-100 rounded-xl transition-all active:scale-95"
+                      onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
+                    >
+                      <MessageCircle className="w-5 h-5 mr-2" /> WhatsApp
+                    </Button>
+                  )}
+                  
+                  {provider.url && (
+                    <Button 
+                      variant="outline"
+                      className="w-full h-11 font-bold border-primary/20 hover:bg-primary/5 text-secondary rounded-xl"
+                      onClick={() => window.open(provider.url!, '_blank')}
+                    >
+                      <Globe className="w-5 h-5 mr-2" /> Visit Website
+                    </Button>
+                  )}
+                </div>
                 
-                <p className="text-[10px] text-center text-muted-foreground font-medium pt-4 border-t border-border/50">
+                <p className="text-[10px] text-center text-muted-foreground font-medium pt-2">
                   Direct contact with the professional
                 </p>
               </CardContent>
