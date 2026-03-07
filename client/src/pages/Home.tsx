@@ -108,7 +108,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/register">
+                <Link href="/categories">
                   <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 shadow-xl shadow-primary/20 hover:-translate-y-1 transition-all rounded-full min-h-12">
                     {t("start_planning")} <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
