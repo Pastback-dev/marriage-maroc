@@ -1,12 +1,12 @@
 import { Link, useLocation } from "wouter";
 import { useUser, useLogout } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { 
-  Heart, 
-  Map as MapIcon, 
-  Users, 
-  LogOut, 
-  Menu, 
+import {
+  Heart,
+  Map as MapIcon,
+  Users,
+  LogOut,
+  Menu,
   X,
   Languages,
   Layout,
@@ -41,7 +41,7 @@ export function Navigation() {
   }, [i18n.language]);
 
   const isActive = (path: string) => location === path;
-  
+
   const publicNavItems = [
     { label: t("sign_in"), path: "/login", icon: LogIn },
     { label: t("nav_providers"), path: "/providers", icon: Heart },
@@ -81,14 +81,13 @@ export function Navigation() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[160px] rounded-xl border-border/40 shadow-xl p-1.5 bg-white">
                 {languages.map((lang) => (
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     key={lang.code}
                     onClick={() => i18n.changeLanguage(lang.code)}
-                    className={`rounded-lg px-4 py-2.5 cursor-pointer transition-all font-medium ${
-                      i18n.language === lang.code 
-                        ? 'bg-primary/10 text-primary' 
+                    className={`rounded-lg px-4 py-2.5 cursor-pointer transition-all font-medium ${i18n.language === lang.code
+                        ? 'bg-primary/10 text-primary'
                         : 'text-secondary hover:bg-muted'
-                    }`}
+                      }`}
                     data-testid={`button-lang-${lang.code}`}
                   >
                     <span className="flex items-center justify-between w-full">
@@ -103,25 +102,25 @@ export function Navigation() {
             {publicNavItems
               .filter(item => !(user && item.path === "/login"))
               .map((item) => (
-              <Link 
-                key={item.path} 
-                href={item.path}
-                className={`
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`
                   flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
                   ${isActive(item.path) ? "text-primary font-bold" : "text-muted-foreground"}
                 `}
-                data-testid={`link-nav-${item.path.slice(1)}`}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </Link>
-            ))}
+                  data-testid={`link-nav-${item.path.slice(1)}`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </Link>
+              ))}
 
             {user ? (
               <>
                 {userNavItems.map((item) => (
-                  <Link 
-                    key={item.path} 
+                  <Link
+                    key={item.path}
                     href={item.path}
                     className={`
                       flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
@@ -134,7 +133,7 @@ export function Navigation() {
                   </Link>
                 ))}
                 {user.role === "provider" && (
-                  <Link 
+                  <Link
                     href="/provider-dashboard"
                     className={`
                       flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
@@ -147,7 +146,7 @@ export function Navigation() {
                   </Link>
                 )}
                 {user.isAdmin && (
-                  <Link 
+                  <Link
                     href="/admin"
                     className={`
                       flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary
@@ -164,8 +163,8 @@ export function Navigation() {
                   <span className="text-sm font-medium text-foreground">
                     {user.displayName || user.username}
                   </span>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="icon"
                     onClick={() => logout()}
                     className="text-muted-foreground hover:text-destructive"
@@ -203,38 +202,37 @@ export function Navigation() {
                       <button
                         key={lang.code}
                         onClick={() => i18n.changeLanguage(lang.code)}
-                        className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${
-                          i18n.language === lang.code
+                        className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all ${i18n.language === lang.code
                             ? 'bg-primary text-primary-foreground shadow-sm'
                             : 'text-muted-foreground hover:text-secondary'
-                        }`}
+                          }`}
                         data-testid={`button-mobile-lang-${lang.code}`}
                       >
                         {lang.short}
                       </button>
                     ))}
                   </div>
-                  
+
                   <div className="flex flex-col gap-2">
                     {publicNavItems
                       .filter(item => !(user && item.path === "/login"))
                       .map((item) => (
-                      <Link 
-                        key={item.path} 
-                        href={item.path}
-                        onClick={() => setIsOpen(false)}
-                        data-testid={`link-mobile-nav-${item.path.slice(1)}`}
-                        className={`
+                        <Link
+                          key={item.path}
+                          href={item.path}
+                          onClick={() => setIsOpen(false)}
+                          data-testid={`link-mobile-nav-${item.path.slice(1)}`}
+                          className={`
                           flex items-center gap-4 p-3 rounded-lg transition-colors
-                          ${isActive(item.path) 
-                            ? "bg-primary/10 text-primary font-bold" 
-                            : "text-muted-foreground hover:bg-muted"}
+                          ${isActive(item.path)
+                              ? "bg-primary/10 text-primary font-bold"
+                              : "text-muted-foreground hover:bg-muted"}
                         `}
-                      >
-                        <item.icon className="w-5 h-5" />
-                        {item.label}
-                      </Link>
-                    ))}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {item.label}
+                        </Link>
+                      ))}
                   </div>
 
                   <div className="h-px bg-border my-2" />
@@ -242,15 +240,15 @@ export function Navigation() {
                   {user ? (
                     <div className="flex flex-col gap-2">
                       {userNavItems.map((item) => (
-                        <Link 
-                          key={item.path} 
+                        <Link
+                          key={item.path}
                           href={item.path}
                           onClick={() => setIsOpen(false)}
                           data-testid={`link-mobile-nav-${item.path.slice(1)}`}
                           className={`
                             flex items-center gap-4 p-3 rounded-lg transition-colors
-                            ${isActive(item.path) 
-                              ? "bg-primary/10 text-primary font-bold" 
+                            ${isActive(item.path)
+                              ? "bg-primary/10 text-primary font-bold"
                               : "text-muted-foreground hover:bg-muted"}
                           `}
                         >
@@ -259,39 +257,39 @@ export function Navigation() {
                         </Link>
                       ))}
                       {user.role === "provider" && (
-                        <Link 
+                        <Link
                           href="/provider-dashboard"
                           onClick={() => setIsOpen(false)}
                           data-testid="link-mobile-nav-provider-dashboard"
                           className={`
                             flex items-center gap-4 p-3 rounded-lg transition-colors
-                            ${isActive("/provider-dashboard") 
-                              ? "bg-primary/10 text-primary font-bold" 
+                            ${isActive("/provider-dashboard")
+                              ? "bg-primary/10 text-primary font-bold"
                               : "text-muted-foreground hover:bg-muted"}
                           `}
                         >
                           <Store className="w-5 h-5" />
-                          My Dashboard
+                          {t("my_dashboard")}
                         </Link>
                       )}
                       {user.isAdmin && (
-                        <Link 
+                        <Link
                           href="/admin"
                           onClick={() => setIsOpen(false)}
                           data-testid="link-mobile-nav-admin"
                           className={`
                             flex items-center gap-4 p-3 rounded-lg transition-colors
-                            ${isActive("/admin") 
-                              ? "bg-primary/10 text-primary font-bold" 
+                            ${isActive("/admin")
+                              ? "bg-primary/10 text-primary font-bold"
                               : "text-muted-foreground hover:bg-muted"}
                           `}
                         >
                           <LayoutDashboard className="w-5 h-5" />
-                          Dashboard
+                          {t("admin_dashboard")}
                         </Link>
                       )}
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         className="mt-4 w-full"
                         onClick={() => {
                           logout();

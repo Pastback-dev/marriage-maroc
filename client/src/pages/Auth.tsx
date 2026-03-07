@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema, loginSchema, type InsertUser, type LoginSchema } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useTranslation } from "react-i18next";
 
 export default function AuthPage({ mode: initialMode }: { mode?: "login" | "register" } = {}) {
   const [, setLocation] = useLocation();
@@ -20,6 +21,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
   const registerMutation = useRegister();
   const [role, setRole] = useState<"client" | "provider">("client");
   const [mode, setMode] = useState<"login" | "register">(initialMode || "login");
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Only redirect if auth is fully resolved (not loading) AND user is confirmed logged in
@@ -70,12 +72,12 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
             </div>
           </Link>
           <CardTitle className="text-2xl font-display text-secondary" data-testid="text-auth-title">
-            {mode === "login" ? "Welcome Back" : "Join Arsi"}
+            {mode === "login" ? t("auth_welcome_back") : t("auth_join")}
           </CardTitle>
           <CardDescription>
             {role === "provider"
-              ? (mode === "login" ? "Login to your provider account" : "Register as a wedding professional")
-              : (mode === "login" ? "Login to start planning" : "Start planning your dream wedding")}
+              ? (mode === "login" ? t("auth_provider_login_desc") : t("auth_provider_register_desc"))
+              : (mode === "login" ? t("auth_client_login_desc") : t("auth_client_register_desc"))}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -102,7 +104,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-primary" /> Email Address
+                        <Mail className="w-4 h-4 text-primary" /> {t("email_address")}
                       </FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="email@example.com" {...field} data-testid="input-email" />
@@ -118,7 +120,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Lock className="w-4 h-4 text-primary" /> Password
+                        <Lock className="w-4 h-4 text-primary" /> {t("password")}
                       </FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
@@ -135,7 +137,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                   data-testid="button-auth-submit"
                 >
                   {loginMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-                  Sign In
+                  {t("sign_in_btn")}
                 </Button>
               </form>
             </Form>
@@ -151,10 +153,10 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <UserCircle className="w-4 h-4 text-primary" /> Full Name
+                        <UserCircle className="w-4 h-4 text-primary" /> {t("full_name")}
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your name" {...field} data-testid="input-name" />
+                        <Input placeholder={t("enter_name")} {...field} data-testid="input-name" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -167,7 +169,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-primary" /> Email Address
+                        <Mail className="w-4 h-4 text-primary" /> {t("email_address")}
                       </FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="email@example.com" {...field} data-testid="input-email" />
@@ -184,7 +186,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
-                          <Phone className="w-4 h-4 text-primary" /> Phone Number
+                          <Phone className="w-4 h-4 text-primary" /> {t("phone_number")}
                         </FormLabel>
                         <FormControl>
                           <Input placeholder="+212 6XX XXX XXX" {...field} data-testid="input-phone" />
@@ -201,7 +203,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
-                        <Lock className="w-4 h-4 text-primary" /> Password
+                        <Lock className="w-4 h-4 text-primary" /> {t("password")}
                       </FormLabel>
                       <FormControl>
                         <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" />
@@ -218,7 +220,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
                   data-testid="button-auth-submit"
                 >
                   {registerMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-                  Create Account
+                  {t("create_account")}
                 </Button>
               </form>
             </Form>
@@ -231,7 +233,7 @@ export default function AuthPage({ mode: initialMode }: { mode?: "login" | "regi
               className="text-sm text-primary hover:underline font-medium"
               data-testid="button-toggle-mode"
             >
-              {mode === "login" ? "Don't have an account? Register" : "Already have an account? Sign In"}
+              {mode === "login" ? t("no_account") : t("have_account")}
             </button>
           </div>
         </CardContent>

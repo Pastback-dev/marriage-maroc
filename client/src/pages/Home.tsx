@@ -133,17 +133,17 @@ export default function Home() {
                     <div className="p-2 bg-gradient-to-br from-primary/20 to-amber-200/30 rounded-xl">
                       <span className="text-primary"><MapPin className="w-5 h-5" /></span>
                     </div>
-                    Find Wedding Vendors
+                    {t("find_vendors_title")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-5 p-8 pt-6">
                   <div className="space-y-3">
                     <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider flex items-center gap-1.5">
-                      <MapPin className="w-3 h-3 text-primary/70" /> Select City
+                      <MapPin className="w-3 h-3 text-primary/70" /> {t("select_city_label")}
                     </label>
                     <Select value={city} onValueChange={setCity}>
                       <SelectTrigger className="bg-white border border-border/50 h-11 text-base rounded-xl focus-visible:ring-primary/20 focus-visible:border-primary/30 transition-all" data-testid="select-city">
-                        <SelectValue placeholder="Choose a city..." />
+                        <SelectValue placeholder={t("choose_city")} />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl border-border/30 shadow-xl p-1.5 bg-white">
                         {cities.map(c => (
@@ -155,7 +155,7 @@ export default function Home() {
 
                   <div className="space-y-3">
                     <label className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider">
-                      Service Categories
+                      {t("service_categories_label")}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
                       {categories.map((cat) => {
@@ -166,8 +166,8 @@ export default function Home() {
                             type="button"
                             onClick={() => toggleCategory(cat.id)}
                             className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${isSelected
-                                ? "border-primary bg-primary/5 shadow-md"
-                                : "border-border/50 hover:border-primary/30 hover:bg-slate-50"
+                              ? "border-primary bg-primary/5 shadow-md"
+                              : "border-border/50 hover:border-primary/30 hover:bg-slate-50"
                               }`}
                             data-testid={`category-${cat.id}`}
                           >
@@ -186,7 +186,7 @@ export default function Home() {
                     className="w-full h-12 text-base font-bold bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary text-white shadow-lg shadow-secondary/15 rounded-xl transition-all active:scale-[0.98]"
                     data-testid="button-search-providers"
                   >
-                    Find Providers
+                    {t("find_providers_btn")}
                   </Button>
                 </CardContent>
               </Card>
@@ -196,11 +196,11 @@ export default function Home() {
       </section>
 
       {/* Search Results Dialog */}
-      <SearchResultsDialog 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
-        city={city} 
-        categories={selectedCategories} 
+      <SearchResultsDialog
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        city={city}
+        categories={selectedCategories}
       />
 
       {/* Categories Section */}
@@ -304,8 +304,8 @@ export default function Home() {
             className="space-y-8"
           >
             <div className="text-center">
-              <h2 className="text-3xl font-display font-bold text-secondary mb-4">Community Guest List</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">See how other couples are planning their celebrations across Morocco.</p>
+              <h2 className="text-3xl font-display font-bold text-secondary mb-4">{t("community_guest_list")}</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">{t("community_guest_desc")}</p>
             </div>
             <Card className="border-primary/10 shadow-xl rounded-3xl overflow-hidden">
               <CardContent className="p-0">

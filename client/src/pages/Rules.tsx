@@ -1,13 +1,13 @@
 import { Navigation } from "@/components/Navigation";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { 
-  ShieldCheck, 
-  ImageIcon, 
-  Package, 
-  DollarSign, 
-  Star, 
-  AlertTriangle, 
+import {
+  ShieldCheck,
+  ImageIcon,
+  Package,
+  DollarSign,
+  Star,
+  AlertTriangle,
   CheckCircle2,
   Home as HomeIcon,
   Users,
@@ -68,7 +68,7 @@ export default function Rules() {
           <div className="space-y-16">
             {/* Platform Standards */}
             <div>
-              <h2 className="text-2xl font-display font-bold text-secondary mb-8 border-b pb-4">Platform Standards</h2>
+              <h2 className="text-2xl font-display font-bold text-secondary mb-8 border-b pb-4">{t("platform_standards")}</h2>
               <div className="space-y-6">
                 {platformRules.map((rule, idx) => (
                   <motion.div
@@ -94,7 +94,7 @@ export default function Rules() {
 
             {/* Event Conduct */}
             <div>
-              <h2 className="text-2xl font-display font-bold text-secondary mb-8 border-b pb-4">Event Conduct</h2>
+              <h2 className="text-2xl font-display font-bold text-secondary mb-8 border-b pb-4">{t("event_conduct")}</h2>
               <div className="space-y-6">
                 {eventRules.map((rule, idx) => (
                   <motion.div
