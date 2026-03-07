@@ -22,6 +22,7 @@ export function useGuests() {
         eventDate: g.event_date,
         eventTime: g.event_time,
         validated: !!g.validated,
+        phoneNumber: g.phone_number,
       })) as Guest[];
     },
   });
@@ -51,6 +52,7 @@ export function useCreateGuest() {
           event_time: data.eventTime,
           description: data.description,
           validated: data.validated ?? false,
+          phone_number: data.phoneNumber,
         })
         .select()
         .single();
@@ -88,6 +90,7 @@ export function useUpdateGuest() {
           event_time: data.eventTime,
           description: data.description,
           validated: data.validated,
+          phone_number: data.phoneNumber,
         })
         .eq('id', id);
 

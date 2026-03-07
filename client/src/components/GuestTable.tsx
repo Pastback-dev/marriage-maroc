@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, Edit2, MapPin, Calendar, Clock, FileText, Users, Gift } from "lucide-react";
+import { Trash2, Edit2, MapPin, Calendar, Clock, FileText, Users, Gift, MessageCircle, Phone } from "lucide-react";
 import { type Guest } from "@shared/schema";
 import { useUser } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,6 +16,12 @@ interface GuestTableProps {
 export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTableProps) {
   const { data: user } = useUser();
   const isMobile = useIsMobile();
+
+  const openWhatsApp = (phoneNumber: string | null) => {
+    if (!phoneNumber) return;
+    const cleanNumber = phoneNumber.replace(/\D/g, '');
+    window.open(`https://wa.me/${cleanNumber}`, '_blank');
+  };
 
   if (isLoading) {
     return (
@@ -51,6 +57,16 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
                   </div>
                 </div>
                 <div className="flex gap-1">
+                  {guest.phoneNumber && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-emerald-600" 
+                      onClick={() => openWhatsApp(guest.phoneNumber)}
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                    </Button>
+                  )}
                   {onEdit && user?.id === guest.userId && (
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(guest)}>
                       <Edit2 className="w-4 h-4" />
@@ -79,8 +95,13 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
                 </div>
               </div>
 
-              {(guest.city || guest.eventDate || guest.eventTime) && (
+              {(guest.city || guest.eventDate || guest.eventTime || guest.phoneNumber) && (
                 <div className="pt-3 border-t border-border/50 space-y-2">
+                  {guest.phoneNumber && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Phone className="w-3 h-3 text-primary" /> {guest.phoneNumber}
+                    </div>
+                  )}
                   {guest.city && (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <MapPin className="w-3 h-3 text-primary" /> {guest.city}
@@ -119,6 +140,7 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
+            <TableHead>Phone</TableHead>
             <TableHead>Gender</TableHead>
             <TableHead>People</TableHead>
             <TableHead>Gift/Person</TableHead>
@@ -126,7 +148,6 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
             <TableHead>City</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Time</TableHead>
-            <TableHead>Description</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -134,6 +155,21 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
           {guests.map((guest) => (
             <TableRow key={guest.id} data-testid={`row-guest-${guest.id}`}>
               <TableCell className="font-medium">{guest.name}</TableCell>
+              <TableCell>
+                {guest.phoneNumber ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs">{guest.phoneNumber}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                      onClick={() => openWhatsApp(guest.phoneNumber)}
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ) : "—"}
+              </TableCell>
               <TableCell className="capitalize">{guest.gender}</TableCell>
               <TableCell>{guest.numberOfGuests}</TableCell>
               <TableCell>{guest.pricePerGuest} MAD</TableCell>
@@ -160,9 +196,6 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
                     <Clock className="w-3 h-3 text-primary" /> {guest.eventTime}
                   </div>
                 ) : "—"}
-              </TableCell>
-              <TableCell className="max-w-[150px] truncate text-xs text-muted-foreground">
-                {guest.description || "—"}
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">

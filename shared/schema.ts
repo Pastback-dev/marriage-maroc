@@ -38,6 +38,7 @@ export const insertGuestSchema = z.object({
   eventTime: z.string().optional(),
   description: z.string().optional(),
   validated: z.boolean().default(false).optional(),
+  phoneNumber: z.string().optional().or(z.literal("")),
 });
 
 export type InsertGuest = z.infer<typeof insertGuestSchema>;
@@ -105,6 +106,7 @@ export type Guest = {
   eventTime: string | null;
   description: string | null;
   validated: boolean;
+  phoneNumber: string | null;
 };
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

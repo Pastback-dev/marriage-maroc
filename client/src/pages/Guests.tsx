@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { UserPlus, Calculator, Users as UsersIcon, Edit2, X, MapPin, Calendar, Clock, FileText } from "lucide-react";
+import { UserPlus, Calculator, Users as UsersIcon, Edit2, X, MapPin, Calendar, Clock, FileText, Phone } from "lucide-react";
 import { useUser } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { GuestTable } from "@/components/GuestTable";
@@ -55,6 +55,7 @@ export default function Guests() {
       eventDate: "",
       eventTime: "",
       description: "",
+      phoneNumber: "",
     },
   });
 
@@ -71,6 +72,7 @@ export default function Guests() {
         eventDate: editingGuest.eventDate || "",
         eventTime: editingGuest.eventTime || "",
         description: editingGuest.description || "",
+        phoneNumber: editingGuest.phoneNumber || "",
       });
     } else {
       form.reset({
@@ -84,6 +86,7 @@ export default function Guests() {
         eventDate: "",
         eventTime: "",
         description: "",
+        phoneNumber: "",
       });
     }
   }, [editingGuest, form, user]);
@@ -166,6 +169,20 @@ export default function Guests() {
                             <FormLabel className="text-xs">Guest/Family Name</FormLabel>
                             <FormControl>
                               <Input placeholder="e.g. Family El Mansouri" {...field} className="h-10" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center gap-2 text-xs"><Phone className="w-3 h-3" /> Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="+212 6XX XXX XXX" {...field} className="h-10" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
