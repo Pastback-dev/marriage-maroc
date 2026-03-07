@@ -15,8 +15,8 @@ export default function AboutUs() {
   ];
 
   const stats = [
-    { value: "6", label: t("about_stat_cities") },
-    { value: "6", label: t("about_stat_categories") },
+    { value: "+6", label: t("about_stat_cities") },
+    { value: "+6", label: t("about_stat_categories") },
     { value: "24/7", label: t("about_stat_support") },
   ];
 
