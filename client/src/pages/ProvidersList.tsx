@@ -7,14 +7,25 @@ import { useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
+const MOROCCAN_CITIES = [
+  "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda", "Kenitra", "Tetouan",
+  "Safi", "Mohammedia", "Khouribga", "El Jadida", "Beni Mellal", "Nador", "Taza", "Settat", "Berrechid",
+  "Khemisset", "Guelmim", "Ksar El Kebir", "Larache", "Berkane", "Khenifra", "Taourirt", "Bouskoura",
+  "Fquih Ben Salah", "Dakhla", "Sidi Slimane", "Errachidia", "Guercif", "Oulad Teima", "Ben Guerir",
+  "Tifelt", "Lqliaa", "Taroudant", "Sefrou", "Essaouira", "Fnideq", "Sidi Kacem", "Tiznit", "Tan-Tan",
+  "Ouarzazate", "Youssoufia", "Martil"
+].sort();
+
 export default function ProvidersList() {
   const { t } = useTranslation();
-  const [city, setCity] = useState<string>("");
+  const [city, setCity] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
+  const [search, setSearch] = useState<string>("all");
 
   const { data: providers, isLoading } = useProviders({
-    city: city || undefined,
-    category: category === "all" ? undefined : category
+    city: city === "all" ? undefined : city,
+    category: category === "all" ? undefined : category,
+    search: search === "all" ? undefined : search
   });
 
   return (
@@ -32,12 +43,25 @@ export default function ProvidersList() {
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Filter by city..."
+                placeholder="Search by name or keyword..."
                 className="pl-9 bg-white"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
+                value={search === "all" ? "" : search}
+                onChange={(e) => setSearch(e.target.value || "all")}
               />
             </div>
+            
+            <Select value={city} onValueChange={setCity}>
+              <SelectTrigger className="w-full sm:w-48 bg-white">
+                <SelectValue placeholder="All Cities" />
+              </SelectTrigger>
+              <SelectContent className="bg-white max-h-[300px]">
+                <SelectItem value="all">All Cities</SelectItem>
+                {MOROCCAN_CITIES.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger className="w-full sm:w-48 bg-white">
                 <SelectValue placeholder="All Categories" />
