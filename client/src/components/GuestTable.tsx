@@ -5,6 +5,7 @@ import { type Guest } from "@shared/schema";
 import { useUser } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 
 interface GuestTableProps {
   guests: Guest[] | undefined;
@@ -16,6 +17,7 @@ interface GuestTableProps {
 export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTableProps) {
   const { data: user } = useUser();
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   const openWhatsApp = (phoneNumber: string | null) => {
     if (!phoneNumber) return;
@@ -27,7 +29,7 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
     return (
       <div className="p-8 text-center text-muted-foreground">
         <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2" />
-        Loading guests...
+        {t("loading_guests")}
       </div>
     );
   }
@@ -36,7 +38,7 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
     return (
       <div className="p-12 text-center text-muted-foreground">
         <Users className="w-12 h-12 mx-auto mb-4 opacity-20" />
-        <p>No guests found in your list.</p>
+        <p>{t("no_guests_found")}</p>
       </div>
     );
   }
@@ -58,10 +60,10 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
                 </div>
                 <div className="flex gap-1">
                   {guest.phoneNumber && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-emerald-600" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-emerald-600"
                       onClick={() => openWhatsApp(guest.phoneNumber)}
                     >
                       <MessageCircle className="w-4 h-4" />
@@ -82,13 +84,13 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">People</p>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{t("table_people")}</p>
                   <p className="text-sm font-medium flex items-center gap-1.5">
                     <Users className="w-3.5 h-3.5 text-primary/60" /> {guest.numberOfGuests}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Total Gift</p>
+                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{t("mobile_total_gift")}</p>
                   <p className="text-sm font-bold text-emerald-600 flex items-center gap-1.5">
                     <Gift className="w-3.5 h-3.5" /> {((guest.pricePerGuest || 0) * (guest.numberOfGuests || 1)).toLocaleString()} MAD
                   </p>
@@ -139,16 +141,16 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Phone</TableHead>
-            <TableHead>Gender</TableHead>
-            <TableHead>People</TableHead>
-            <TableHead>Gift/Person</TableHead>
-            <TableHead>Total Gift</TableHead>
-            <TableHead>City</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Time</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>{t("table_name")}</TableHead>
+            <TableHead>{t("table_phone")}</TableHead>
+            <TableHead>{t("table_gender")}</TableHead>
+            <TableHead>{t("table_people")}</TableHead>
+            <TableHead>{t("table_gift_person")}</TableHead>
+            <TableHead>{t("table_total_gift")}</TableHead>
+            <TableHead>{t("table_city")}</TableHead>
+            <TableHead>{t("table_date")}</TableHead>
+            <TableHead>{t("table_time")}</TableHead>
+            <TableHead className="text-right">{t("table_actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -159,9 +161,9 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
                 {guest.phoneNumber ? (
                   <div className="flex items-center gap-2">
                     <span className="text-xs">{guest.phoneNumber}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-6 w-6 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                       onClick={() => openWhatsApp(guest.phoneNumber)}
                     >
@@ -200,9 +202,9 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   {onEdit && user?.id === guest.userId && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="text-muted-foreground hover:text-primary"
                       onClick={() => onEdit(guest)}
                       data-testid={`button-edit-guest-${guest.id}`}
@@ -211,9 +213,9 @@ export function GuestTable({ guests, isLoading, onEdit, onDelete }: GuestTablePr
                     </Button>
                   )}
                   {onDelete && user?.id === guest.userId && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="text-muted-foreground hover:text-destructive"
                       onClick={() => onDelete(guest.id)}
                       data-testid={`button-delete-guest-${guest.id}`}

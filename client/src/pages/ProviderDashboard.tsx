@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 const MOROCCO_CITIES = [
   "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda", "Kenitra", "Tetouan"
@@ -49,14 +50,15 @@ export default function ProviderDashboard() {
   const [editingPhone, setEditingPhone] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [editingUrl, setEditingUrl] = useState(false);
+  const { t } = useTranslation();
 
   const nameMutation = useMutation({
     mutationFn: async (name: string) => {
       if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .upsert({
+          id: user.id,
           display_name: name,
           role: 'provider'
         });
@@ -77,8 +79,8 @@ export default function ProviderDashboard() {
       if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .upsert({
+          id: user.id,
           city: city,
           role: 'provider'
         });
@@ -99,8 +101,8 @@ export default function ProviderDashboard() {
       if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .upsert({
+          id: user.id,
           service_category: serviceCategory,
           role: 'provider'
         });
@@ -121,8 +123,8 @@ export default function ProviderDashboard() {
       if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .upsert({
+          id: user.id,
           description: description,
           role: 'provider'
         });
@@ -143,8 +145,8 @@ export default function ProviderDashboard() {
       if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .upsert({
+          id: user.id,
           price_min: min,
           price_max: max,
           role: 'provider'
@@ -166,8 +168,8 @@ export default function ProviderDashboard() {
       if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .upsert({
+          id: user.id,
           phone: phone,
           role: 'provider'
         });
@@ -188,8 +190,8 @@ export default function ProviderDashboard() {
       if (!user?.id) throw new Error("User not found");
       const { error } = await supabase
         .from('profiles')
-        .upsert({ 
-          id: user.id, 
+        .upsert({
+          id: user.id,
           url: url,
           role: 'provider'
         });
@@ -206,10 +208,10 @@ export default function ProviderDashboard() {
   });
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>;
-  
-  if (!user || user.role !== "provider") { 
-    setLocation("/login"); 
-    return null; 
+
+  if (!user || user.role !== "provider") {
+    setLocation("/login");
+    return null;
   }
 
   const currentCategory = user.serviceCategory;
@@ -223,8 +225,8 @@ export default function ProviderDashboard() {
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-display font-bold text-secondary">Provider Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Welcome back, {user.displayName || user.username}!</p>
+          <h1 className="text-3xl font-display font-bold text-secondary">{t("pd_title")}</h1>
+          <p className="text-muted-foreground mt-2">{t("pd_welcome", { name: user.displayName || user.username })}</p>
         </div>
 
         <div className="mb-8">
@@ -238,11 +240,11 @@ export default function ProviderDashboard() {
                 <UserCircle className="w-7 h-7 text-primary opacity-80" />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Business Name</p>
-                <p className="text-xl font-bold text-secondary truncate max-w-[120px]">{user.displayName || "Not set"}</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("pd_business_name")}</p>
+                <p className="text-xl font-bold text-secondary truncate max-w-[120px]">{user.displayName || t("pd_not_set")}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setEditingName(true)}>
-                Edit
+                {t("pd_edit")}
               </Button>
             </CardContent>
           </Card>
@@ -253,11 +255,11 @@ export default function ProviderDashboard() {
                 {currentCatInfo ? <currentCatInfo.icon className="w-7 h-7 opacity-80" /> : <Store className="w-7 h-7 opacity-40" />}
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Service</p>
-                <p className="text-xl font-bold text-secondary">{currentCatInfo?.name || "Not set"}</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("pd_service")}</p>
+                <p className="text-xl font-bold text-secondary">{currentCatInfo?.name || t("pd_not_set")}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setSelectedCategory(currentCategory || "")}>
-                Edit
+                {t("pd_edit")}
               </Button>
             </CardContent>
           </Card>
@@ -268,11 +270,11 @@ export default function ProviderDashboard() {
                 <MapPin className="w-7 h-7 text-emerald-600 opacity-80" />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">City</p>
-                <p className="text-xl font-bold text-secondary">{user.city || "Not set"}</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("pd_city")}</p>
+                <p className="text-xl font-bold text-secondary">{user.city || t("pd_not_set")}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setChangingCity(true)}>
-                Edit
+                {t("pd_edit")}
               </Button>
             </CardContent>
           </Card>
@@ -283,13 +285,13 @@ export default function ProviderDashboard() {
                 <Banknote className="w-7 h-7 text-amber-600 opacity-80" />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Price</p>
+                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("pd_price")}</p>
                 <p className="text-xl font-bold text-secondary">
-                  {user.priceMin !== null ? `${user.priceMin.toLocaleString()} MAD` : "Not set"}
+                  {user.priceMin !== null ? `${user.priceMin.toLocaleString()} MAD` : t("pd_not_set")}
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setEditingPrice(true)}>
-                Edit
+                {t("pd_edit")}
               </Button>
             </CardContent>
           </Card>
@@ -303,21 +305,21 @@ export default function ProviderDashboard() {
                 <Phone className="w-10 h-10 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">Contact Phone Number</p>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">{t("pd_phone_label")}</p>
                 <p className="text-3xl font-bold text-secondary tracking-tight">
-                  {user.phone || "Not set"}
+                  {user.phone || t("pd_not_set")}
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full">
-                <Button 
-                  variant="outline" 
-                  className="flex-1 h-12 rounded-xl border-primary/20 hover:bg-primary/5" 
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 rounded-xl border-primary/20 hover:bg-primary/5"
                   onClick={() => setEditingPhone(true)}
                 >
-                  Edit Number
+                  {t("pd_edit_number")}
                 </Button>
                 {whatsappNumber && (
-                  <Button 
+                  <Button
                     className="flex-1 h-12 font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 rounded-xl transition-all active:scale-95"
                     onClick={() => window.open(`https://wa.me/${whatsappNumber}`, '_blank')}
                   >
@@ -335,25 +337,25 @@ export default function ProviderDashboard() {
                 <LinkIcon className="w-10 h-10 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">Website or Social Link</p>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-1">{t("pd_link_label")}</p>
                 <p className="text-xl font-bold text-secondary tracking-tight truncate max-w-[250px]">
-                  {user.url || "No link added"}
+                  {user.url || t("pd_no_link")}
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full">
-                <Button 
-                  variant="outline" 
-                  className="flex-1 h-12 rounded-xl border-primary/20 hover:bg-primary/5" 
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 rounded-xl border-primary/20 hover:bg-primary/5"
                   onClick={() => setEditingUrl(true)}
                 >
-                  Edit Link
+                  {t("pd_edit_link")}
                 </Button>
                 {user.url && (
-                  <Button 
+                  <Button
                     className="flex-1 h-12 font-bold bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-200 rounded-xl transition-all active:scale-95"
                     onClick={() => window.open(user.url!, '_blank')}
                   >
-                    <ExternalLink className="w-5 h-5 mr-2" /> Visit Link
+                    <ExternalLink className="w-5 h-5 mr-2" /> {t("pd_visit_link")}
                   </Button>
                 )}
               </div>
@@ -365,7 +367,7 @@ export default function ProviderDashboard() {
           <div className="mb-8">
             <NamePicker
               currentName={user.displayName}
-              onConfirm={(name) => nameMutation.mutate(name)}
+              onConfirm={(name: string) => nameMutation.mutate(name)}
               onCancel={() => setEditingName(false)}
               isPending={nameMutation.isPending}
             />
@@ -388,7 +390,7 @@ export default function ProviderDashboard() {
           <div className="mb-8">
             <CityPicker
               currentCity={user.city}
-              onConfirm={(city) => cityMutation.mutate(city)}
+              onConfirm={(city: string) => cityMutation.mutate(city)}
               onCancel={() => setChangingCity(false)}
               isPending={cityMutation.isPending}
             />
@@ -400,7 +402,7 @@ export default function ProviderDashboard() {
             <PricePicker
               currentMin={user.priceMin}
               currentMax={user.priceMax}
-              onConfirm={(min, max) => priceMutation.mutate({ min, max })}
+              onConfirm={(min: number, max: number) => priceMutation.mutate({ min, max })}
               onCancel={() => setEditingPrice(false)}
               isPending={priceMutation.isPending}
             />
@@ -411,7 +413,7 @@ export default function ProviderDashboard() {
           <div className="mb-8">
             <PhonePicker
               currentPhone={user.phone}
-              onConfirm={(phone) => phoneMutation.mutate(phone)}
+              onConfirm={(phone: string) => phoneMutation.mutate(phone)}
               onCancel={() => setEditingPhone(false)}
               isPending={phoneMutation.isPending}
             />
@@ -422,7 +424,7 @@ export default function ProviderDashboard() {
           <div className="mb-8">
             <UrlPicker
               currentUrl={user.url}
-              onConfirm={(url) => urlMutation.mutate(url)}
+              onConfirm={(url: string) => urlMutation.mutate(url)}
               onCancel={() => setEditingUrl(false)}
               isPending={urlMutation.isPending}
             />
@@ -432,39 +434,39 @@ export default function ProviderDashboard() {
         <Card className="mb-8 border-primary/20 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-primary" /> Business Description
+              <FileText className="w-5 h-5 text-primary" /> {t("pd_desc_title")}
             </CardTitle>
-            <CardDescription>Tell couples about your services, experience, and what makes you unique.</CardDescription>
+            <CardDescription>{t("pd_desc_subtitle")}</CardDescription>
           </CardHeader>
           <CardContent>
             {editingDescription ? (
               <div className="space-y-4">
-                <Textarea 
-                  defaultValue={user.description || ""} 
-                  placeholder="Write a detailed description of your business..."
+                <Textarea
+                  defaultValue={user.description || ""}
+                  placeholder={t("pd_desc_placeholder")}
                   className="min-h-[150px]"
                   id="business-description"
                 />
                 <div className="flex gap-3">
-                  <Button 
+                  <Button
                     onClick={() => {
                       const val = (document.getElementById('business-description') as HTMLTextAreaElement).value;
                       descriptionMutation.mutate(val);
                     }}
                     disabled={descriptionMutation.isPending}
                   >
-                    {descriptionMutation.isPending && <Loader2 className="animate-spin mr-2" />} Save Description
+                    {descriptionMutation.isPending && <Loader2 className="animate-spin mr-2" />} {t("pd_save_desc")}
                   </Button>
-                  <Button variant="outline" onClick={() => setEditingDescription(false)}>Cancel</Button>
+                  <Button variant="outline" onClick={() => setEditingDescription(false)}>{t("cancel")}</Button>
                 </div>
               </div>
             ) : (
               <div className="space-y-4">
                 <p className="text-muted-foreground whitespace-pre-wrap">
-                  {user.description || "No description added yet. Add one to help couples understand your services."}
+                  {user.description || t("pd_no_desc")}
                 </p>
                 <Button variant="outline" onClick={() => setEditingDescription(true)}>
-                  {user.description ? "Edit Description" : "Add Description"}
+                  {user.description ? t("pd_edit_desc") : t("pd_add_desc")}
                 </Button>
               </div>
             )}
@@ -481,6 +483,7 @@ function PhotoGallery({ userId }: { userId: string }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [previews, setPreviews] = useState<{ url: string; file: File }[]>([]);
+  const { t } = useTranslation();
 
   const { data: photos, isLoading } = useQuery({
     queryKey: ["provider-photos", userId],
@@ -498,18 +501,18 @@ function PhotoGallery({ userId }: { userId: string }) {
   const uploadMutation = useMutation({
     mutationFn: async () => {
       if (previews.length === 0) return;
-      
+
       const currentCount = photos?.length || 0;
       if (currentCount + previews.length > 5) {
         throw new Error("Maximum 5 photos allowed in portfolio");
       }
-      
+
       setIsUploading(true);
 
       for (const preview of previews) {
         const fileExt = preview.file.name.split('.').pop();
         const fileName = `${userId}/${Math.random()}.${fileExt}`;
-        
+
         const { error: uploadError } = await supabase.storage
           .from('portfolios')
           .upload(fileName, preview.file);
@@ -559,26 +562,26 @@ function PhotoGallery({ userId }: { userId: string }) {
     const files = Array.from(e.target.files || []);
     const currentCount = photos?.length || 0;
     const pendingCount = previews.length;
-    
+
     const totalPotential = currentCount + pendingCount + files.length;
-    
+
     if (totalPotential > 5) {
       const allowedCount = 5 - (currentCount + pendingCount);
       if (allowedCount <= 0) {
-        toast({ 
-          variant: "destructive", 
-          title: "Limit reached", 
-          description: "You already have 5 photos in your portfolio." 
+        toast({
+          variant: "destructive",
+          title: "Limit reached",
+          description: "You already have 5 photos in your portfolio."
         });
         return;
       }
-      
-      toast({ 
-        variant: "destructive", 
-        title: "Partial selection", 
-        description: `Only ${allowedCount} more photo(s) can be added to reach the limit of 5.` 
+
+      toast({
+        variant: "destructive",
+        title: "Partial selection",
+        description: `Only ${allowedCount} more photo(s) can be added to reach the limit of 5.`
       });
-      
+
       const allowedFiles = files.slice(0, allowedCount);
       const newPreviews = allowedFiles.map(file => ({
         url: URL.createObjectURL(file),
@@ -599,27 +602,27 @@ function PhotoGallery({ userId }: { userId: string }) {
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><ImageIcon className="w-5 h-5 text-primary" /> Portfolio Gallery</CardTitle>
-        <CardDescription>Upload photos of your work. Maximum 5 photos allowed.</CardDescription>
+        <CardTitle className="flex items-center gap-2"><ImageIcon className="w-5 h-5 text-primary" /> {t("pd_gallery_title")}</CardTitle>
+        <CardDescription>{t("pd_gallery_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
-        <input 
-          ref={fileInputRef} 
-          type="file" 
-          className="hidden" 
-          onChange={handleFileSelect} 
-          accept="image/*" 
-          multiple 
+        <input
+          ref={fileInputRef}
+          type="file"
+          className="hidden"
+          onChange={handleFileSelect}
+          accept="image/*"
+          multiple
           disabled={isAtLimit}
         />
-        
+
         {previews.length > 0 && (
           <div className="mb-8 p-6 border-2 border-dashed rounded-2xl bg-primary/5">
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 mb-6">
               {previews.map((p, idx) => (
                 <div key={idx} className="relative aspect-square rounded-xl overflow-hidden shadow-sm">
                   <img src={p.url} className="w-full h-full object-cover" />
-                  <button 
+                  <button
                     onClick={() => setPreviews(prev => prev.filter((_, i) => i !== idx))}
                     className="absolute top-1 right-1 bg-destructive text-white p-1 rounded-full hover:scale-110 transition-transform"
                   >
@@ -630,16 +633,16 @@ function PhotoGallery({ userId }: { userId: string }) {
             </div>
             <div className="flex gap-3">
               <Button onClick={() => uploadMutation.mutate()} disabled={isUploading} className="bg-primary hover:bg-primary/90">
-                {isUploading ? <Loader2 className="animate-spin mr-2" /> : <Upload className="mr-2 w-4 h-4" />} 
-                Upload {previews.length} Photo(s)
+                {isUploading ? <Loader2 className="animate-spin mr-2" /> : <Upload className="mr-2 w-4 h-4" />}
+                {t("pd_upload_photos", { count: previews.length })}
               </Button>
-              <Button variant="outline" onClick={() => setPreviews([])}>Clear All</Button>
+              <Button variant="outline" onClick={() => setPreviews([])}>{t("pd_clear_all")}</Button>
             </div>
           </div>
         )}
 
-        <button 
-          onClick={() => fileInputRef.current?.click()} 
+        <button
+          onClick={() => fileInputRef.current?.click()}
           disabled={isAtLimit}
           className="w-full mb-8 p-12 border-2 border-dashed rounded-2xl hover:bg-primary/5 hover:border-primary/30 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -647,10 +650,10 @@ function PhotoGallery({ userId }: { userId: string }) {
             <ImagePlus className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
           <p className="text-lg font-bold text-secondary">
-            {isAtLimit ? "Portfolio Limit Reached" : "Add Portfolio Photos"}
+            {isAtLimit ? t("pd_limit_reached") : t("pd_add_photos")}
           </p>
           <p className="text-sm text-muted-foreground">
-            {isAtLimit ? "You have reached the maximum of 5 photos." : "Click to select one or many pictures (Max 5 total)"}
+            {isAtLimit ? t("pd_limit_desc") : t("pd_select_hint")}
           </p>
         </button>
 
@@ -658,7 +661,7 @@ function PhotoGallery({ userId }: { userId: string }) {
           <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>
         ) : photos?.length === 0 ? (
           <div className="text-center py-12 border rounded-2xl bg-slate-50/50">
-            <p className="text-muted-foreground">Your gallery is empty. Upload your first photos above!</p>
+            <p className="text-muted-foreground">{t("pd_gallery_empty")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -666,13 +669,13 @@ function PhotoGallery({ userId }: { userId: string }) {
               <div key={photo.id} className="group relative rounded-2xl overflow-hidden border shadow-sm aspect-square">
                 <img src={photo.image_url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Button 
-                    variant="destructive" 
-                    size="sm" 
+                  <Button
+                    variant="destructive"
+                    size="sm"
                     className="gap-2"
-                    onClick={() => { if(confirm("Delete this photo?")) deleteMutation.mutate(photo); }}
+                    onClick={() => { if (confirm(t("pd_delete_confirm"))) deleteMutation.mutate(photo); }}
                   >
-                    <Trash2 className="w-4 h-4" /> Delete
+                    <Trash2 className="w-4 h-4" /> {t("pd_delete_photo")}
                   </Button>
                 </div>
               </div>
@@ -686,25 +689,26 @@ function PhotoGallery({ userId }: { userId: string }) {
 
 function NamePicker({ currentName, onConfirm, onCancel, isPending }: any) {
   const [name, setName] = useState(currentName || "");
+  const { t } = useTranslation();
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle>Update Business Name</CardTitle>
-        <CardDescription>This is the name couples will see on your profile.</CardDescription>
+        <CardTitle>{t("pd_name_title")}</CardTitle>
+        <CardDescription>{t("pd_name_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="max-w-xs space-y-6">
-          <Input 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
-            placeholder="Enter your business name"
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t("pd_name_placeholder")}
             className="h-12 rounded-xl"
           />
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(name)} disabled={!name || isPending} className="bg-secondary hover:bg-secondary/90">
-              {isPending && <Loader2 className="animate-spin mr-2" />} Save Name
+              {isPending && <Loader2 className="animate-spin mr-2" />} {t("pd_save_name")}
             </Button>
-            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+            <Button variant="outline" onClick={onCancel}>{t("cancel")}</Button>
           </div>
         </div>
       </CardContent>
@@ -713,11 +717,12 @@ function NamePicker({ currentName, onConfirm, onCancel, isPending }: any) {
 }
 
 function ServiceCategoryPicker({ pendingSelection, onSelect, onConfirm, onCancel, isPending }: any) {
+  const { t } = useTranslation();
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle>What service do you provide?</CardTitle>
-        <CardDescription>This helps us show your profile to the right couples.</CardDescription>
+        <CardTitle>{t("pd_service_title")}</CardTitle>
+        <CardDescription>{t("pd_service_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -725,11 +730,10 @@ function ServiceCategoryPicker({ pendingSelection, onSelect, onConfirm, onCancel
             <button
               key={cat.id}
               onClick={() => onSelect(cat.id)}
-              className={`p-6 rounded-2xl border-2 text-left transition-all duration-200 ${
-                pendingSelection === cat.id 
-                  ? `ring-2 ${cat.selected} ${cat.border}` 
-                  : "border-border hover:border-primary/30 hover:bg-slate-50"
-              }`}
+              className={`p-6 rounded-2xl border-2 text-left transition-all duration-200 ${pendingSelection === cat.id
+                ? `ring-2 ${cat.selected} ${cat.border}`
+                : "border-border hover:border-primary/30 hover:bg-slate-50"
+                }`}
             >
               <div className={`w-12 h-12 rounded-xl ${cat.bg} flex items-center justify-center mb-4 shadow-sm`}>
                 <cat.icon className="w-6 h-6" />
@@ -740,14 +744,14 @@ function ServiceCategoryPicker({ pendingSelection, onSelect, onConfirm, onCancel
           ))}
         </div>
         <div className="flex gap-3">
-          <Button 
-            onClick={onConfirm} 
+          <Button
+            onClick={onConfirm}
             disabled={!pendingSelection || isPending}
             className="bg-secondary hover:bg-secondary/90 px-8"
           >
-            {isPending && <Loader2 className="animate-spin mr-2" />} Confirm Selection
+            {isPending && <Loader2 className="animate-spin mr-2" />} {t("pd_confirm_selection")}
           </Button>
-          {onCancel && <Button variant="outline" onClick={onCancel}>Cancel</Button>}
+          {onCancel && <Button variant="outline" onClick={onCancel}>{t("cancel")}</Button>}
         </div>
       </CardContent>
     </Card>
@@ -756,25 +760,26 @@ function ServiceCategoryPicker({ pendingSelection, onSelect, onConfirm, onCancel
 
 function CityPicker({ currentCity, onConfirm, onCancel, isPending }: any) {
   const [city, setCity] = useState(currentCity || "");
+  const { t } = useTranslation();
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle>Where are you located?</CardTitle>
-        <CardDescription>Couples often search for vendors in specific cities.</CardDescription>
+        <CardTitle>{t("pd_city_title")}</CardTitle>
+        <CardDescription>{t("pd_city_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="max-w-xs space-y-6">
           <Select value={city} onValueChange={setCity}>
-            <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Choose a city..." /></SelectTrigger>
+            <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder={t("choose_city")} /></SelectTrigger>
             <SelectContent className="rounded-xl">
               {MOROCCO_CITIES.map(c => <SelectItem key={c} value={c} className="rounded-lg">{c}</SelectItem>)}
             </SelectContent>
           </Select>
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(city)} disabled={!city || isPending} className="bg-secondary hover:bg-secondary/90">
-              {isPending && <Loader2 className="animate-spin mr-2" />} Save City
+              {isPending && <Loader2 className="animate-spin mr-2" />} {t("pd_save_city")}
             </Button>
-            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+            <Button variant="outline" onClick={onCancel}>{t("cancel")}</Button>
           </div>
         </div>
       </CardContent>
@@ -785,39 +790,40 @@ function CityPicker({ currentCity, onConfirm, onCancel, isPending }: any) {
 function PricePicker({ currentMin, currentMax, onConfirm, onCancel, isPending }: any) {
   const [min, setMin] = useState(currentMin || 0);
   const [max, setMax] = useState(currentMax || 0);
+  const { t } = useTranslation();
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle>Set your pricing range</CardTitle>
-        <CardDescription>Provide an estimated price range for your services in MAD.</CardDescription>
+        <CardTitle>{t("pd_price_title")}</CardTitle>
+        <CardDescription>{t("pd_price_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="max-w-md space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Minimum Price (MAD)</label>
-              <Input 
-                type="number" 
-                value={min} 
-                onChange={(e) => setMin(Number(e.target.value))} 
+              <label className="text-sm font-medium">{t("pd_min_price")}</label>
+              <Input
+                type="number"
+                value={min}
+                onChange={(e) => setMin(Number(e.target.value))}
                 placeholder="e.g. 5000"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Maximum Price (MAD)</label>
-              <Input 
-                type="number" 
-                value={max} 
-                onChange={(e) => setMax(Number(e.target.value))} 
+              <label className="text-sm font-medium">{t("pd_max_price")}</label>
+              <Input
+                type="number"
+                value={max}
+                onChange={(e) => setMax(Number(e.target.value))}
                 placeholder="e.g. 15000"
               />
             </div>
           </div>
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(min, max)} disabled={isPending} className="bg-secondary hover:bg-secondary/90">
-              {isPending && <Loader2 className="animate-spin mr-2" />} Save Pricing
+              {isPending && <Loader2 className="animate-spin mr-2" />} {t("pd_save_pricing")}
             </Button>
-            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+            <Button variant="outline" onClick={onCancel}>{t("cancel")}</Button>
           </div>
         </div>
       </CardContent>
@@ -827,25 +833,26 @@ function PricePicker({ currentMin, currentMax, onConfirm, onCancel, isPending }:
 
 function PhonePicker({ currentPhone, onConfirm, onCancel, isPending }: any) {
   const [phone, setPhone] = useState(currentPhone || "");
+  const { t } = useTranslation();
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle>Update your phone number</CardTitle>
-        <CardDescription>This will be visible to couples who want to contact you.</CardDescription>
+        <CardTitle>{t("pd_phone_title")}</CardTitle>
+        <CardDescription>{t("pd_phone_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="max-w-xs space-y-6">
-          <Input 
-            value={phone} 
-            onChange={(e) => setPhone(e.target.value)} 
+          <Input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             placeholder="+212 6XX XXX XXX"
             className="h-12 rounded-xl"
           />
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(phone)} disabled={!phone || isPending} className="bg-secondary hover:bg-secondary/90">
-              {isPending && <Loader2 className="animate-spin mr-2" />} Save Phone
+              {isPending && <Loader2 className="animate-spin mr-2" />} {t("pd_save_phone")}
             </Button>
-            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+            <Button variant="outline" onClick={onCancel}>{t("cancel")}</Button>
           </div>
         </div>
       </CardContent>
@@ -855,25 +862,26 @@ function PhonePicker({ currentPhone, onConfirm, onCancel, isPending }: any) {
 
 function UrlPicker({ currentUrl, onConfirm, onCancel, isPending }: any) {
   const [url, setUrl] = useState(currentUrl || "");
+  const { t } = useTranslation();
   return (
     <Card className="border-primary/10 shadow-sm">
       <CardHeader>
-        <CardTitle>Update your website or social link</CardTitle>
-        <CardDescription>Provide a link to your portfolio, Instagram, or website.</CardDescription>
+        <CardTitle>{t("pd_url_title")}</CardTitle>
+        <CardDescription>{t("pd_url_subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="max-w-xs space-y-6">
-          <Input 
-            value={url} 
-            onChange={(e) => setUrl(e.target.value)} 
+          <Input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
             placeholder="https://instagram.com/yourprofile"
             className="h-12 rounded-xl"
           />
           <div className="flex gap-3">
             <Button onClick={() => onConfirm(url)} disabled={!url || isPending} className="bg-secondary hover:bg-secondary/90">
-              {isPending && <Loader2 className="animate-spin mr-2" />} Save Link
+              {isPending && <Loader2 className="animate-spin mr-2" />} {t("pd_save_link")}
             </Button>
-            <Button variant="outline" onClick={onCancel}>Cancel</Button>
+            <Button variant="outline" onClick={onCancel}>{t("cancel")}</Button>
           </div>
         </div>
       </CardContent>
