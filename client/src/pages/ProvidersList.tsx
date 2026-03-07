@@ -20,12 +20,12 @@ export default function ProvidersList() {
   const { t } = useTranslation();
   const [city, setCity] = useState<string>("all");
   const [category, setCategory] = useState<string>("all");
-  const [search, setSearch] = useState<string>("all");
+  const [search, setSearch] = useState<string>("");
 
   const { data: providers, isLoading } = useProviders({
     city: city === "all" ? undefined : city,
-    category: category === "all" ? undefined : category,
-    search: search === "all" ? undefined : search
+    categories: category === "all" ? undefined : [category],
+    search: search === "" ? undefined : search
   });
 
   return (
@@ -43,10 +43,10 @@ export default function ProvidersList() {
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name or keyword..."
+                placeholder="Search by name..."
                 className="pl-9 bg-white"
-                value={search === "all" ? "" : search}
-                onChange={(e) => setSearch(e.target.value || "all")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             

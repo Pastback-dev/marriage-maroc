@@ -14,7 +14,7 @@ export type ProviderProfile = {
   url: string | null;
 };
 
-export function useProviders(filters?: { categories?: string[]; city?: string }) {
+export function useProviders(filters?: { categories?: string[]; city?: string; search?: string }) {
   return useQuery<ProviderProfile[]>({
     queryKey: ["providers", filters],
     queryFn: async () => {
@@ -26,6 +26,10 @@ export function useProviders(filters?: { categories?: string[]; city?: string })
       
       if (filters?.city && filters.city !== "") {
         query = query.ilike('city', `%${filters.city}%`);
+      }
+
+      if (filters?.search && filters.search !== "") {
+        query = query.or(`display_name.ilike.%${filters.search}%,username.ilike.%${filters.search}%`);
       }
 
       const { data, error } = await query;
