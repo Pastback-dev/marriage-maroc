@@ -29,13 +29,13 @@ const MOROCCO_CITIES = [
 ];
 
 const SERVICE_CATEGORIES = [
-  { id: "traiteur", name: "Catering", desc: "Exquisite Moroccan cuisine.", icon: Utensils, color: "from-orange-400 to-orange-600", bg: "bg-orange-50", border: "border-orange-300", selected: "ring-orange-500 bg-orange-50" },
-  { id: "hall", name: "Wedding Venues", desc: "Magnificent reception halls.", icon: HomeIcon, color: "from-blue-400 to-blue-600", bg: "bg-blue-50", border: "border-blue-300", selected: "ring-blue-500 bg-blue-50" },
-  { id: "dj", name: "DJ & Live Orchestra", desc: "Premium DJ sets.", icon: Music, color: "from-purple-400 to-purple-600", bg: "bg-purple-50", border: "border-purple-300", selected: "ring-purple-500 bg-purple-50" },
-  { id: "cameraman", name: "Photography", desc: "Cinematic storytelling.", icon: Camera, color: "from-rose-400 to-rose-600", bg: "bg-rose-50", border: "border-rose-300", selected: "ring-rose-500 bg-rose-50" },
-  { id: "neggafa", name: "Bridal Makeup", desc: "The art of bridal beauty.", icon: UserRound, color: "from-amber-400 to-amber-600", bg: "bg-amber-50", border: "border-amber-300", selected: "ring-amber-500 bg-amber-50" },
-  { id: "decoration", name: "Decor", desc: "Magical Moroccan paradise.", icon: Paintbrush, color: "from-emerald-400 to-emerald-600", bg: "bg-emerald-50", border: "border-emerald-300", selected: "ring-emerald-500 bg-emerald-50" },
-  { id: "other", name: "Other", desc: "Other wedding services.", icon: Sparkles, color: "from-slate-400 to-slate-600", bg: "bg-slate-50", border: "border-slate-300", selected: "ring-slate-500 bg-slate-50" },
+  { id: "traiteur", icon: Utensils, color: "from-orange-400 to-orange-600", bg: "bg-orange-50", border: "border-orange-300", selected: "ring-orange-500 bg-orange-50" },
+  { id: "hall", icon: HomeIcon, color: "from-blue-400 to-blue-600", bg: "bg-blue-50", border: "border-blue-300", selected: "ring-blue-500 bg-blue-50" },
+  { id: "dj", icon: Music, color: "from-purple-400 to-purple-600", bg: "bg-purple-50", border: "border-purple-300", selected: "ring-purple-500 bg-purple-50" },
+  { id: "cameraman", icon: Camera, color: "from-rose-400 to-rose-600", bg: "bg-rose-50", border: "border-rose-300", selected: "ring-rose-500 bg-rose-50" },
+  { id: "neggafa", icon: UserRound, color: "from-amber-400 to-amber-600", bg: "bg-amber-50", border: "border-amber-300", selected: "ring-amber-500 bg-amber-50" },
+  { id: "decoration", icon: Paintbrush, color: "from-emerald-400 to-emerald-600", bg: "bg-emerald-50", border: "border-emerald-300", selected: "ring-emerald-500 bg-emerald-50" },
+  { id: "other", icon: Sparkles, color: "from-slate-400 to-slate-600", bg: "bg-slate-50", border: "border-slate-300", selected: "ring-slate-500 bg-slate-50" },
 ];
 
 export default function ProviderDashboard() {
@@ -256,7 +256,7 @@ export default function ProviderDashboard() {
               </div>
               <div className="flex-1">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("pd_service")}</p>
-                <p className="text-xl font-bold text-secondary">{currentCatInfo?.name || t("pd_not_set")}</p>
+                <p className="text-xl font-bold text-secondary">{currentCatInfo ? t(`category_${currentCatInfo.id}`) : t("pd_not_set")}</p>
               </div>
               <Button variant="outline" size="sm" onClick={() => setSelectedCategory(currentCategory || "")}>
                 {t("pd_edit")}
@@ -738,8 +738,8 @@ function ServiceCategoryPicker({ pendingSelection, onSelect, onConfirm, onCancel
               <div className={`w-12 h-12 rounded-xl ${cat.bg} flex items-center justify-center mb-4 shadow-sm`}>
                 <cat.icon className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-secondary text-lg">{cat.name}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{cat.desc}</p>
+              <h3 className="font-bold text-secondary text-lg">{t(`category_${cat.id}`)}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{t(`cat_desc_${cat.id}`)}</p>
             </button>
           ))}
         </div>
