@@ -31,7 +31,7 @@ export function Footer() {
           {/* Social Icons */}
           <div className="flex justify-center md:justify-end gap-5">
             <a 
-              href="https://instagram.com" 
+              href="https://www.instagram.com/supportarsi01?igsh=MTg0Mjl1M3E0eTZwaw==" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:bg-primary hover:text-white transition-all duration-300"
@@ -40,7 +40,7 @@ export function Footer() {
               <SiInstagram className="w-5 h-5" />
             </a>
             <a 
-              href="https://tiktok.com" 
+              href="https://www.tiktok.com/@arsisupport?_r=1&_t=ZS-94V2FvuZbxX" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:bg-primary hover:text-white transition-all duration-300"
@@ -49,7 +49,7 @@ export function Footer() {
               <SiTiktok className="w-5 h-5" />
             </a>
             <a 
-              href="https://facebook.com" 
+              href="https://www.facebook.com/share/17vm7KTxDL/" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:bg-primary hover:text-white transition-all duration-300"
