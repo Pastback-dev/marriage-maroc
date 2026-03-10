@@ -34,6 +34,10 @@ const resources = {
       "city_fes": "Fes",
       "city_tangier": "Tangier",
       "city_agadir": "Agadir",
+      "city_meknes": "Meknes",
+      "city_oujda": "Oujda",
+      "city_kenitra": "Kenitra",
+      "city_tetouan": "Tetouan",
       "sign_in": "Sign In",
       "get_started": "Get Started",
       "why_choose": "The Arsi Difference",
@@ -255,7 +259,18 @@ const resources = {
       "pd_save_phone": "Save Phone",
       "pd_url_title": "Update your website or social link",
       "pd_url_subtitle": "Provide a link to your portfolio, Instagram, or website.",
-      "pd_save_link": "Save Link"
+      "pd_save_link": "Save Link",
+      "pp_not_found": "Provider not found",
+      "pp_back": "Back to all vendors",
+      "pp_subtitle": "Professional Wedding Service Provider",
+      "pp_gallery_title": "Portfolio Gallery",
+      "pp_gallery_desc": "A showcase of recent work and celebrations.",
+      "pp_location": "Location",
+      "pp_contact_price": "Contact for price",
+      "pp_desc_subtitle": "Learn more about the services and experience offered.",
+      "pp_no_desc": "No description provided yet. This professional is dedicated to making your Moroccan wedding dreams come true with exceptional service and attention to detail.",
+      "pp_contact_title": "Contact & Booking",
+      "pp_contact_hint": "Direct contact with the professional"
     }
   },
   fr: {
@@ -289,6 +304,10 @@ const resources = {
       "city_fes": "Fès",
       "city_tangier": "Tanger",
       "city_agadir": "Agadir",
+      "city_meknes": "Meknès",
+      "city_oujda": "Oujda",
+      "city_kenitra": "Kénitra",
+      "city_tetouan": "Tétouan",
       "sign_in": "Connexion",
       "get_started": "Commencer",
       "why_choose": "La Différence Arsi",
@@ -510,7 +529,18 @@ const resources = {
       "pd_save_phone": "Enregistrer le Téléphone",
       "pd_url_title": "Mettre à Jour votre Site ou Réseau Social",
       "pd_url_subtitle": "Fournissez un lien vers votre portfolio, Instagram ou site web.",
-      "pd_save_link": "Enregistrer le Lien"
+      "pd_save_link": "Enregistrer le Lien",
+      "pp_not_found": "Prestataire introuvable",
+      "pp_back": "Retour à tous les prestataires",
+      "pp_subtitle": "Prestataire Professionnel de Services de Mariage",
+      "pp_gallery_title": "Galerie Portfolio",
+      "pp_gallery_desc": "Une vitrine de travaux et célébrations récents.",
+      "pp_location": "Emplacement",
+      "pp_contact_price": "Contacter pour le prix",
+      "pp_desc_subtitle": "En savoir plus sur les services et l'expérience offerts.",
+      "pp_no_desc": "Aucune description fournie pour le moment. Ce professionnel est dédié à réaliser vos rêves de mariage marocain avec un service exceptionnel et une grande attention aux détails.",
+      "pp_contact_title": "Contact & Réservation",
+      "pp_contact_hint": "Contact direct avec le professionnel"
     }
   },
   ar: {
@@ -544,6 +574,10 @@ const resources = {
       "city_fes": "فاس",
       "city_tangier": "طنجة",
       "city_agadir": "أكادير",
+      "city_meknes": "مكناس",
+      "city_oujda": "وجدة",
+      "city_kenitra": "القنيطرة",
+      "city_tetouan": "تطوان",
       "sign_in": "تسجيل الدخول",
       "get_started": "ابدأ الآن",
       "why_choose": "موقع عرسي",
@@ -765,7 +799,18 @@ const resources = {
       "pd_save_phone": "حفظ الهاتف",
       "pd_url_title": "تحديث موقعك أو حسابك الاجتماعي",
       "pd_url_subtitle": "أدخل رابطاً لمعرضك أو إنستغرام أو موقعك.",
-      "pd_save_link": "حفظ الرابط"
+      "pd_save_link": "حفظ الرابط",
+      "pp_not_found": "المزود غير موجود",
+      "pp_back": "العودة إلى جميع المزودين",
+      "pp_subtitle": "مزود خدمات زفاف محترف",
+      "pp_gallery_title": "معرض الأعمال",
+      "pp_gallery_desc": "عرض لأحدث الأعمال والاحتفالات.",
+      "pp_location": "الموقع",
+      "pp_contact_price": "تواصل لمعرفة السعر",
+      "pp_desc_subtitle": "تعرف أكثر على الخدمات والخبرات المقدمة.",
+      "pp_no_desc": "لم يتم تقديم وصف بعد. يكرس هذا المحترف جهوده لتحقيق أحلام زفافك المغربي بخدمة استثنائية واهتمام بالتفاصيل.",
+      "pp_contact_title": "التواصل والحجز",
+      "pp_contact_hint": "تواصل مباشر مع المحترف"
     }
   }
 };

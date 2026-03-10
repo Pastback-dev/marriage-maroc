@@ -37,6 +37,10 @@ export default function Home() {
     { id: "Fes", name: t("city_fes") },
     { id: "Tangier", name: t("city_tangier") },
     { id: "Agadir", name: t("city_agadir") },
+    { id: "Meknes", name: t("city_meknes") },
+    { id: "Oujda", name: t("city_oujda") },
+    { id: "Kenitra", name: t("city_kenitra") },
+    { id: "Tetouan", name: t("city_tetouan") },
   ];
 
   const categories = [

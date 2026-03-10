@@ -8,12 +8,7 @@ import { Loader2, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 const MOROCCAN_CITIES = [
-  "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda", "Kenitra", "Tetouan",
-  "Safi", "Mohammedia", "Khouribga", "El Jadida", "Beni Mellal", "Nador", "Taza", "Settat", "Berrechid",
-  "Khemisset", "Guelmim", "Ksar El Kebir", "Larache", "Berkane", "Khenifra", "Taourirt", "Bouskoura",
-  "Fquih Ben Salah", "Dakhla", "Sidi Slimane", "Errachidia", "Guercif", "Oulad Teima", "Ben Guerir",
-  "Tifelt", "Lqliaa", "Taroudant", "Sefrou", "Essaouira", "Fnideq", "Sidi Kacem", "Tiznit", "Tan-Tan",
-  "Ouarzazate", "Youssoufia", "Martil"
+  "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda", "Kenitra", "Tetouan"
 ].sort();
 
 export default function ProvidersList() {

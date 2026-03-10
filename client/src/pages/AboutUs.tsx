@@ -113,7 +113,7 @@ export default function AboutUs() {
               {t("about_coverage_desc")}
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              {["Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir"].map((city) => (
+              {["Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda", "Kenitra", "Tetouan"].map((city) => (
                 <span key={city} className="px-5 py-2 bg-primary/5 text-primary font-semibold rounded-full text-sm border border-primary/10" data-testid={`badge-city-${city.toLowerCase()}`}>
                   {t(`city_${city.toLowerCase()}`)}
                 </span>

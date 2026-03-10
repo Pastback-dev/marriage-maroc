@@ -36,8 +36,12 @@ export default function Plan() {
     { id: "Fes", name: t("city_fes") },
     { id: "Tangier", name: t("city_tangier") },
     { id: "Agadir", name: t("city_agadir") },
+    { id: "Meknes", name: t("city_meknes") },
+    { id: "Oujda", name: t("city_oujda") },
+    { id: "Kenitra", name: t("city_kenitra") },
+    { id: "Tetouan", name: t("city_tetouan") },
   ];
-  
+
   const form = useForm<PlanFormValues>({
     resolver: zodResolver(planSchema),
     defaultValues: {
@@ -65,7 +69,7 @@ export default function Plan() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <Navigation />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {!currentPlan ? (
           <div className="max-w-2xl mx-auto">
@@ -118,7 +122,7 @@ export default function Plan() {
                         )}
                       />
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-5">
                       <FormField
                         control={form.control}
@@ -199,7 +203,7 @@ export default function Plan() {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card className="rounded-2xl">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="p-3 bg-primary/10 text-primary rounded-xl">
@@ -223,7 +227,7 @@ export default function Plan() {
                   </div>
                 </CardContent>
               </Card>
-              
+
               <Card className="rounded-2xl">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="p-3 bg-primary/10 text-primary rounded-xl">
@@ -249,15 +253,15 @@ export default function Plan() {
                 {currentPlan.breakdown.cameraman && <ProviderCard provider={currentPlan.breakdown.cameraman} />}
               </div>
             </div>
-            
+
             <div className="flex justify-center mt-12">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 className="text-muted-foreground hover:text-destructive hover:border-destructive rounded-xl"
                 onClick={() => {
-                  if(confirm(t("reset_confirm"))) {
-                    window.location.reload(); 
+                  if (confirm(t("reset_confirm"))) {
+                    window.location.reload();
                   }
                 }}
                 data-testid="button-reset-plan"
