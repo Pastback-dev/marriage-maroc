@@ -62,7 +62,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-white/5 text-center">
           <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">
-            Developed by m3akcoder.com @ 2026 Arsi
+             @ 2026 Arsi
           </p>
         </div>
       </div>
