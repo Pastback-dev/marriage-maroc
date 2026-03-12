@@ -7,10 +7,20 @@ export function useGuests() {
   return useQuery<Guest[]>({
     queryKey: ["guests"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('guests')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+
+      let query = supabase.from('guests').select('*');
+
+      if (userId) {
+        // Show guests that are validated OR belong to the current user
+        query = query.or(`validated.eq.true,user_id.eq.${userId}`);
+      } else {
+        // If not logged in, only show validated guests
+        query = query.eq('validated', true);
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
       
       if (error) throw error;
       

@@ -15,7 +15,7 @@ import { UserPlus, Calculator, Users as UsersIcon, Edit2, X, MapPin, Calendar, C
 import { useUser } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { GuestTable } from "@/components/GuestTable";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 const MOROCCAN_CITIES = [
@@ -107,8 +107,13 @@ export default function Guests() {
     form.reset();
   };
 
-  const totalExpectedGift = guests?.reduce((sum, g) => sum + ((g.pricePerGuest || 0) * (g.numberOfGuests || 1)), 0) || 0;
-  const totalPeople = guests?.reduce((sum, g) => sum + (g.numberOfGuests || 1), 0) || 0;
+  // Only calculate stats for the current user's guests
+  const myGuests = useMemo(() => {
+    return guests?.filter(g => g.userId === user?.id) || [];
+  }, [guests, user?.id]);
+
+  const totalExpectedGift = myGuests.reduce((sum, g) => sum + ((g.pricePerGuest || 0) * (g.numberOfGuests || 1)), 0);
+  const totalPeople = myGuests.reduce((sum, g) => sum + (g.numberOfGuests || 1), 0);
 
   return (
     <div className="min-h-screen bg-background">
